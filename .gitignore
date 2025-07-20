@@ -1,3 +1,40 @@
+# ---- Global ----
+.env
+*.log
+__pycache__/
+.DS_Store
+*.sqlite3
+
+# ---- Python / Django ----
+backend/venv/
+backend/*.pyc
+backend/db.sqlite3
+backend/staticfiles/
+backend/media/
+
+# Django cache and migration files
+**/__pycache__/
+**/migrations/
+*.py[cod]
+*.egg-info/
+
+# ---- Node / Next.js ----
+frontend/node_modules/
+frontend/.next/
+frontend/.env.local
+frontend/.env.*.local
+frontend/out/
+
+# Build output
+frontend/build/
+frontend/.turbo/
+
+# ---- OS / Editor Specific ----
+.vscode/
+.idea/
+*.swp
+
+
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
 # dependencies
