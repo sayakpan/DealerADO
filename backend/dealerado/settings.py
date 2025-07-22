@@ -136,7 +136,8 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # CSRF and session settings for production
 CSRF_TRUSTED_ORIGINS = [
-    'https://api.electrodegames.site'
+    "https://api.electrodegames.site",
+    "https://electrodegames.site"
 ]
 
 SESSION_COOKIE_SECURE = True
