@@ -1,22 +1,23 @@
-# Stage 1: Builder
-FROM node:20-alpine AS builder
+# Use Node.js 22 base image
+FROM node:22.12.0
 
+# Set the working directory inside the container
 WORKDIR /app
 
+# Copy package.json and package-lock.json (or yarn.lock) first to leverage caching
 COPY package*.json ./
+
+# Install dependencies
 RUN npm install
 
+# Copy the rest of the application code to the container
 COPY . .
+
+# Build the Next.js project
 RUN npm run build
 
-# Stage 2: Production
-FROM node:20-alpine
-
-WORKDIR /app
-
-COPY --from=builder /app ./
-COPY --from=builder /app/node_modules ./node_modules
-
+# Expose the port that the Next.js app runs on (default 3000)
 EXPOSE 3000
 
-CMD ["npm", "start"]
+# Start the Next.js application
+CMD ["npm", "run", "start"]
