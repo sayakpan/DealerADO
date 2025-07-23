@@ -3,12 +3,11 @@
 *.log
 __pycache__/
 .DS_Store
-*.sqlite3
 
 # ---- Python / Django ----
 backend/venv/
 backend/*.pyc
-backend/db.sqlite3
+# backend/db.sqlite3
 backend/staticfiles/
 backend/media/
 
