@@ -20,14 +20,14 @@ export default function LoginContent() {
             </div>
 
             {/* Sign In Form - positioned with exact specifications */}
-            <div 
+            <div
                 className="absolute z-20"
                 style={{
                     top: '104px',
                     left: '835px'
                 }}
             >
-                <div 
+                <div
                     className="bg-[#151C22]"
                     style={{
                         width: '470px',
@@ -38,7 +38,7 @@ export default function LoginContent() {
                         opacity: '1'
                     }}
                 >
-                    <form 
+                    <form
                         className="flex flex-col"
                         style={{
                             gap: '40px'
@@ -106,7 +106,7 @@ export default function LoginContent() {
                         transformOrigin: 'left'
                     }}
                 ></div>
-                
+
                 {/* Second white stripe */}
                 <div
                     className="absolute bg-white"
@@ -119,7 +119,7 @@ export default function LoginContent() {
                         transformOrigin: 'left'
                     }}
                 ></div>
-                
+
                 {/* Dark stripe */}
                 <div
                     className="absolute"
@@ -147,7 +147,7 @@ export default function LoginContent() {
                         objectFit: 'contain'
                     }}
                 />
-                
+
                 {/* Small black ellipse shadow */}
                 <div
                     className="absolute"
