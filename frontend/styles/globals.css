@@ -1,0 +1,34 @@
+/* Global color variables */
+:root {
+  --dealer-red: #c53030;
+  --dealer-red-dark: #b91c1c;
+  --dealer-dark: #2d3748;
+  --dealer-dark-light: #4a5568;
+  --dealer-gray: #718096;
+  --dealer-light-gray: #e2e8f0;
+}
+
+/* Custom utility classes */
+.bg-dealer-red {
+  background-color: var(--dealer-red);
+}
+
+.bg-dealer-red-dark {
+  background-color: var(--dealer-red-dark);
+}
+
+.bg-dealer-dark {
+  background-color: var(--dealer-dark);
+}
+
+.text-dealer-red {
+  color: var(--dealer-red);
+}
+
+.border-dealer-red {
+  border-color: var(--dealer-red);
+}
+
+.hover\:bg-dealer-red-dark:hover {
+  background-color: var(--dealer-red-dark);
+}
