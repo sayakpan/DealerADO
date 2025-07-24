@@ -22,22 +22,22 @@ export default function LoginPage() {
     };
 
     return (
-        <div className="min-h-screen bg-red-700 relative overflow-hidden">
+        <div className="min-h-screen bg-red-700 relative overflow-hidden overflow-x-hidden">
             {/* Desktop Layout (1024px+) */}
             <div className="hidden lg:block">
-                <div className="w-full max-w-[1440px] h-screen relative mx-auto bg-red-700 overflow-hidden">
+                <div className="w-full h-screen relative mx-auto bg-red-700 overflow-hidden px-2 sm:px-4 md:px-8 lg:px-12 xl:px-20 2xl:px-32">
                     {/* Decorative ellipses */}
                     <div className="w-60 h-60 absolute -left-[105px] -top-[50px] opacity-20 rounded-full border-[35px] border-white" />
                     <div className="w-96 h-96 absolute -left-[167px] -top-[114px] opacity-20 rounded-full border-[35px] border-white" />
                     
                     {/* Decorative stripes */}
-                    <div className="w-[1551px] h-9 absolute -left-[46px] top-[481px] origin-top-left rotate-[-5.42deg] bg-white" />
-                    <div className="w-[1536px] h-3.5 absolute -left-[46px] top-[537px] origin-top-left rotate-[-5.42deg] bg-white" />
-                    <div className="w-[1536px] h-3.5 absolute -left-[46px] top-[560px] origin-top-left rotate-[-5.42deg] bg-slate-700" />
+                    <div className="w-[calc(100%+200px)] h-9 absolute -left-[46px] top-[481px] origin-top-left rotate-[-5.42deg] bg-white" />
+                    <div className="w-[calc(100%+200px)] h-3.5 absolute -left-[46px] top-[537px] origin-top-left rotate-[-5.42deg] bg-white" />
+                    <div className="w-[calc(100%+200px)] h-3.5 absolute -left-[46px] top-[560px] origin-top-left rotate-[-5.42deg] bg-slate-700" />
                     
                     {/* Car */}
                     <Image 
-                        className="w-[579px] h-[579px] absolute left-[377px] top-[159px]" 
+                        className="w-full max-w-[579px] h-auto absolute left-[377px] top-[159px]" 
                         src="/images/signin/white-car.png" 
                         alt="White sedan car"
                         width={579}
@@ -74,16 +74,16 @@ export default function LoginPage() {
                     
                     {/* Welcome text */}
                     <div className="w-[470px] absolute left-[135px] top-[134px]">
-                        <h1 className="text-7xl font-bold text-white mb-4 leading-tight">
+                        <h1 className="text-4xl md:text-5xl lg:text-7xl font-bold text-white mb-4 leading-tight">
                             Welcome<br/>Back!
                         </h1>
-                        <p className="text-white text-base">
+                        <p className="text-white text-sm md:text-base lg:text-base">
                             Sign in to access your Vehicle Services history and get real-time updates on all your Services
                         </p>
                     </div>    
                 
                     {/* Desktop Login form */}
-                    <form onSubmit={handleSubmit} className="w-[470px] p-10 absolute left-[835px] top-[134px] bg-gray-900 rounded-[30px] shadow-[0px_12px_40px_0px_rgba(0,0,0,0.30)]">
+                    <form onSubmit={handleSubmit} className="w-full max-w-[470px] p-6 md:p-10 absolute left-[835px] top-[134px] bg-[#151C22] rounded-[30px] shadow-[0px_12px_40px_0px_rgba(0,0,0,0.30)]">
                         <div className="space-y-6">
                             <div className="p-3 border-b border-stone-300">
                                 <label htmlFor="desktop-email" className="block text-zinc-500 text-xs font-normal mb-1.5">Email or Phone Number</label>
@@ -95,6 +95,7 @@ export default function LoginPage() {
                                     required
                                     className="w-full bg-transparent border-0 outline-0 text-white text-base font-medium"
                                     placeholder="johndoe@gmail.com"
+                                    aria-label="Email or Phone Number"
                                 />
                             </div>
                             <div className="p-3 border-b border-stone-300">
@@ -108,6 +109,7 @@ export default function LoginPage() {
                                         required
                                         className="w-full bg-transparent border-0 outline-0 text-white text-base font-medium pr-8"
                                         placeholder="••••••••"
+                                        aria-label="Password"
                                     />
                                     <button
                                         type="button"
@@ -133,7 +135,7 @@ export default function LoginPage() {
                                 </span>
                             </button>
                             <div className="text-center">
-                                <span className="text-white text-sm">Don't have an account? </span>
+                                <span className="text-white text-sm">Don&#39;t have an account? </span>
                                 <Link href="/signup" className="text-red-700 text-sm font-semibold underline hover:text-red-600 transition-colors">
                                     Sign Up
                                 </Link>
@@ -148,7 +150,7 @@ export default function LoginPage() {
      
             {/* Tablet Layout (768px - 1023px) */}
             <div className="hidden md:block lg:hidden">
-                <div className="w-full min-h-screen bg-red-700 relative">
+                <div className="w-full min-h-screen bg-red-700 relative overflow-x-hidden px-4 md:px-8 flex flex-col justify-between">
                     {/* Tablet Header */}
                     <header className="flex items-center justify-between px-6 py-4">
                         <Link href="/">
@@ -169,27 +171,27 @@ export default function LoginPage() {
 
                     {/* Tablet Main Content */}
                     <div className="px-6 py-8">
-                        <div className="grid md:grid-cols-2 gap-8 items-center">
-                            <div className="space-y-6">
-                                <h1 className="text-5xl font-bold text-white leading-tight">
+                        <div className="grid md:grid-cols-2 gap-8 items-center w-full max-w-full">
+                            <div className="space-y-6 w-full max-w-full">
+                                <h1 className="text-2xl md:text-4xl font-bold text-white leading-tight">
                                     Welcome<br/>Back!
                                 </h1>
-                                <p className="text-white/90 text-base leading-relaxed">
+                                <p className="text-white/90 text-sm md:text-base leading-relaxed">
                                     Sign in to access your Vehicle Services history and get real-time updates on all your Services
                                 </p>
-                                <div className="relative">
+                                <div className="relative w-full max-w-md mx-auto">
                                     <Image
                                         src="/images/signin/white-car.png"
                                         alt="White sedan car"
                                         width={400}
                                         height={250}
-                                        className="w-full max-w-md"
+                                        className="w-full max-w-xs h-auto mx-auto"
                                     />
                                 </div>
                             </div>
 
-                            <div className="flex justify-center">
-                                <form onSubmit={handleSubmit} className="bg-gray-900 rounded-3xl p-8 w-full max-w-md shadow-2xl">
+                            <div className="flex justify-center w-full max-w-full">
+                                <form onSubmit={handleSubmit} className="bg-gray-900 rounded-3xl p-4 md:p-8 w-full max-w-md shadow-2xl mx-auto">
                                     <div className="space-y-6">
                                         <div className="space-y-1">
                                             <label htmlFor="tablet-email" className="block text-zinc-500 text-xs font-normal">Email or Phone Number</label>
@@ -201,6 +203,7 @@ export default function LoginPage() {
                                                 required
                                                 className="w-full bg-transparent border-0 border-b border-gray-500 rounded-none text-white text-base font-medium py-2 focus:border-white focus:outline-none"
                                                 placeholder="johndoe@gmail.com"
+                                                aria-label="Email or Phone Number"
                                             />
                                         </div>
                                         <div className="space-y-1">
@@ -214,6 +217,7 @@ export default function LoginPage() {
                                                     required
                                                     className="w-full bg-transparent border-0 border-b border-gray-500 rounded-none text-white text-base font-medium py-2 pr-8 focus:border-white focus:outline-none"
                                                     placeholder="••••••••"
+                                                    aria-label="Password"
                                                 />
                                                 <button
                                                     type="button"
@@ -239,7 +243,7 @@ export default function LoginPage() {
                                             </span>
                                         </button>
                                         <div className="text-center">
-                                            <span className="text-white text-sm">Don't have an account? </span>
+                                            <span className="text-white text-sm">Don&#39;t have an account? </span>
                                             <Link href="/signup" className="text-red-700 text-sm font-semibold underline hover:text-red-600 transition-colors">
                                                 Sign Up
                                             </Link>
@@ -257,7 +261,7 @@ export default function LoginPage() {
           
             {/* Mobile Layout (below 768px) */}
             <div className="md:hidden">
-                <div className="w-full min-h-screen relative bg-gray-900">
+                <div className="w-full min-h-screen relative bg-gray-900 overflow-x-hidden">
                     {/* Mobile red background section */}
                     <div className="w-full h-96 bg-red-700 relative">
                         {/* Mobile status bar */}
@@ -281,17 +285,17 @@ export default function LoginPage() {
 
                         {/* Mobile welcome text */}
                         <div className="absolute left-4 top-16 w-80">
-                            <h1 className="text-4xl font-bold text-white mb-4 leading-[50px]">
+                            <h1 className="text-2xl xs:text-3xl sm:text-4xl font-bold text-white mb-4 leading-[40px] xs:leading-[50px]">
                                 Welcome<br/>Back!
                             </h1>
-                            <p className="text-white text-xs leading-tight">
+                            <p className="text-white text-xs sm:text-sm leading-tight">
                                 Sign in to access your Vehicle Services history and get real-time updates on all your Services
                             </p>
                         </div>
 
                         {/* Mobile car image */}
                         <Image
-                            className="absolute left-12 top-32 w-80 h-80"
+                            className="absolute left-1/2 -translate-x-1/2 top-32 w-full max-w-xs h-auto"
                             src="/images/signin/white-car.png"
                             alt="White sedan car"
                             width={320}
@@ -300,7 +304,7 @@ export default function LoginPage() {
                     </div>
 
                     {/* Mobile login form */}
-                    <div className="px-4 py-8 bg-gray-900 shadow-[0px_-8px_30px_0px_rgba(34,34,34,0.25)]">
+                    <div className="px-2 xs:px-4 py-8 bg-gray-900 shadow-[0px_-8px_30px_0px_rgba(34,34,34,0.25)]">
                         <form onSubmit={handleSubmit} className="space-y-6">
                             <div className="p-3 border-b border-stone-300">
                                 <label htmlFor="mobile-email" className="block text-zinc-500 text-xs font-normal mb-1.5">
@@ -314,6 +318,7 @@ export default function LoginPage() {
                                     required
                                     className="w-full bg-transparent border-0 outline-0 text-white text-base font-medium"
                                     placeholder="johndoe@gmail.com"
+                                    aria-label="Email or Phone Number"
                                 />
                             </div>
                             <div className="p-3 border-b border-stone-300">
@@ -329,6 +334,7 @@ export default function LoginPage() {
                                         required
                                         className="w-full bg-transparent border-0 outline-0 text-white text-base font-medium pr-8"
                                         placeholder="••••••••"
+                                        aria-label="Password"
                                     />
                                     <button
                                         type="button"
@@ -354,7 +360,7 @@ export default function LoginPage() {
                                 </span>
                             </button>
                             <div className="text-center">
-                                <span className="text-white text-sm">Don't have an account? </span>
+                                <span className="text-white text-sm">Don&#39;t have an account? </span>
                                 <Link href="/signup" className="text-red-700 text-sm font-semibold underline hover:text-red-600 transition-colors">
                                     Sign Up
                                 </Link>

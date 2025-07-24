@@ -28,12 +28,12 @@ export default function ForgotPasswordPage() {
                     {/* Decorative ellipses */}
                     <div className="w-60 h-60 absolute -left-[105px] -top-[50px] opacity-20 rounded-full border-[35px] border-white" />
                     <div className="w-96 h-96 absolute -left-[167px] -top-[114px] opacity-20 rounded-full border-[35px] border-white" />
-                    
+
                     {/* Decorative stripes */}
-                    <div className="w-[1551px] h-9 absolute -left-[39px] top-[495px] origin-top-left rotate-[-5.42deg] bg-white" />
-                    <div className="w-[1536px] h-3.5 absolute -left-[39px] top-[551px] origin-top-left rotate-[-5.42deg] bg-white" />
-                    <div className="w-[1536px] h-3.5 absolute -left-[39px] top-[574px] origin-top-left rotate-[-5.42deg] bg-slate-700" />
-                    
+                    <div className="w-[calc(100%+200px)] h-9 absolute -left-[39px] top-[495px] origin-top-left rotate-[-5.42deg] bg-white" />
+                    <div className="w-[calc(100%+200px)] h-3.5 absolute -left-[39px] top-[551px] origin-top-left rotate-[-5.42deg] bg-white" />
+                    <div className="w-[calc(100%+200px)] h-3.5 absolute -left-[39px] top-[574px] origin-top-left rotate-[-5.42deg] bg-slate-700" />
+
                     {/* Logo */}
                     <Link href="/" className="absolute left-[135px] top-[15px]">
                         <Image
@@ -44,7 +44,7 @@ export default function ForgotPasswordPage() {
                             height={70}
                         />
                     </Link>
-                    
+
                     {/* Navigation */}
                     <div className="absolute left-[658px] top-[25px] flex items-center gap-9">
                         <nav className="flex items-center gap-8">
@@ -61,17 +61,17 @@ export default function ForgotPasswordPage() {
                             </Link>
                         </div>
                     </div>
-                    
+
                     {/* Forgot Password heading */}
                     <div className="w-[470px] absolute left-[135px] top-[134px]">
                         <h1 className="text-7xl font-bold text-white mb-4 leading-tight">
-                            Forgot<br/>Password
+                            Forgot<br />Password
                         </h1>
                         <p className="text-white text-base">
                             We will sent Reset Link to the email or Phone on your Linked Device
                         </p>
                     </div>
-                    
+
                     {/* Illustration image */}
                     <Image
                         className="w-[776px] h-80 absolute left-[313px] top-[252px]"
@@ -80,7 +80,7 @@ export default function ForgotPasswordPage() {
                         width={776}
                         height={336}
                     />
-                    
+
                     {/* Desktop Reset form */}
                     <form onSubmit={handleSubmit} className="w-[470px] p-10 absolute left-[835px] top-[134px] bg-gray-900 rounded-[30px] shadow-[0px_12px_40px_0px_rgba(0,0,0,0.30)]">
                         <div className="space-y-6">
@@ -116,19 +116,19 @@ export default function ForgotPasswordPage() {
                         </div>
                     </form>
                 </div>
-                
+
                 {/* Desktop Footer */}
                 <FooterContent />
             </div>
-            
+
             {/* Tablet Layout (768px - 1023px) */}
             <div className="hidden md:block lg:hidden">
                 <div className="w-full min-h-screen bg-red-700 relative">
                     {/* Tablet Header */}
                     <header className="flex items-center justify-between px-6 py-4">
                         <Link href="/">
-                            <Image 
-                                src="/images/core/logo.jpg" 
+                            <Image
+                                src="/images/core/logo.jpg"
                                 alt="Dealer ADO Logo"
                                 width={120}
                                 height={60}
@@ -147,7 +147,7 @@ export default function ForgotPasswordPage() {
                         <div className="grid md:grid-cols-2 gap-8 items-center">
                             <div className="space-y-6">
                                 <h1 className="text-5xl font-bold text-white leading-tight">
-                                    Forgot<br/>Password
+                                    Forgot<br />Password
                                 </h1>
                                 <p className="text-white/90 text-base leading-relaxed">
                                     We will sent Reset Link to the email or Phone on your Linked Device
@@ -180,7 +180,7 @@ export default function ForgotPasswordPage() {
                                                 placeholder="johndoe@gmail.com"
                                             />
                                         </div>
-                                        <button 
+                                        <button
                                             type="submit"
                                             disabled={isSubmitting}
                                             className="w-full h-12 bg-red-700 rounded-2xl shadow-lg flex items-center justify-center hover:bg-red-800 transition-colors disabled:opacity-50"
@@ -205,7 +205,7 @@ export default function ForgotPasswordPage() {
                     <FooterContent />
                 </div>
             </div>
-            
+
             {/* Mobile Layout (below 768px) */}
             <div className="md:hidden">
                 <div className="w-full min-h-screen relative bg-gray-900">
@@ -233,7 +233,7 @@ export default function ForgotPasswordPage() {
                         {/* Mobile forgot password text */}
                         <div className="absolute left-4 top-16 w-80">
                             <h1 className="text-4xl font-bold text-white mb-4 leading-[50px]">
-                                Forgot<br/>Password
+                                Forgot<br />Password
                             </h1>
                             <p className="text-white text-xs leading-tight">
                                 We will sent Reset Link to the email or Phone on your Linked Device
@@ -267,7 +267,7 @@ export default function ForgotPasswordPage() {
                                     placeholder="johndoe@gmail.com"
                                 />
                             </div>
-                            <button 
+                            <button
                                 type="submit"
                                 disabled={isSubmitting}
                                 className="w-full h-12 bg-red-700 rounded-2xl shadow-lg flex items-center justify-center hover:bg-red-800 transition-colors disabled:opacity-50"
