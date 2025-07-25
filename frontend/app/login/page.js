@@ -36,13 +36,13 @@ export default function LoginPage() {
                 </div>
 
                 {/* Decorative ellipses - Responsive positioning */}
-                <div className="w-[15%] sm:w-[12%] lg:w-[240px] max-w-[240px] aspect-square absolute -left-[8%] sm:-left-[105px] -top-[10%] sm:-top-[50px] opacity-20 rounded-full border-[25px] sm:border-[35px] border-white" />
-                <div className="w-[20%] sm:w-[16%] lg:w-[366px] max-w-[366px] aspect-square absolute -left-[12%] sm:-left-[167px] -top-[8%] sm:-top-[114px] opacity-20 rounded-full border-[25px] sm:border-[35px] border-white" />
+                <div className="w-[240px] max-w-[240px] aspect-square absolute -left-[8%] sm:-left-[105px] -top-[10%] sm:-top-[50px] opacity-20 rounded-full border-[25px] sm:border-[35px] border-white" />
+                <div className="w-[366px] max-w-[366px] aspect-square absolute -left-[12%] sm:-left-[167px] -top-[8%] sm:-top-[114px] opacity-20 rounded-full border-[25px] sm:border-[35px] border-white" />
                 
                 {/* Decorative stripes - Responsive positioning */}
-                <div className="w-[120%] h-[2%] sm:h-[1.5%] lg:h-[36px] absolute -left-[3%] sm:-left-[46px] top-[60%] sm:top-[75%] lg:top-[526px] origin-top-left rotate-[-15deg] sm:rotate-[-5.42deg] bg-white" />
-                <div className="w-[120%] h-[1%] sm:h-[0.8%] lg:h-[14px] absolute -left-[3%] sm:-left-[46px] top-[65%] sm:top-[82%] lg:top-[577px] origin-top-left rotate-[-15deg] sm:rotate-[-5.42deg] bg-white" />
-                <div className="w-[120%] h-[1%] sm:h-[0.8%] lg:h-[14px] absolute -left-[3%] sm:-left-[46px] top-[67%] sm:top-[85%] lg:top-[600px] origin-top-left rotate-[-15deg] sm:rotate-[-5.42deg] bg-slate-700" />
+                <div className="w-[120%] h-[2%]  md:h-[36px] absolute -left-[3%] sm:-left-[46px] top-[60%] sm:top-[75%] lg:top-[526px] origin-top-left rotate-[-15deg] sm:rotate-[-5.42deg] bg-white" />
+                <div className="w-[120%] h-[1%]  md:h-[14px] absolute -left-[3%] sm:-left-[46px] top-[65%] sm:top-[82%] lg:top-[577px] origin-top-left rotate-[-15deg] sm:rotate-[-5.42deg] bg-white" />
+                <div className="w-[120%] h-[1%]  md:h-[14px] absolute -left-[3%] sm:-left-[46px] top-[67%] sm:top-[85%] lg:top-[600px] origin-top-left rotate-[-15deg] sm:rotate-[-5.42deg] bg-slate-700" />
                 
                 {/* Navigation Header - Responsive */}
                 <header className="flex flex-col sm:flex-row justify-between items-between sm:items-center left-[40px] pt-[3%] sm:pt-[15px] pb-[3%] gap-4 relative z-10">
@@ -58,7 +58,7 @@ export default function LoginPage() {
                     </Link>
                     
                     {/* Navigation Menu - Responsive layout */}
-                    <div className="hidden sm:flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6 lg:gap-9 w-full sm:w-auto absolute pr-[40px] lg-pr-0 lg:right-[40px] xl:right-[80px] lg:top-[25px]">
+                    <div className="hidden sm:flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6 lg:gap-9 pr-[80px] lg-pr-[40px] lg:pr-[80px]">
                         <nav className="flex flex-wrap gap-4 sm:gap-6 lg:gap-8">
                             <Link href="/" className="text-white text-sm sm:text-base lg:text-lg font-medium hover:text-white/80 transition-colors">Home</Link>
                             <Link href="/about" className="text-white text-sm sm:text-base lg:text-lg font-medium hover:text-white/80 transition-colors">About Us</Link>
@@ -80,7 +80,7 @@ export default function LoginPage() {
                 {/* Main Content Area - Responsive layout */}
                 <div className="flex flex-col lg:flex-row items-center justify-between px-[5%] sm:px-[8%] lg:px-[135px] pt-[2%] sm:pt-[5%] lg:pt-[90px] gap-8 lg:gap-12 relative z-10">
                     {/* Welcome Section - Responsive content */}
-                    <div className="w-full lg:w-[470px] text-center lg:text-left lg:absolute lg:left-[40px] xl:left-[85px] lg:top-[40px]">
+                    <div className="w-full lg:w-[470px] text-left lg:absolute lg:left-[40px] xl:left-[85px] lg:top-[40px]">
                         <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 leading-tight">
                             Welcome<br/>Back!
                         </h1>
