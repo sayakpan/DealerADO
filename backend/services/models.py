@@ -2,15 +2,62 @@ from django.db import models
 from django.core.exceptions import ValidationError
 from django.contrib.auth import get_user_model
 from wallet.models import TransactionLog
+from django.utils.text import slugify
 import json
+
 
 User = get_user_model()
 
+def generate_unique_slug(instance, model, slug_field, slug_base):
+    slug = slugify(slug_base)
+    original_slug = slug
+    counter = 1
+
+    while model.objects.filter(**{slug_field: slug}).exclude(pk=instance.pk).exists():
+        slug = f"{original_slug}-{counter}"
+        counter += 1
+
+    return slug
+
+def default_headers():
+    return {"clientId": "", "secretKey": ""}
+
+
+class Secrets(models.Model):
+    AUTH_TYPE_CHOICES = [
+        ('none', 'No Auth'),
+        ('bearer_token', 'Bearer Token'),
+        ('custom_headers', 'Custom Headers'),
+    ]
+
+    provider_name = models.CharField(max_length=100, verbose_name="Provider Name", help_text="Name of the API provider (e.g., Surepass, Invincible)")
+    auth_type = models.CharField(max_length=50, choices=AUTH_TYPE_CHOICES, default='none', verbose_name="Authentication Type")
+    bearer_token = models.TextField(blank=True, null=True, verbose_name="Bearer Token", help_text="Used when Authentication Type is 'Bearer Token'. Example: 'eyJhbGciOi...'")
+    headers = models.JSONField(blank=True, null=True, default=default_headers, verbose_name="Custom Headers", help_text="Used when Authentication Type is 'Custom Headers'. Example: {\"clientId\": \"abc\", \"secretKey\": \"xyz\"}")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "Secret"
+        verbose_name_plural = "Secrets"
+
+    def __str__(self):
+        return f"{self.provider_name} ({self.get_auth_type_display()}) - {self.id}"
+    
+    def clean(self):
+        if self.auth_type == 'bearer_token' and not self.bearer_token:
+            raise ValidationError({'bearer_token': 'Bearer Token is required for bearer_token auth.'})
+
+        if self.auth_type == 'custom_headers' and not self.headers:
+            raise ValidationError({'headers': 'Custom headers are required for custom_headers auth.'})
 
 class ServiceCategory(models.Model):
     name = models.CharField(max_length=100, verbose_name="Category Name")
+    slug = models.SlugField(null=True, blank=True, max_length=100, verbose_name="Slug")
     description = models.TextField(blank=True, verbose_name="Description")
     rank = models.PositiveIntegerField(default=0, verbose_name="Display Order")
+    logo = models.ImageField(upload_to="service_categories/logos/", blank=True, null=True, verbose_name="Logo")
+    cover_image = models.ImageField(upload_to="service_categories/covers/", blank=True, null=True, verbose_name="Cover Image")
 
     class Meta:
         verbose_name = "Service Category"
@@ -18,15 +65,26 @@ class ServiceCategory(models.Model):
 
     def __str__(self):
         return self.name
+    
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = generate_unique_slug(
+                instance=self,
+                model=ServiceCategory,
+                slug_field='slug',
+                slug_base=self.name
+            )
+        super().save(*args, **kwargs)
 
 
 class Service(models.Model):
     category = models.ForeignKey(
         ServiceCategory, on_delete=models.CASCADE,
         related_name='services',
-        verbose_name="Service Category"
+        verbose_name="Service Category",
     )
     name = models.CharField(max_length=100, verbose_name="Service Name")
+    slug = models.SlugField(null=True, blank=True, max_length=100, verbose_name="Slug")
     description = models.TextField(blank=True, verbose_name="Description")
     api_url = models.URLField(verbose_name="API Endpoint")
     api_method = models.CharField(
@@ -34,7 +92,7 @@ class Service(models.Model):
         choices=[('GET', 'GET'), ('POST', 'POST')],
         verbose_name="HTTP Method"
     )
-    api_key = models.CharField(max_length=255, blank=True, null=True, verbose_name="API Key")
+    secret = models.ForeignKey(Secrets, on_delete=models.SET_NULL, null=True, blank=True, related_name='services', verbose_name="Linked Secret", help_text="Which secret this service should use for authentication")
     price_per_hit = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Price Per Hit")
     is_active = models.BooleanField(default=True, verbose_name="Is Active")
 
@@ -44,6 +102,16 @@ class Service(models.Model):
 
     def __str__(self):
         return self.name
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = generate_unique_slug(
+                instance=self,
+                model=Service,
+                slug_field='slug',
+                slug_base=self.name
+            )
+        super().save(*args, **kwargs)
 
 
 class ServiceFormField(models.Model):
@@ -58,29 +126,21 @@ class ServiceFormField(models.Model):
         ('textarea', 'Textarea'),
     ]
 
-    service = models.ForeignKey(
-        Service,
-        on_delete=models.CASCADE,
-        related_name='form_fields',
-        verbose_name="Service"
-    )
+    service = models.ForeignKey(Service, on_delete=models.CASCADE, related_name='form_fields', verbose_name="Service")
     label = models.CharField(max_length=100, verbose_name="Field Label")
     key = models.CharField(max_length=100, help_text="Key to be used in API payload", verbose_name="Payload Key")
     input_type = models.CharField(max_length=20, choices=INPUT_TYPES, verbose_name="Input Type")
     is_required = models.BooleanField(default=True, verbose_name="Is Required")
-    validation_regex = models.CharField(max_length=255, blank=True, null=True, verbose_name="Validation Regex")
+    help_text = models.TextField(blank=True, verbose_name="Help Text")
     placeholder = models.CharField(max_length=255, blank=True, verbose_name="Placeholder")
-    options = models.JSONField(
+    options = models.JSONField(blank=True, null=True, help_text="Applicable for select, radio, checkbox fields", verbose_name="Options")
+    condition_group = models.CharField(max_length=50, blank=True, help_text="Fields in same group share OR condition", verbose_name="Condition Group")
+    validation_rules = models.JSONField(
         blank=True,
         null=True,
-        help_text="Applicable for select, radio, checkbox fields",
-        verbose_name="Options"
-    )
-    condition_group = models.CharField(
-        max_length=50,
-        blank=True,
-        help_text="Fields in same group share OR condition",
-        verbose_name="Condition Group"
+        default=list,
+        help_text='Use format like: [{"type": "alphaNum"}, {"type": "hasLength", "value": 10}]',
+        verbose_name="Validation Rules"
     )
 
     class Meta:
@@ -110,6 +170,18 @@ class ServiceFormField(models.Model):
                 raise ValidationError(
                     {'options': 'Invalid JSON format for options.'}
                 )
+        if self.validation_rules:
+            if not isinstance(self.validation_rules, list):
+                raise ValidationError({"validation_rules": "Must be a list of validation rule objects."})
+            for rule in self.validation_rules:
+                if not isinstance(rule, dict) or "type" not in rule:
+                    raise ValidationError({"validation_rules": "Each rule must be a dict with a 'type' key."})
+
+                if rule["type"] in ["minLength", "maxLength", "hasLength"] and "value" not in rule:
+                    raise ValidationError({"validation_rules": f"'{rule['type']}' requires a numeric 'value'"})
+
+                if rule["type"] == "hasMultipleLengths" and not isinstance(rule.get("value"), list):
+                    raise ValidationError({"validation_rules": "'hasMultipleLengths' requires a list of values"})
         
 
 class ServiceUsageLog(models.Model):
@@ -121,6 +193,7 @@ class ServiceUsageLog(models.Model):
 
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     service = models.ForeignKey(Service, on_delete=models.CASCADE)
+    full_url = models.URLField(blank=True, null=True, help_text="Full URL used for the API call")
     form_data_sent = models.JSONField()
     api_response = models.JSONField()
     status = models.CharField(max_length=20, choices=STATUS_CHOICES)
@@ -136,3 +209,5 @@ class ServiceUsageLog(models.Model):
     class Meta:
         verbose_name = "Service Usage Log"
         verbose_name_plural = "Service Usage Logs"
+        
+        
