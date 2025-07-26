@@ -24,7 +24,7 @@ export default function LoginPage() {
     return (
         <div className="min-h-screen bg-red-700 relative overflow-hidden">
             {/* Single Responsive Layout */}
-            <div className="w-full h-[650px] lg:min-h-[630px] relative bg-red-700 overflow-hidden">
+            <div className="w-full md:h-screen lg:h-[650px] lg:min-h-[630px] relative bg-red-700 overflow-hidden">
                 {/* Mobile Status Bar - Only visible on mobile */}
                 <div className="md:hidden flex items-center justify-between px-6 pt-3 pb-2 relative z-20">
                     <div className="text-white text-base font-normal">9:41</div>
@@ -40,9 +40,9 @@ export default function LoginPage() {
                 <div className="w-[366px] max-w-[366px] aspect-square absolute -left-[12%] sm:-left-[167px] -top-[8%] sm:-top-[114px] opacity-20 rounded-full border-[25px] sm:border-[35px] border-white" />
                 
                 {/* Decorative stripes - Responsive positioning */}
-                <div className="w-[120%] h-[2%]  md:h-[36px] absolute -left-[3%] sm:-left-[46px] top-[60%] sm:top-[75%] lg:top-[526px] origin-top-left rotate-[-15deg] sm:rotate-[-5.42deg] bg-white" />
-                <div className="w-[120%] h-[1%]  md:h-[14px] absolute -left-[3%] sm:-left-[46px] top-[65%] sm:top-[82%] lg:top-[577px] origin-top-left rotate-[-15deg] sm:rotate-[-5.42deg] bg-white" />
-                <div className="w-[120%] h-[1%]  md:h-[14px] absolute -left-[3%] sm:-left-[46px] top-[67%] sm:top-[85%] lg:top-[600px] origin-top-left rotate-[-15deg] sm:rotate-[-5.42deg] bg-slate-700" />
+                <div className="w-[120%] h-[2%]  md:h-[36px] absolute -left-[3%] sm:-left-[46px] top-[526px] origin-top-left rotate-[-15deg] sm:rotate-[-5.42deg] bg-white" />
+                <div className="w-[120%] h-[1%]  md:h-[14px] absolute -left-[3%] sm:-left-[46px] top-[577px] origin-top-left rotate-[-15deg] sm:rotate-[-5.42deg] bg-white" />
+                <div className="w-[120%] h-[1%]  md:h-[14px] absolute -left-[3%] sm:-left-[46px] top-[600px] origin-top-left rotate-[-15deg] sm:rotate-[-5.42deg] bg-slate-700" />
                 
                 {/* Navigation Header - Responsive */}
                 <header className="flex flex-col sm:flex-row justify-between items-between sm:items-center left-[40px] pt-[3%] sm:pt-[15px] pb-[3%] gap-4 relative z-10">
@@ -78,7 +78,7 @@ export default function LoginPage() {
                 </header>
                 
                 {/* Main Content Area - Responsive layout */}
-                <div className="flex flex-col lg:flex-row items-center justify-between px-[5%] sm:px-[8%] lg:px-[135px] pt-[2%] sm:pt-[5%] lg:pt-[90px] gap-8 lg:gap-12 relative z-10">
+                <div className="flex flex-col lg:flex-row items-end lg:items-center justify-between px-[5%] sm:px-[8%] lg:px-[135px] lg:pt-[90px] gap-8 lg:gap-12 relative z-10">
                     {/* Welcome Section - Responsive content */}
                     <div className="w-full lg:w-[470px] text-left lg:absolute lg:left-[40px] xl:left-[85px] lg:top-[40px]">
                         <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 leading-tight">
@@ -87,17 +87,6 @@ export default function LoginPage() {
                         <p className="text-white text-sm sm:text-base lg:text-base mb-6 lg:mb-0 leading-relaxed">
                             Sign in to access your Vehicle Services history and get real-time updates on all your Services
                         </p>
-                        
-                        {/* Car Image - Mobile/Tablet only */}
-                        <div className="lg:hidden mt-8 flex justify-center">
-                            <Image
-                                src="/images/signin/white-car.png"
-                                alt="White sedan car"
-                                width={320}
-                                height={320}
-                                className="w-full max-w-[280px] sm:max-w-[320px] h-auto"
-                            />
-                        </div>
                     </div>
                     
                     {/* Login Form - Responsive form */}
@@ -171,7 +160,7 @@ export default function LoginPage() {
                 </div>
                 
                 {/* Car Image - Desktop only, positioned behind content */}
-                <div className="hidden lg:block absolute right-[435px] lg:top-[210px] xl:top-[190px] w-[579px] max-w-[579px] z-0">
+                <div className="block absolute lg:right-[435px] top-[210px] xl:top-[190px] w-[579px] max-w-[579px] z-0">
                     <Image
                         src="/images/signin/white-car.png"
                         alt="White sedan car"
