@@ -25,10 +25,10 @@ export default function Header({ currentPage = "" }) {
                 
                 {/* Auth buttons - Responsive sizing */}
                 <div className="flex items-center gap-2 sm:gap-3">
-                    <div className={`px-3 sm:px-4 lg:px-6 py-2 sm:py-2.5 lg:py-3 bg-slate-700 rounded-[10px] min-w-[100px] sm:min-w-[120px] lg:min-w-[144px] ${currentPage === 'login' ? 'opacity-50' : ''}`}>
+                    <Link href="/login" className={`px-3 sm:px-4 lg:px-6 py-2 sm:py-2.5 lg:py-3 bg-slate-700 rounded-[10px] min-w-[100px] sm:min-w-[120px] lg:min-w-[144px] ${currentPage === 'login' ? 'opacity-50' : 'hover:bg-slate-600'} transition-colors`}>
                         <span className="text-white text-sm sm:text-base lg:text-lg font-semibold text-center block">Sign in</span>
-                    </div>
-                    <Link href="/signup" className="px-3 sm:px-4 lg:px-6 py-2 sm:py-2.5 lg:py-3 bg-white rounded-[10px] border border-red-700 hover:bg-gray-100 transition-colors min-w-[100px] sm:min-w-[120px] lg:min-w-[144px]">
+                    </Link>
+                    <Link href="/signup" className={`px-3 sm:px-4 lg:px-6 py-2 sm:py-2.5 lg:py-3 bg-white rounded-[10px] border border-red-700 min-w-[100px] sm:min-w-[120px] lg:min-w-[144px] ${currentPage === 'signup' ? 'opacity-50' : 'hover:bg-gray-100'} transition-colors`}>
                         <span className="text-slate-700 text-sm sm:text-base lg:text-lg font-semibold text-center block">Sign up</span>
                     </Link>
                 </div>
