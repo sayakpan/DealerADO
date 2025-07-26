@@ -46,7 +46,7 @@ export default function Navbar() {
                                 src="/images/core/logo.jpg"
                                 alt="Dealer ADO Logo"
                                 fill
-                                className="rounded-full object-contain hover:opacity-90 transition-opacity"
+                                className="rounded-full object-cover hover:opacity-90 transition-opacity"
                                 priority
                             />
                         </div>
