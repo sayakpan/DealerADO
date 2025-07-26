@@ -131,10 +131,28 @@ CSRF_TRUSTED_ORIGINS = [
     "https://electrodegames.site"
 ]
 
-SESSION_COOKIE_SECURE = True
-CSRF_COOKIE_SECURE = True
-CSRF_COOKIE_HTTPONLY = False
+ENVIRONMENT = config('ENVIRONMENT', default='local')
 
-# If frontend and backend are subdomains or share a base domain:
-CSRF_COOKIE_DOMAIN = '.electrodegames.site'
-SESSION_COOKIE_DOMAIN = '.electrodegames.site'
+if ENVIRONMENT == 'production':
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    CSRF_COOKIE_DOMAIN = '.electrodegames.site'
+    SESSION_COOKIE_DOMAIN = '.electrodegames.site'
+    CSRF_COOKIE_HTTPONLY = True  # usually good for prod
+else:
+    SESSION_COOKIE_SECURE = False
+    CSRF_COOKIE_SECURE = False
+    CSRF_COOKIE_HTTPONLY = False
+
+
+# Email settings
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+DEFAULT_FROM_EMAIL = 'no-reply@electrodegames.site'
+
+# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+# EMAIL_HOST = 'smtp.zoho.com'  # or Gmail SMTP etc.
+# EMAIL_PORT = 587
+# EMAIL_USE_TLS = True
+# EMAIL_HOST_USER = config("EMAIL_HOST_USER")
+# EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD")
+# DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
