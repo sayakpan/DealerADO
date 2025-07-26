@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
-import FooterContent from "@/components/core/Footer1";
+import FooterContent from "@/components/core/Footer";
 
 export default function ForgotPasswordPage() {
     const [email, setEmail] = useState("johndoe@gmail.com");
