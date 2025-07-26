@@ -24,25 +24,16 @@ export default function LoginPage() {
     return (
         <div className="min-h-screen bg-red-700 relative overflow-hidden">
             {/* Single Responsive Layout */}
-            <div className="w-full md:h-screen lg:h-[650px] lg:min-h-[630px] relative bg-red-700 overflow-hidden">
-                {/* Mobile Status Bar - Only visible on mobile */}
-                <div className="md:hidden flex items-center justify-between px-6 pt-3 pb-2 relative z-20">
-                    <div className="text-white text-base font-normal">9:41</div>
-                    <div className="flex items-center gap-1">
-                        <div className="w-5 h-3 opacity-30 rounded-sm border border-white"></div>
-                        <div className="w-[1.33px] h-1 opacity-40 bg-white"></div>
-                        <div className="w-2.5 h-2 bg-white rounded-sm"></div>
-                    </div>
-                </div>
+            <div className="w-full h-[800px] sm:h-[1050px] lg:h-[650px] lg:min-h-[630px] relative bg-red-700 overflow-hidden">
 
                 {/* Decorative ellipses - Responsive positioning */}
-                <div className="w-[240px] max-w-[240px] aspect-square absolute -left-[8%] sm:-left-[105px] -top-[10%] sm:-top-[50px] opacity-20 rounded-full border-[25px] sm:border-[35px] border-white" />
-                <div className="w-[366px] max-w-[366px] aspect-square absolute -left-[12%] sm:-left-[167px] -top-[8%] sm:-top-[114px] opacity-20 rounded-full border-[25px] sm:border-[35px] border-white" />
+                <div className="w-[240px] max-w-[240px] aspect-square absolute -left-[105px] -top-[50px] opacity-20 rounded-full border-[25px] border-[35px] border-white" />
+                <div className="w-[366px] max-w-[366px] aspect-square absolute -left-[167px] -top-[114px] opacity-20 rounded-full border-[25px] border-[35px] border-white" />
                 
                 {/* Decorative stripes - Responsive positioning */}
-                <div className="w-[120%] h-[2%]  md:h-[36px] absolute -left-[3%] sm:-left-[46px] top-[526px] origin-top-left rotate-[-15deg] sm:rotate-[-5.42deg] bg-white" />
-                <div className="w-[120%] h-[1%]  md:h-[14px] absolute -left-[3%] sm:-left-[46px] top-[577px] origin-top-left rotate-[-15deg] sm:rotate-[-5.42deg] bg-white" />
-                <div className="w-[120%] h-[1%]  md:h-[14px] absolute -left-[3%] sm:-left-[46px] top-[600px] origin-top-left rotate-[-15deg] sm:rotate-[-5.42deg] bg-slate-700" />
+                <div className="w-[120%] h-[2%] h-[26px] md:h-[36px] absolute -left-[3%] sm:-left-[46px] top-[360px] md:top-[406px] lg:top-[526px] origin-top-left rotate-[-6.42deg] bg-white" />
+                <div className="w-[120%] h-[1%] h-[18px] md:h-[14px] absolute -left-[3%] sm:-left-[46px] top-[392px] md:top-[456px] lg:top-[577px] origin-top-left rotate-[-6.42deg] bg-white" />
+                <div className="w-[120%] h-[1%] h-[10px] md:h-[14px] absolute -left-[3%] sm:-left-[46px] top-[416px] md:top-[480px] lg:top-[600px] origin-top-left rotate-[-6.42deg] bg-slate-700" />
                 
                 {/* Navigation Header - Responsive */}
                 <header className="flex flex-col sm:flex-row justify-between items-between sm:items-center left-[40px] pt-[3%] sm:pt-[15px] pb-[3%] gap-4 relative z-10">
@@ -58,7 +49,7 @@ export default function LoginPage() {
                     </Link>
                     
                     {/* Navigation Menu - Responsive layout */}
-                    <div className="hidden sm:flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6 lg:gap-9 pr-[80px] lg-pr-[40px] lg:pr-[80px]">
+                    <div className="hidden md:flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6 lg:gap-9 pr-[80px] lg-pr-[40px] lg:pr-[80px]">
                         <nav className="flex flex-wrap gap-4 sm:gap-6 lg:gap-8">
                             <Link href="/" className="text-white text-sm sm:text-base lg:text-lg font-medium hover:text-white/80 transition-colors">Home</Link>
                             <Link href="/about" className="text-white text-sm sm:text-base lg:text-lg font-medium hover:text-white/80 transition-colors">About Us</Link>
@@ -90,8 +81,8 @@ export default function LoginPage() {
                     </div>
                     
                     {/* Login Form - Responsive form */}
-                    <div className="w-full lg:w-[470px] max-w-[470px] lg:absolute lg:right-[40px] xl:right-[80px] lg:top-[40px]">
-                        <form onSubmit={handleSubmit} className="bg-[#151C22] rounded-[30px] sm:rounded-t-[30px] lg:rounded-[30px] p-6 sm:p-8 lg:p-10 shadow-[0px_12px_40px_0px_rgba(0,0,0,0.30)]">
+                    <div className="w-full lg:w-[470px] sm:max-w-[470px] absolute right-0 sm:right-[calc(50%-235px)] lg:right-[40px] xl:right-[80px] top-[360px] sm:top-[350px] md:top-[465px] lg:top-[40px]">
+                        <form onSubmit={handleSubmit} className="bg-[#151C22] sm:rounded-[30px] sm:rounded-t-[30px] lg:rounded-[30px] p-6 sm:p-8 lg:p-10 shadow-[0px_12px_40px_0px_rgba(0,0,0,0.30)]">
                             <div className="space-y-6">
                                 <div className="p-3 border-b border-stone-300">
                                     <label htmlFor="email" className="block text-zinc-500 text-xs font-normal mb-1.5">
@@ -160,7 +151,7 @@ export default function LoginPage() {
                 </div>
                 
                 {/* Car Image - Desktop only, positioned behind content */}
-                <div className="block absolute lg:right-[435px] top-[210px] xl:top-[190px] w-[579px] max-w-[579px] z-0">
+                <div className="block absolute right-[calc(50%-289px)] lg:right-[435px] top-[130px] lg:top-[210px] xl:top-[190px] w-[410px] md:w-[579px] md:max-w-[579px] z-0">
                     <Image
                         src="/images/signin/white-car.png"
                         alt="White sedan car"
