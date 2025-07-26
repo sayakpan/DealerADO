@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
-import FooterContent from "@/components/core/footer";
+import FooterContent from "@/components/core/Footer1";
 
 export default function LoginPage() {
     const [email, setEmail] = useState("johndoe@gmail.com");
@@ -22,10 +22,10 @@ export default function LoginPage() {
     };
 
     return (
-        <div className="min-h-screen bg-red-700 relative overflow-hidden">
+        <div className="min-h-screen bg-red-800 relative overflow-hidden">
             {/* Desktop Layout (1024px+) */}
             <div className="hidden lg:block">
-                <div className="w-full max-w-[1440px] h-screen relative mx-auto bg-red-700 overflow-hidden">
+                <div className="w-full max-w-[1440px] h-screen relative mx-auto bg-red-800 overflow-hidden">
                     {/* Decorative ellipses */}
                     <div className="w-60 h-60 absolute -left-[105px] -top-[50px] opacity-20 rounded-full border-[35px] border-white" />
                     <div className="w-96 h-96 absolute -left-[167px] -top-[114px] opacity-20 rounded-full border-[35px] border-white" />
@@ -44,33 +44,6 @@ export default function LoginPage() {
                         height={579}
                     />
                     
-                    {/* Logo */}
-                    <Link href="/" className="absolute left-[135px] top-[15px]">
-                        <Image 
-                            className="w-36 h-16 rounded-[50px] hover:opacity-90 transition-opacity" 
-                            src="/images/core/logo.jpg" 
-                            alt="Dealer ADO Logo"
-                            width={137}
-                            height={70}
-                        />
-                    </Link>
-                    
-                    {/* Navigation */}
-                    <div className="absolute left-[658px] top-[25px] flex items-center gap-9">
-                        <nav className="flex items-center gap-8">
-                            <Link href="/" className="text-white text-lg font-medium hover:text-white/80 transition-colors">Home</Link>
-                            <Link href="/about" className="text-white text-lg font-medium hover:text-white/80 transition-colors">About Us</Link>
-                            <Link href="/contact" className="text-white text-lg font-medium hover:text-white/80 transition-colors">Contact Us</Link>
-                        </nav>
-                        <div className="flex items-center gap-3">
-                            <div className="w-36 h-12 p-2.5 bg-slate-700 rounded-[10px] flex justify-center items-center opacity-50">
-                                <span className="text-white text-lg font-semibold">Sign in</span>
-                            </div>
-                            <Link href="/signup" className="w-36 h-12 p-2.5 bg-white rounded-[10px] border border-red-700 flex justify-center items-center hover:bg-gray-100 transition-colors">
-                                <span className="text-slate-700 text-lg font-semibold">Sign up</span>
-                            </Link>
-                        </div>
-                    </div>
                     
                     {/* Welcome text */}
                     <div className="w-[470px] absolute left-[135px] top-[134px]">
