@@ -4,7 +4,7 @@ export default function Hero() {
     return (
         <section className="relative bg-[#151C22] text-white overflow-hidden flex items-center justify-center px-2 md:px-10 lg:px-20">
             {/* Content */}
-            <div className="relative z-10 container mx-auto px-4 py-24 md:py-32 lg:py-40 w-2/3 lg:w-1/2 h-full">
+            <div className="relative z-10 container mx-auto px-4 py-16 md:py-24 lg:py-32 w-2/3 lg:w-1/2 h-full">
                 <div className="max-w-xl">
                     <h1 className="text-xl md:text-3xl lg:text-5xl font-semibold mb-6 leading-tight">
                         Welcome Garage Companion, Simplify Service Scheduling
