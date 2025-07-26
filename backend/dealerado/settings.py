@@ -28,6 +28,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'rest_framework.authtoken',
+    'corsheaders',
     'accounts',
     'wallet',
     'services',
@@ -41,6 +42,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
 ]
 
 REST_FRAMEWORK = {
@@ -131,10 +133,38 @@ CSRF_TRUSTED_ORIGINS = [
     "https://electrodegames.site"
 ]
 
-SESSION_COOKIE_SECURE = True
-CSRF_COOKIE_SECURE = True
-CSRF_COOKIE_HTTPONLY = False
+ENVIRONMENT = config('ENVIRONMENT', default='local')
 
-# If frontend and backend are subdomains or share a base domain:
-CSRF_COOKIE_DOMAIN = '.electrodegames.site'
-SESSION_COOKIE_DOMAIN = '.electrodegames.site'
+if ENVIRONMENT == 'production':
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    CSRF_COOKIE_DOMAIN = '.electrodegames.site'
+    SESSION_COOKIE_DOMAIN = '.electrodegames.site'
+    CSRF_COOKIE_HTTPONLY = True  # usually good for prod
+else:
+    SESSION_COOKIE_SECURE = False
+    CSRF_COOKIE_SECURE = False
+    CSRF_COOKIE_HTTPONLY = False
+
+
+# Email settings
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+DEFAULT_FROM_EMAIL = 'no-reply@electrodegames.site'
+
+# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+# EMAIL_HOST = 'smtp.zoho.com'  # or Gmail SMTP etc.
+# EMAIL_PORT = 587
+# EMAIL_USE_TLS = True
+# EMAIL_HOST_USER = config("EMAIL_HOST_USER")
+# EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD")
+# DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
+
+# CORS Settings
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",        # Your Next.js frontend
+    "http://127.0.0.1:3000",        # Optional if you access via this
+]
+
+# Optional: if you want to allow credentials like cookies or auth headers
+CORS_ALLOW_CREDENTIALS = True
