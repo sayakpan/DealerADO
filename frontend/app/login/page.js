@@ -25,10 +25,10 @@ export default function LoginPage() {
         <div className="min-h-screen bg-red-800 relative overflow-hidden">
             {/* Desktop Layout (1024px+) */}
             <div className="hidden lg:block">
-                <div className="w-full max-w-[1440px] h-screen relative mx-auto bg-red-800 overflow-hidden">
+                <div className="w-full h-screen relative mx-auto bg-red-800 overflow-hidden">
                     {/* Decorative ellipses */}
-                    <div className="w-60 h-60 absolute -left-[105px] -top-[50px] opacity-20 rounded-full border-[35px] border-white" />
-                    <div className="w-96 h-96 absolute -left-[167px] -top-[114px] opacity-20 rounded-full border-[35px] border-white" />
+                    <div className="w-60 h-60 absolute -left-[105px] -top-[100px] opacity-20 rounded-full border-[35px] border-white" />
+                    <div className="w-96 h-96 absolute -left-[167px] -top-[164px] opacity-20 rounded-full border-[35px] border-white" />
                     
                     {/* Decorative stripes */}
                     <div className="w-[1551px] h-9 absolute -left-[46px] top-[481px] origin-top-left rotate-[-5.42deg] bg-white" />

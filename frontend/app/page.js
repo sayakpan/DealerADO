@@ -1,15 +1,15 @@
-import { login } from "@/lib/auth";
-import { getAllCategories } from "@/services/homepage";
-import Image from "next/image";
-import { cookies } from "next/headers"
-import Test from "@/components/homepage/test";
-import HomeBeforeLogin from "@/components/homepage/HomeBeforeLogin";
+import Hero from "@/components/homepage/Hero"
+import Features from "@/components/homepage/Features"
+import Testimonials from "@/components/homepage/Testimonials"
+import AboutUs from "@/components/homepage/AboutUs"
 
-export default async function Home() {
-
+export default function Homepage() {
     return (
-        <div className="">
-            <HomeBeforeLogin />
-        </div>
-    );
+        <main>
+            <Hero />
+            <Features />
+            <Testimonials />
+            <AboutUs />
+        </main>
+    )
 }
