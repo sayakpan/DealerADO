@@ -4,8 +4,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
-import Header from "@/components/core/header";
-import FooterContent from "@/components/core/footer";
+// import Header from "@/components/core/header";
+// import FooterContent from "@/components/core/Footer";
 
 export default function SignupPage() {
     const [name, setName] = useState("John Doe");
@@ -28,7 +28,7 @@ export default function SignupPage() {
     return (
         <div className="min-h-screen bg-red-700 relative overflow-hidden">
             {/* Single Responsive Layout */}
-            <div className="w-full h-[945px] sm:h-[1000px] md:h-[1160px] lg:h-[650px] lg:min-h-[680px] relative bg-red-700 overflow-hidden">
+            <div className="w-full pt-24 h-[945px] sm:h-[1000px] md:h-[1160px] lg:h-[650px] lg:min-h-[680px] relative bg-red-700 overflow-hidden">
 
                 {/* Decorative ellipses - Responsive positioning */}
                 <div className="w-[240px] max-w-[240px] aspect-square absolute -left-[105px] -top-[50px] opacity-20 rounded-full border-[25px] border-[35px] border-white" />
@@ -40,7 +40,7 @@ export default function SignupPage() {
                 <div className="w-[120%] h-[1%] h-[10px] md:h-[14px] absolute -left-[3%] sm:-left-[46px] top-[416px] md:top-[480px] lg:top-[610px] origin-top-left rotate-[-6.42deg] bg-slate-700" />
 
                 {/* Navigation Header - Responsive */}
-                <Header currentPage="signup" />
+                {/* <Header currentPage="signup" /> */}
 
                 {/* Main Content Area - Responsive layout */}
                 <div className="flex flex-col lg:flex-row items-end lg:items-center justify-between px-[5%] sm:px-[8%] lg:px-[135px] lg:pt-[100px] gap-8 lg:gap-12 relative z-10">
@@ -172,7 +172,7 @@ export default function SignupPage() {
             </div>
 
             {/* Footer */}
-            <FooterContent />
+            {/* <FooterContent /> */}
         </div>
     );
 }

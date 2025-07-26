@@ -4,8 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
-import Header from "@/components/core/header";
-import FooterContent from "@/components/core/footer";
+// import FooterContent from "@/components/core/Footer";
 
 export default function LoginPage() {
     const [email, setEmail] = useState("johndoe@gmail.com");
@@ -25,7 +24,7 @@ export default function LoginPage() {
     return (
         <div className="min-h-screen bg-red-700 relative overflow-hidden">
             {/* Single Responsive Layout */}
-            <div className="w-full h-[800px] sm:h-[1050px] lg:h-[650px] lg:min-h-[630px] relative bg-red-700 overflow-hidden">
+            <div className="w-full pt-20 h-[800px] sm:h-[1050px] lg:h-[650px] lg:min-h-[630px] relative bg-red-700 overflow-hidden">
 
                 {/* Decorative ellipses - Responsive positioning */}
                 <div className="w-[240px] max-w-[240px] aspect-square absolute -left-[105px] -top-[50px] opacity-20 rounded-full border-[25px] border-[35px] border-white" />
@@ -37,12 +36,12 @@ export default function LoginPage() {
                 <div className="w-[120%] h-[1%] h-[10px] md:h-[14px] absolute -left-[3%] sm:-left-[46px] top-[416px] md:top-[480px] lg:top-[600px] origin-top-left rotate-[-6.42deg] bg-slate-700" />
                 
                 {/* Navigation Header - Responsive */}
-                <Header currentPage="login" />
+                {/* <Header currentPage="login" /> */}
                 
                 {/* Main Content Area - Responsive layout */}
                 <div className="flex flex-col lg:flex-row items-end lg:items-center justify-between px-[5%] sm:px-[8%] lg:px-[135px] lg:pt-[90px] gap-8 lg:gap-12 relative z-10">
                     {/* Welcome Section - Responsive content */}
-                    <div className="w-full lg:w-[470px] text-left lg:absolute lg:left-[40px] xl:left-[85px] lg:top-[40px]">
+                    <div className="w-full lg:w-[470px] text-left lg:absolute lg:left-[40px] xl:left-[85px] lg:top-[80px]">
                         <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 leading-tight">
                             Welcome<br/>Back!
                         </h1>
@@ -134,7 +133,7 @@ export default function LoginPage() {
             </div>
             
             {/* Footer */}
-            <FooterContent />
+            {/* <FooterContent /> */}
         </div>
     );
 }

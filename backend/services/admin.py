@@ -13,7 +13,7 @@ class SecretsAdmin(admin.ModelAdmin):
 
 @admin.register(ServiceCategory)
 class ServiceCategoryAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name', 'rank')
+    list_display = ('id', 'name', 'slug', 'rank')
     search_fields = ('name',)
 
 
