@@ -1,38 +1,74 @@
-import Link from "next/link";
+'use client';
+
 import SmartLink from "../utils/SmartLink";
 import Image from "next/image";
+import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
 
 export default function Navbar() {
-    return (
-        <>
-            <header className="sticky top-0 z-50">
-                <SmartLink href="/" className="absolute left-[135px] top-[15px]">
-                    <Image
-                        className="w-36 h-16 rounded-[50px] hover:opacity-90 transition-opacity"
-                        src="/images/core/logo.jpg"
-                        alt="Dealer ADO Logo"
-                        width={137}
-                        height={70}
-                    />
-                </SmartLink>
+    const pathname = usePathname();
+    const isLoginPage = pathname === '/login';
+    const [scrolled, setScrolled] = useState(false);
 
-                {/* Navigation */}
-                <div className="absolute left-[658px] top-[25px] flex items-center gap-9">
-                    <nav className="flex items-center gap-8">
-                        <SmartLink href="/" className="text-white text-lg font-medium hover:text-white/80 transition-colors">Home</SmartLink>
-                        <SmartLink href="/about" className="text-white text-lg font-medium hover:text-white/80 transition-colors">About Us</SmartLink>
-                        <SmartLink href="/contact" className="text-white text-lg font-medium hover:text-white/80 transition-colors">Contact Us</SmartLink>
-                    </nav>
-                    <div className="flex items-center gap-3">
-                        <div className="w-36 h-12 p-2.5 bg-slate-700 rounded-[10px] flex justify-center items-center opacity-50">
-                            <span className="text-white text-lg font-semibold">Sign in</span>
+    useEffect(() => {
+        const handleScroll = () => {
+            setScrolled(window.scrollY > 0);
+        };
+        window.addEventListener("scroll", handleScroll);
+        return () => window.removeEventListener("scroll", handleScroll);
+    }, []);
+
+    const baseClasses = "sticky top-0 z-50 transition-all duration-300";
+    const loginBgClasses = scrolled
+        ? "bg-transparent bg-opacity-10 backdrop-blur-md shadow-md"
+        : "bg-red-800";
+    const defaultBgClasses = "bg-white shadow-md";
+
+    return (
+        <header className={`${baseClasses} ${isLoginPage ? loginBgClasses : defaultBgClasses}`}>
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div className="flex items-center justify-between h-20">
+
+                    {/* Logo */}
+                    <SmartLink href="/" className="flex-shrink-0">
+                        <Image
+                            src="/images/core/logo.jpg"
+                            alt="Dealer ADO Logo"
+                            width={137}
+                            height={70}
+                            className="rounded-full hover:opacity-90 transition-opacity"
+                        />
+                    </SmartLink>
+
+                    {/* Nav Links */}
+                    <nav className="hidden md:flex gap-8 items-center">
+                        {["/", "/about", "/contact"].map((path, idx) => (
+                            <SmartLink
+                                key={path}
+                                href={path}
+                                className={`text-base font-medium transition-colors ${isLoginPage ? 'text-white hover:text-gray-300' : 'text-slate-800 hover:text-slate-600'}`}
+                            >
+                                {["Home", "About Us", "Contact Us"][idx]}
+                            </SmartLink>
+                        ))}
+
+                        <div className="flex items-center gap-3">
+                            <SmartLink
+                                href="/login"
+                                className={`w-32 h-10 px-4 border rounded-md flex justify-center items-center transition-colors ${isLoginPage ? 'bg-gray-800 border-gray-900 text-white hover:bg-gray-900' : 'bg-red-800 border-red-900 text-white'}`}
+                            >
+                                <span className="text-base font-semibold">Sign In</span>
+                            </SmartLink>
+                            <SmartLink
+                                href="/login"
+                                className="w-32 h-10 px-4 bg-white border border-red-700 rounded-md flex justify-center items-center hover:bg-gray-200 transition"
+                            >
+                                <span className="text-slate-700 text-base font-semibold">Sign Up</span>
+                            </SmartLink>
                         </div>
-                        <SmartLink href="/signup" className="w-36 h-12 p-2.5 bg-white rounded-[10px] border border-red-700 flex justify-center items-center hover:bg-gray-100 transition-colors">
-                            <span className="text-slate-700 text-lg font-semibold">Sign up</span>
-                        </SmartLink>
-                    </div>
+                    </nav>
                 </div>
-            </header>
-        </>
+            </div>
+        </header>
     );
 }
