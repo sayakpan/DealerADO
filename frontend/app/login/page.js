@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
-import FooterContent from "@/components/core/Footer1";
+import FooterContent from "@/components/core/Footer";
 
 export default function LoginPage() {
     const [email, setEmail] = useState("johndoe@gmail.com");
