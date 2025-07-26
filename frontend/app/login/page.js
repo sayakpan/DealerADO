@@ -22,18 +22,18 @@ export default function LoginPage() {
     };
 
     return (
-        <div className="min-h-screen bg-red-700 relative overflow-hidden">
+        <div className="min-h-screen bg-red-800 relative overflow-hidden">
             {/* Single Responsive Layout */}
-            <div className="w-full pt-20 h-[800px] sm:h-[1050px] lg:h-[650px] lg:min-h-[630px] relative bg-red-700 overflow-hidden">
+            <div className="w-full pt-20 h-[800px] sm:h-[1050px] lg:h-[650px] lg:min-h-[630px] relative bg-red-800 overflow-hidden">
 
                 {/* Decorative ellipses - Responsive positioning */}
-                <div className="w-[240px] max-w-[240px] aspect-square absolute -left-[105px] -top-[50px] opacity-20 rounded-full border-[25px] border-[35px] border-white" />
-                <div className="w-[366px] max-w-[366px] aspect-square absolute -left-[167px] -top-[114px] opacity-20 rounded-full border-[25px] border-[35px] border-white" />
+                <div className="w-[240px] max-w-[240px] aspect-square absolute -left-[105px] -top-[50px] opacity-20 rounded-full border-[25px] md:border-[35px] border-white" />
+                <div className="w-[366px] max-w-[366px] aspect-square absolute -left-[167px] -top-[114px] opacity-20 rounded-full border-[25px] md:border-[35px] border-white" />
                 
                 {/* Decorative stripes - Responsive positioning */}
-                <div className="w-[120%] h-[2%] h-[26px] md:h-[36px] absolute -left-[3%] sm:-left-[46px] top-[360px] md:top-[406px] lg:top-[526px] origin-top-left rotate-[-6.42deg] bg-white" />
-                <div className="w-[120%] h-[1%] h-[18px] md:h-[14px] absolute -left-[3%] sm:-left-[46px] top-[392px] md:top-[456px] lg:top-[577px] origin-top-left rotate-[-6.42deg] bg-white" />
-                <div className="w-[120%] h-[1%] h-[10px] md:h-[14px] absolute -left-[3%] sm:-left-[46px] top-[416px] md:top-[480px] lg:top-[600px] origin-top-left rotate-[-6.42deg] bg-slate-700" />
+                <div className="w-[120%] h-[2%] sm:h-[26px] md:h-[36px] absolute -left-[3%] sm:-left-[46px] top-[360px] md:top-[406px] lg:top-[526px] origin-top-left rotate-[-6.42deg] bg-white" />
+                <div className="w-[120%] h-[1%] sm:h-[18px] md:h-[14px] absolute -left-[3%] sm:-left-[46px] top-[392px] md:top-[456px] lg:top-[577px] origin-top-left rotate-[-6.42deg] bg-white" />
+                <div className="w-[120%] h-[1%] sm:h-[10px] md:h-[14px] absolute -left-[3%] sm:-left-[46px] top-[416px] md:top-[480px] lg:top-[600px] origin-top-left rotate-[-6.42deg] bg-slate-700" />
                 
                 {/* Navigation Header - Responsive */}
                 {/* <Header currentPage="login" /> */}
