@@ -1,7 +1,7 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import "@/public/globals.css";
 import Navbar from "@/components/core/Navbar";
-import FooterContent from "@/components/core/Footer";
+import FooterContent from "@/components/core/footer";
 import { LoadingProvider } from "@/contexts/LoadingContext";
 import { Suspense } from "react";
 
