@@ -50,7 +50,7 @@ export default function ForgotPasswordPage() {
                     </div>
 
                     {/* Reset Form - Responsive form */}
-                    <div className="w-full lg:w-[470px] sm:max-w-[470px] absolute right-0 sm:right-[calc(50%-235px)] lg:right-[40px] xl:right-[80px] top-[360px] sm:top-[350px] md:top-[390px] lg:top-[40px]">
+                    <div className="w-full lg:w-[470px] sm:max-w-[470px] absolute right-0 sm:right-[calc(50%-235px)] lg:right-[40px] xl:right-[80px] top-[338px] sm:top-[380px] md:top-[370px] lg:top-[40px] xl:top-[40px]">
                         <form onSubmit={handleSubmit} className="bg-[#151C22] h-[400px] sm:rounded-[30px] sm:rounded-t-[30px] lg:rounded-[30px] p-6 sm:p-8 lg:p-10 shadow-[0px_12px_40px_0px_rgba(0,0,0,0.30)]">
                             <div className="space-y-6">
                                 <div className="p-3 border-b border-stone-300">
@@ -90,7 +90,7 @@ export default function ForgotPasswordPage() {
                 </div>
 
                 {/* Car Image - Desktop only, positioned behind content */}
-                <div className="block absolute right-[calc(50%-289px)] lg:right-[435px] top-[240px] lg:top-[350px] xl:top-[350px] w-[410px] md:w-[579px] md:max-w-[579px] z-0">
+                <div className="block absolute right-[calc(50%-289px)] lg:right-[435px] sm:top-[220px] lg:top-[350px] xl:top-[340px] w-[410px] sm:w-[579px] md:max-w-[579px] z-0">
                     <Image
                         src="/images/forgot-password/grey-car.png"
                         alt="Grey sedan car"
