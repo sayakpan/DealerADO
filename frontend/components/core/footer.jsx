@@ -3,7 +3,7 @@ import Link from "next/link";
 
 export default function FooterContent() {
     return (
-        <footer className="bg-[#151C22] relative overflow-hidden w-full">
+        <footer className="bg-[#151C22] relative overflow-hidden w-full pt-4">
             {/* Desktop Footer (1024px+) */}
             <div className="hidden lg:block">
                 <div className="w-full mx-auto relative h-[522px] overflow-hidden">
