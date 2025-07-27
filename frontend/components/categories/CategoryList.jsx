@@ -4,16 +4,12 @@ import CategoryCard from "./CategoryCard"
 
 
 export default function CategoryList({ allCategories }) {
-    const handleCategoryClick = (category) => {
-        console.log("Category clicked:", category)
-    }
-
     return (
-        <section className="py-16 bg-gray-50">
+        <section className="py-6 md:py-16 bg-gray-50">
             <div className="container mx-auto px-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mx-auto">
+                <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 mx-auto">
                     {allCategories?.map((category) => (
-                        <CategoryCard key={category.id} category={category} onClick={handleCategoryClick} />
+                        <CategoryCard key={category.id} category={category} />
                     ))}
                 </div>
             </div>
