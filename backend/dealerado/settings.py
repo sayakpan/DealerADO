@@ -164,6 +164,7 @@ DEFAULT_FROM_EMAIL = 'no-reply@electrodegames.site'
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",        # Your Next.js frontend
     "http://127.0.0.1:3000",        # Optional if you access via this
+    "https://electrodegames.site"
 ]
 
 # Optional: if you want to allow credentials like cookies or auth headers
