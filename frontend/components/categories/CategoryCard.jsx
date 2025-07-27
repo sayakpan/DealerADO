@@ -1,12 +1,13 @@
 "use client"
 
 import Image from "next/image"
+import SmartLink from "../utils/SmartLink"
 
 export default function CategoryCard({ category, onClick }) {
     return (
-        <div
-            className="relative bg-slate-700 rounded-2xl p-6 cursor-pointer hover:bg-slate-600 transition-colors group overflow-hidden"
-            onClick={() => onClick && onClick(category)}
+        <SmartLink
+            className="relative bg-slate-700 rounded-2xl p-4 md:p-6 cursor-pointer hover:bg-slate-600 transition-colors group overflow-hidden"
+            href={`/categories/${category.slug}`}
         >
             {/* Decorative Background */}
             <div className="absolute inset-0 z-0">
@@ -25,36 +26,35 @@ export default function CategoryCard({ category, onClick }) {
             {/* Content */}
             <div className="relative z-10">
                 {/* Logo */}
-                    <div className="mb-4">
-                        <div className="w-20 h-20 bg-white/90 rounded-lg flex items-center justify-center">
-                            <Image
-                                src={category.logo_url || "/images/categories/logo-fallback.png"}
-                                alt={category.name + " logo"}
-                                width={48}
-                                height={48}
-                                className="object-contain"
-                            />
-                        </div>
+                <div className="mb-2 md:mb-4">
+                    <div className="relative w-10 h-10 md:w-20 md:h-20 bg-white/90 rounded-lg flex items-center justify-center">
+                        <Image
+                            src={category.logo_url || "/images/categories/logo-fallback.png"}
+                            alt={category.name + " logo"}
+                            fill
+                            className="object-contain p-2"
+                        />
                     </div>
+                </div>
 
                 {/* Title */}
-                <h3 className="text-white font-semibold text-lg mb-1">{category.name}</h3>
+                <h3 className="text-white font-semibold text-sm md:text-lg mb-1">{category.name}</h3>
 
                 {/* Service Count */}
                 {category.service_count > 0 && (
-                    <p className="text-white text-sm absolute top-0 right-0">
+                    <p className="text-white text-[8px] md:text-sm absolute top-0 right-0">
                         {category.service_count} service{category.service_count !== 1 ? "s" : ""}
                     </p>
                 )}
 
                 {/* Description */}
                 {category.description && (
-                    <p className="text-gray-200 text-sm mt-2 line-clamp-2" title={category.description}>{category.description}</p>
+                    <p className="text-gray-200 text-[8px] md:text-sm mt-2 line-clamp-2" title={category.description}>{category.description}</p>
                 )}
             </div>
 
             {/* Hover overlay */}
             <div className="absolute inset-0 bg-gradient-to-r from-red-600/0 to-red-600/5 opacity-0 group-hover:opacity-100 transition-opacity rounded-2xl z-10" />
-        </div>
+        </SmartLink>
     )
 }
