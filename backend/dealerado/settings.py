@@ -32,6 +32,7 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'corsheaders',
     'storages',
+    'django_ckeditor_5',
     'accounts',
     'wallet',
     'services',
@@ -222,3 +223,25 @@ CORS_ALLOWED_ORIGINS = [
 
 # Optional: if you want to allow credentials like cookies or auth headers
 CORS_ALLOW_CREDENTIALS = True
+
+
+
+# CKEditor 5 settings
+
+CKEDITOR_5_CONFIGS = {
+    'default': {
+        'toolbar': [
+            'undo', 'redo', '|',
+            'heading', '|',
+            'bold', 'italic', 'underline', 'strikethrough', '|',
+            'link', '|',
+            'bulletedList', 'numberedList', '|',
+            'blockQuote', 'codeBlock', '|',
+            'insertTable', '|',
+            'imageUpload', 'mediaEmbed', '|',
+            'removeFormat'
+        ],
+        'language': 'en',
+        'upload_url': '/ckeditor5/upload/',
+    }
+}
