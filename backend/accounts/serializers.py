@@ -67,3 +67,30 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['id', 'username', 'email', 'first_name', 'last_name', 'mobile_number', 'role']
+        
+        
+class DeactivateUserSerializer(serializers.Serializer):
+    password = serializers.CharField(write_only=True)
+
+    def validate_password(self, value):
+        user = self.context['request'].user
+        if not user.check_password(value):
+            raise serializers.ValidationError("Incorrect password.")
+        return value
+    
+
+class ChangePasswordSerializer(serializers.Serializer):
+    old_password = serializers.CharField(write_only=True)
+    new_password = serializers.CharField(write_only=True, min_length=8)
+
+    def validate_old_password(self, value):
+        user = self.context['request'].user
+        if not user.check_password(value):
+            raise serializers.ValidationError("Old password is incorrect.")
+        return value
+
+    def validate_new_password(self, value):
+        # You can add more password validation here if needed
+        if len(value) < 6:
+            raise serializers.ValidationError("New password must be at least 6 characters.")
+        return value

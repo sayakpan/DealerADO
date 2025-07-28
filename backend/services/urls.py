@@ -5,5 +5,5 @@ urlpatterns = [
     path('categories/', ServiceCategoryListAPIView.as_view(), name='service-category-list'),
     path('categories/<slug:slug>/', ServiceCategoryDetailAPIView.as_view(), name='service-category-detail'),
     path('service/<slug:slug>/', ServiceDetailAPIView.as_view(), name='service-detail'),
-    path('service/<slug:slug>/submit', submit_service_form, name='submit_service_form'),
+    path('service/<slug:slug>/submit/', submit_service_form, name='submit_service_form'),
 ]
