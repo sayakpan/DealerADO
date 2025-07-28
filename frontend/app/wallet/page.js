@@ -48,19 +48,19 @@ const WalletPage = () => {
                                     />
 
                                     {/* Balance Amount */}
-                                    <div className="text-white text-3xl sm:text-4xl lg:text-5xl font-bold font-['Plus_Jakarta_Sans']">
+                                    <div className="text-white text-3xl sm:text-4xl lg:text-5xl font-bold">
                                         5996.88
                                     </div>
                                 </div>
 
                                 {/* Available Points Text */}
-                                <div className="text-center text-white text-base sm:text-lg font-normal font-['Plus_Jakarta_Sans'] mb-6 sm:mb-8">
+                                <div className="text-center text-white text-base sm:text-lg font-normal mb-6 sm:mb-8">
                                     Available Dealerdo Point
                                 </div>
 
                                 {/* Add Points Button - Responsive */}
                                 <button className="w-full max-w-[90%] h-12 bg-red-700 hover:bg-red-800 rounded-2xl shadow-[0px_4px_16px_0px_rgba(0,0,0,0.20)] flex justify-center items-center transition-colors">
-                                    <span className="text-white text-base font-semibold font-['Plus_Jakarta_Sans'] capitalize">
+                                    <span className="text-white text-base font-semibold capitalize">
                                         Add Points
                                     </span>
                                 </button>
