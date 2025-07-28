@@ -13,6 +13,11 @@ const nextConfig = {
                 port: '8000',
                 pathname: '/media/**',
             },
+            {
+                protocol: 'https',
+                hostname: 'placehold.co',
+                pathname: '**',
+            },
         ],
     },
 };
