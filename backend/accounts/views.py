@@ -1,6 +1,7 @@
 from rest_framework import generics, permissions
 from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
+from rest_framework.authentication import TokenAuthentication
 from django.contrib.auth.models import User
 from .serializers import RegisterSerializer, LoginSerializer, UserSerializer
 from django.contrib.auth.tokens import default_token_generator
@@ -47,6 +48,15 @@ class UserDataView(generics.RetrieveAPIView):
 
     def get_object(self):
         return self.request.user
+    
+
+class LogoutView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request):
+        request.user.auth_token.delete()
+        return Response({"message": "Logged out successfully."}, status=status.HTTP_200_OK)
     
     
 class ForgotPasswordView(APIView):
