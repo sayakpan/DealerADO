@@ -1,8 +1,83 @@
-import React from 'react'
+"use client"
+
+import React, { useState, useEffect } from 'react'
 import Image from 'next/image'
 import ServiceHeader from '@/components/ui/serviceHeader'
+import { getWalletData } from '@/services/wallet'
 
 const WalletPage = () => {
+    const [walletData, setWalletData] = useState(null)
+    const [loading, setLoading] = useState(true)
+    const [error, setError] = useState(null)
+
+    useEffect(() => {
+        const fetchWalletData = async () => {
+            try {
+                setLoading(true)
+                const data = await getWalletData()
+                setWalletData(data)
+            } catch (err) {
+                setError(err.message)
+                console.error("Error fetching wallet data:", err)
+            } finally {
+                setLoading(false)
+            }
+        }
+
+        fetchWalletData()
+    }, [])
+
+    const formatAmount = (amount) => {
+        return parseFloat(amount).toFixed(2)
+    }
+
+    const formatTransactionType = (type) => {
+        switch (type) {
+            case 'recharge':
+                return 'Points Added'
+            case 'debit':
+                return 'Paid For Order'
+            case 'refund':
+                return 'Refund For Order'
+            default:
+                return type
+        }
+    }
+
+    const formatDate = (timestamp) => {
+        return new Date(timestamp).toLocaleDateString('en-IN', {
+            day: '2-digit',
+            month: 'short',
+            year: 'numeric'
+        })
+    }
+
+    if (loading) {
+        return (
+            <div className="min-h-screen bg-gray-50">
+                <ServiceHeader title="Wallet" />
+                <div className="container mx-auto px-4 py-8 max-w-6xl">
+                    <div className="flex justify-center items-center h-64">
+                        <div className="text-lg text-gray-600">Loading wallet...</div>
+                    </div>
+                </div>
+            </div>
+        )
+    }
+
+    if (error) {
+        return (
+            <div className="min-h-screen bg-gray-50">
+                <ServiceHeader title="Wallet" />
+                <div className="container mx-auto px-4 py-8 max-w-6xl">
+                    <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                        <div className="text-red-800">Error loading wallet: {error}</div>
+                    </div>
+                </div>
+            </div>
+        )
+    }
+
     return (
         <div className="min-h-screen bg-gray-50">
             <ServiceHeader title="Wallet" />
@@ -48,19 +123,19 @@ const WalletPage = () => {
                                     />
 
                                     {/* Balance Amount */}
-                                    <div className="text-white text-3xl sm:text-4xl lg:text-5xl font-bold font-['Plus_Jakarta_Sans']">
-                                        5996.88
+                                    <div className="text-white text-3xl sm:text-4xl lg:text-5xl font-bold">
+                                        {formatAmount(walletData?.balance?.amount || 0)}
                                     </div>
                                 </div>
 
                                 {/* Available Points Text */}
-                                <div className="text-center text-white text-base sm:text-lg font-normal font-['Plus_Jakarta_Sans'] mb-6 sm:mb-8">
+                                <div className="text-center text-white text-base sm:text-lg font-normal mb-6 sm:mb-8">
                                     Available Dealerdo Point
                                 </div>
 
                                 {/* Add Points Button - Responsive */}
                                 <button className="w-full max-w-[90%] h-12 bg-red-700 hover:bg-red-800 rounded-2xl shadow-[0px_4px_16px_0px_rgba(0,0,0,0.20)] flex justify-center items-center transition-colors">
-                                    <span className="text-white text-base font-semibold font-['Plus_Jakarta_Sans'] capitalize">
+                                    <span className="text-white text-base font-semibold capitalize">
                                         Add Points
                                     </span>
                                 </button>
@@ -74,50 +149,37 @@ const WalletPage = () => {
                             <h2 className="text-2xl font-bold text-gray-800 mb-6">History:</h2>
 
                             <div className="space-y-4">
-                                {/* Transaction Item */}
-                                <div className="flex justify-between items-center py-3 border-b border-gray-100">
-                                    <div>
-                                        <div className="font-semibold text-gray-800">Paid For Order:</div>
-                                        <div className="text-gray-500 text-sm">112059</div>
+                                {walletData?.history?.results?.length > 0 ? (
+                                    walletData.history.results.map((transaction, index) => (
+                                        <div 
+                                            key={transaction.id} 
+                                            className={`flex justify-between items-center py-3 ${
+                                                index < walletData.history.results.length - 1 ? 'border-b border-gray-100' : ''
+                                            }`}
+                                        >
+                                            <div>
+                                                <div className="font-semibold text-gray-800">
+                                                    {formatTransactionType(transaction.transaction_type)}
+                                                    {transaction.service_name && transaction.service_name !== 'Manual Admin Adjustment' && ':'}
+                                                </div>
+                                                <div className="text-gray-500 text-sm">
+                                                    {transaction.service_name +' '+ formatDate(transaction.timestamp)}
+                                                </div>
+                                            </div>
+                                            <div className={`font-semibold ${
+                                                parseFloat(transaction.amount_change) > 0 
+                                                    ? 'text-green-600' 
+                                                    : 'text-red-600'
+                                            }`}>
+                                                {parseFloat(transaction.amount_change) > 0 ? '(+)' : '(-)'} {Math.abs(parseFloat(transaction.amount_change)).toFixed(0)}
+                                            </div>
+                                        </div>
+                                    ))
+                                ) : (
+                                    <div className="text-center py-8 text-gray-500">
+                                        No transaction history available
                                     </div>
-                                    <div className="text-red-600 font-semibold">(-) 500</div>
-                                </div>
-
-                                {/* Transaction Item */}
-                                <div className="flex justify-between items-center py-3 border-b border-gray-100">
-                                    <div>
-                                        <div className="font-semibold text-gray-800">Refund For Order</div>
-                                        <div className="text-gray-500 text-sm">12594</div>
-                                    </div>
-                                    <div className="text-green-600 font-semibold">(+) 250</div>
-                                </div>
-
-                                {/* Transaction Item */}
-                                <div className="flex justify-between items-center py-3 border-b border-gray-100">
-                                    <div>
-                                        <div className="font-semibold text-gray-800">Points Added:</div>
-                                        <div className="text-gray-500 text-sm">Remarks:</div>
-                                    </div>
-                                    <div className="text-green-600 font-semibold">(+) 3000</div>
-                                </div>
-
-                                {/* Transaction Item */}
-                                <div className="flex justify-between items-center py-3 border-b border-gray-100">
-                                    <div>
-                                        <div className="font-semibold text-gray-800">Paid For Order:</div>
-                                        <div className="text-gray-500 text-sm">12586</div>
-                                    </div>
-                                    <div className="text-red-600 font-semibold">(-) 750</div>
-                                </div>
-
-                                {/* Transaction Item */}
-                                <div className="flex justify-between items-center py-3">
-                                    <div>
-                                        <div className="font-semibold text-gray-800">Paid For Order:</div>
-                                        <div className="text-gray-500 text-sm">112059</div>
-                                    </div>
-                                    <div className="text-red-600 font-semibold">(-) 500</div>
-                                </div>
+                                )}
                             </div>
                         </div>
                     </div>

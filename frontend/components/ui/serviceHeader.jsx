@@ -1,6 +1,6 @@
 import Image from "next/image"
 
-const ServiceHeaderWithImg = ({ title = "Wallet" }) => {
+const ServiceHeader = ({ title = "Wallet" }) => {
     return (
         <div className="w-full h-44 md:h-72 relative rounded-b-[30px] md:rounded-b-[60px] overflow-hidden">
             {/* Background Image using Next.js Image component */}
@@ -17,4 +17,4 @@ const ServiceHeaderWithImg = ({ title = "Wallet" }) => {
     )
 }
 
-export default ServiceHeaderWithImg
+export default ServiceHeader
