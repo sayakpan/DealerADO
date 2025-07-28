@@ -16,9 +16,11 @@ import { ChevronRight } from "lucide-react";
 
 export default function Navbar() {
     const pathname = usePathname();
-    const isLoginPage = pathname === '/login' || pathname === '/signup';
     const [scrolled, setScrolled] = useState(false);
     const [menuOpen, setMenuOpen] = useState(false);
+
+    const fixedNavPathList = ['/login', '/signup', '/forgot-password', '/reset-password', '/contact-us', '/wallet'];
+    const fixedNav = fixedNavPathList.includes(pathname);
 
     useEffect(() => {
         const handleScroll = () => {
@@ -28,10 +30,8 @@ export default function Navbar() {
         return () => window.removeEventListener("scroll", handleScroll);
     }, []);
 
-    const baseClasses = "sticky top-0 z-50 transition-all duration-300";
-    const loginBgClasses = scrolled
-        ? "bg-transparent bg-opacity-10 backdrop-blur-md shadow-md"
-        : "bg-red-800";
+    const baseClasses = fixedNav ? "fixed top-0 z-50 transition-all duration-300 w-full" : "sticky top-0 z-50 transition-all duration-300";
+    const loginBgClasses = scrolled ? "bg-black/40 bg-opacity-10 backdrop-blur-md shadow-md" : "bg-transparent";
     const defaultBgClasses = "bg-white shadow-md";
 
     const navLinks = [
@@ -40,7 +40,7 @@ export default function Navbar() {
         { href: "/contact", label: "Contact Us" },
     ];
 
-    const textColor = isLoginPage ? "text-white hover:text-gray-300" : "text-slate-800 hover:text-slate-600";
+    const textColor = fixedNav ? "text-white hover:text-gray-300" : "text-slate-800 hover:text-slate-600";
 
 
     const handleLogout = async () => {
@@ -57,40 +57,40 @@ export default function Navbar() {
     }
 
     return (
-        <header className={`${baseClasses} ${isLoginPage ? loginBgClasses : defaultBgClasses}`}>
-            <div className="max-w-7xl mx-auto px-4 sm:px-4 md:px-10 lg:px-20 xl:px-0">
-                <div className="flex items-center justify-between h-14 md:h-20">
+        <ClientOnly>
+            <header className={`${baseClasses} ${fixedNav ? loginBgClasses : defaultBgClasses}`}>
+                <div className="max-w-7xl mx-auto px-4 sm:px-4 md:px-10 lg:px-20 xl:px-0">
+                    <div className="flex items-center justify-between h-14 md:h-20">
 
-                    {/* Logo */}
-                    <SmartLink href="/" className="flex-shrink-0">
-                        <div className="relative w-28 h-12 sm:w-32 sm:h-14 md:w-36 md:h-16">
-                            <Image
-                                src="/images/core/logo.jpg"
-                                alt="Dealer ADO Logo"
-                                fill
-                                className="rounded-full object-cover hover:opacity-90 transition-opacity"
-                                priority
-                            />
-                        </div>
-                    </SmartLink>
+                        {/* Logo */}
+                        <SmartLink href="/" className="flex-shrink-0">
+                            <div className="relative w-28 h-12 sm:w-32 sm:h-14 md:w-36 md:h-16">
+                                <Image
+                                    src="/images/core/logo.jpg"
+                                    alt="Dealer ADO Logo"
+                                    fill
+                                    className="rounded-full object-cover hover:opacity-90 transition-opacity"
+                                    priority
+                                />
+                            </div>
+                        </SmartLink>
 
-                    {/* Desktop Nav */}
-                    <nav className="hidden md:flex gap-6 lg:gap-8 items-center">
-                        {navLinks.map((item) => (
-                            <SmartLink
-                                key={item.href}
-                                href={item.href}
-                                className={`text-base font-medium transition-colors ${textColor}`}
-                            >
-                                {item.label}
-                            </SmartLink>
-                        ))}
-                        <ClientOnly>
+                        {/* Desktop Nav */}
+                        <nav className="hidden md:flex gap-6 lg:gap-8 items-center">
+                            {navLinks.map((item) => (
+                                <SmartLink
+                                    key={item.href}
+                                    href={item.href}
+                                    className={`text-base font-medium transition-colors ${textColor}`}
+                                >
+                                    {item.label}
+                                </SmartLink>
+                            ))}
                             {isAuthenticated() ? (
                                 <NavigationMenu.Root className="relative z-50">
                                     <NavigationMenu.List className="flex items-center">
                                         <NavigationMenu.Item>
-                                            <NavigationMenu.Trigger className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-gray-100 cursor-pointer">
+                                            <NavigationMenu.Trigger className={`flex items-center gap-2 px-3 py-2 rounded-md cursor-pointer ${fixedNav ? 'hover:backdrop-blur-sm bg-transparent' : 'hover:bg-gray-100'}`}>
                                                 <Avatar className="h-8 w-8">
                                                     <AvatarFallback>
                                                         {getUserDetails()?.firstName?.[0] ?? 'U'}
@@ -144,7 +144,7 @@ export default function Navbar() {
                                 <div className="flex items-center gap-3">
                                     <SmartLink
                                         href="/login"
-                                        className={`w-32 h-10 px-4 border rounded-md flex justify-center items-center transition-colors ${isLoginPage
+                                        className={`w-32 h-10 px-4 border rounded-md flex justify-center items-center transition-colors ${fixedNav
                                             ? 'bg-gray-800 border-gray-900 text-white hover:bg-gray-900'
                                             : 'bg-red-800 border-red-800 text-white hover:bg-red-700'
                                             }`}
@@ -159,23 +159,21 @@ export default function Navbar() {
                                     </SmartLink>
                                 </div>
                             )}
-                        </ClientOnly>
-                    </nav>
+                        </nav>
 
-                    {/* Hamburger Icon */}
-                    <button
-                        onClick={() => setMenuOpen(!menuOpen)}
-                        className="md:hidden p-2"
-                    >
-                        {menuOpen ? <X className={`w-6 h-6 ${isLoginPage ? 'text-white' : 'text-black'}`} /> : <Menu className={`w-6 h-6 ${isLoginPage ? 'text-white' : 'text-black'}`} />}
-                    </button>
+                        {/* Hamburger Icon */}
+                        <button
+                            onClick={() => setMenuOpen(!menuOpen)}
+                            className="md:hidden p-2"
+                        >
+                            {menuOpen ? <X className={`w-6 h-6 ${fixedNav ? 'text-white' : 'text-black'}`} /> : <Menu className={`w-6 h-6 ${fixedNav ? 'text-white' : 'text-black'}`} />}
+                        </button>
+                    </div>
                 </div>
-            </div>
 
-            {/* Mobile Sidebar Menu */}
-            <ClientOnly>
+                {/* Mobile Sidebar Menu */}
                 <div
-                    className={`fixed top-0 right-0 h-full w-72 bg-white shadow-lg z-[999] transform transition-transform duration-300 ease-in-out ${menuOpen ? 'translate-x-0' : 'translate-x-full'
+                    className={`fixed top-0 md:hidden right-0 h-full w-72 bg-white shadow-lg z-[999] transform transition-transform duration-300 ease-in-out ${menuOpen ? 'translate-x-0' : 'translate-x-full'
                         }`}
                 >
                     <div className="flex justify-end p-4">
@@ -205,7 +203,7 @@ export default function Navbar() {
                                         </Avatar>
                                         <div className="flex flex-col justify-between">
                                             <span className="text-lg font-bold">
-                                               {getUserDetails()?.firstName || "User"} {getUserDetails()?.lastName || ""}
+                                                {getUserDetails()?.firstName || "User"} {getUserDetails()?.lastName || ""}
                                             </span>
 
                                             <SmartLink
@@ -282,7 +280,7 @@ export default function Navbar() {
                         </nav>
                     </div>
                 </div>
-            </ClientOnly>
-        </header>
+            </header>
+        </ClientOnly>
     );
 }
