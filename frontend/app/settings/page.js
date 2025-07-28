@@ -1,4 +1,5 @@
 "use client"
+import Image from 'next/image'
 import ServiceHeader from "@/components/ui/serviceHeader"
 
 const SettingsPage = () => {
@@ -14,7 +15,7 @@ const SettingsPage = () => {
                             <div className="flex justify-start items-center gap-3">
                                 {/* Background Circle with Password Icon */}
                                 <div className="w-[50px] h-[50px] rounded-full bg-[#F9EEEE] flex items-center justify-center relative">
-                                    <img src="/images/settings/change-password.svg" alt="Change Password" className="w-5 h-5" />
+                                    <Image src="/images/settings/change-password.svg" alt="Change Password" width={20} height={20} className="w-5 h-5" />
                                 </div>
                                 {/* Text Content */}
                                 <div className="text-slate-700 text-lg font-semibold">Change Password</div>
@@ -38,7 +39,7 @@ const SettingsPage = () => {
                             <div className="flex justify-start items-center gap-3">
                                 {/* Background Circle with Deactivate Icon */}
                                 <div className="w-[50px] h-[50px] rounded-full bg-[#F9EEEE] flex items-center justify-center relative">
-                                    <img src="/images/settings/deactivate-account.svg" alt="Deactivate Account" className="w-5 h-5" />
+                                    <Image src="/images/settings/deactivate-account.svg" alt="Deactivate Account" width={20} height={20} className="w-5 h-5" />
                                 </div>
                                 {/* Text Content */}
                                 <div className="text-slate-700 text-lg font-semibold">Deactivate My Account</div>

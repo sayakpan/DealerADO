@@ -19,11 +19,12 @@ export default function AboutUs() {
             {/* Background cars */}
             <div className="relative bottom-0 left-0 right-0 h-[250px] md:h-[350px] lg:h-[450px] xl:h-[500px]">
                 {/* Red diagonal background */}
-                {/* <div className="absolute inset-0 bg-gradient-to-r from-transparent via-red-600/20 to-transparent transform skew-y-1"></div> */}
-
+                <div className="w-[120%] h-[2%] h-[40px] lg:h-[80px] absolute -left-[3%] sm:-left-[46px] top-[120px] sm:top-[170px] md:top-[240px] lg:top-[260px] origin-top-left rotate-[-10deg] bg-[#B52628]" />
+                <div className="w-[120%] h-[2%] h-[20px] lg:h-[30px] absolute -left-[3%] sm:-left-[46px] top-[170px] sm:top-[220px] md:top-[290px] lg:top-[350px] origin-top-left rotate-[-10deg] bg-[#B52628]" />
+                <div className="w-[120%] h-[2%] h-[20px] lg:h-[30px] absolute -left-[3%] sm:-left-[46px] top-[200px] sm:top-[250px] md:top-[320px] lg:top-[390px] origin-top-left rotate-[-10deg] bg-[#2A394A]" />
                 {/* Left car */}
                 <div
-                    className="absolute bottom-0 left-[-50%] sm:left-[-15%] lg:left-[-12%] w-[400px] h-[240px] md:w-[600px] md:h-[360px] lg:w-[800px] lg:h-[480px] xl:w-[1000px] xl:h-[600px] z-10"
+                    className="absolute bottom-0 left-[-30%] sm:left-[-15%] lg:left-[-12%] w-[400px] h-[240px] md:w-[600px] md:h-[360px] lg:w-[800px] lg:h-[480px] xl:w-[1000px] xl:h-[600px] z-10"
                 >
                     <Image
                         src="/images/homepage/car2.png"
