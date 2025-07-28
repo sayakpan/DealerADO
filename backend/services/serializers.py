@@ -27,9 +27,17 @@ class ServiceCategorySerializer(serializers.ModelSerializer):
     
     
 class ServiceListItemSerializer(serializers.ModelSerializer):
+    cover_image_url = serializers.SerializerMethodField()
+    
     class Meta:
         model = Service
-        fields = ['id', 'name', 'slug', 'price_per_hit']
+        fields = ['id', 'name', 'slug', 'price_per_hit', 'cover_image_url']
+
+    def get_cover_image_url(self, obj):
+        request = self.context.get('request')
+        if obj.cover_image and hasattr(obj.cover_image, 'url'):
+            return request.build_absolute_uri(obj.cover_image.url)
+        return None
         
         
 class ServiceCategoryDetailSerializer(serializers.ModelSerializer):
@@ -57,13 +65,13 @@ class ServiceFormFieldSerializer(serializers.ModelSerializer):
             'help_text',
             'placeholder',
             'options',
-            'condition_group',
             'validation_rules',
         ]
 
 
 class ServiceDetailSerializer(serializers.ModelSerializer):
     form_fields = ServiceFormFieldSerializer(many=True, read_only=True)
+    or_groups = serializers.SerializerMethodField()
 
     class Meta:
         model = Service
@@ -74,4 +82,25 @@ class ServiceDetailSerializer(serializers.ModelSerializer):
             'price_per_hit',
             'is_active',
             'form_fields',
+            'or_groups',
+        ]
+    
+    def get_form_fields(self, obj):
+        fields = obj.form_fields.all()
+        return ServiceFormFieldSerializer(fields, many=True).data
+
+    def get_or_groups(self, obj):
+        from collections import defaultdict
+
+        groups = defaultdict(list)
+        for field in obj.form_fields.all():
+            if field.condition_group:
+                groups[field.condition_group].append(field)
+
+        return [
+            {
+                "fields": [f.key for f in group_fields],
+                "message": f"Please enter any one of: {', '.join(f.label for f in group_fields)}"
+            }
+            for group_fields in groups.values() if len(group_fields) > 1
         ]

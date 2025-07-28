@@ -2,6 +2,7 @@ from django.contrib import admin
 from .models import Secrets, ServiceCategory, Service, ServiceFormField, ServiceUsageLog
 from django.utils.safestring import mark_safe
 from django import forms
+from django_ckeditor_5.widgets import CKEditor5Widget
 
             
 @admin.register(Secrets)
@@ -17,13 +18,22 @@ class ServiceCategoryAdmin(admin.ModelAdmin):
     search_fields = ('name',)
 
 
+class ServiceAdminForm(forms.ModelForm):
+    class Meta:
+        model = Service
+        fields = '__all__'
+        widgets = {
+            'description': CKEditor5Widget(config_name='default'),
+        }
+        
 @admin.register(Service)
 class ServiceAdmin(admin.ModelAdmin):
+    form = ServiceAdminForm
     list_display = ('id', 'name', 'category', 'api_url','price_per_hit', 'is_active')
     search_fields = ('name', 'api_url')
     list_filter = ('category', 'is_active', 'api_method')
     ordering = ('category__name', 'name')
-    autocomplete_fields = ['secret']
+    autocomplete_fields = ['secret', 'category']
 
 
 @admin.register(ServiceFormField)

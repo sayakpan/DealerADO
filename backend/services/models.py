@@ -3,6 +3,7 @@ from django.core.exceptions import ValidationError
 from django.contrib.auth import get_user_model
 from wallet.models import TransactionLog
 from django.utils.text import slugify
+from django_ckeditor_5.fields import CKEditor5Field
 import json
 
 
@@ -85,7 +86,7 @@ class Service(models.Model):
     )
     name = models.CharField(max_length=100, verbose_name="Service Name")
     slug = models.SlugField(null=True, blank=True, max_length=100, verbose_name="Slug")
-    description = models.TextField(blank=True, verbose_name="Description")
+    is_active = models.BooleanField(default=True, verbose_name="Is Active")
     api_url = models.URLField(verbose_name="API Endpoint")
     api_method = models.CharField(
         max_length=10,
@@ -94,7 +95,8 @@ class Service(models.Model):
     )
     secret = models.ForeignKey(Secrets, on_delete=models.SET_NULL, null=True, blank=True, related_name='services', verbose_name="Linked Secret", help_text="Which secret this service should use for authentication")
     price_per_hit = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Price Per Hit")
-    is_active = models.BooleanField(default=True, verbose_name="Is Active")
+    cover_image = models.ImageField(upload_to="services/covers/", blank=True, null=True, verbose_name="Cover Image")
+    description = CKEditor5Field(blank=True, verbose_name="Description")
 
     class Meta:
         verbose_name = "Service"
