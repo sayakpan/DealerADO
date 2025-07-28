@@ -40,7 +40,7 @@ const WalletPage = () => {
                                 <div className="flex items-center justify-center gap-2 sm:gap-4 mb-3 sm:mb-4">
                                     {/* Car Icon */}
                                     <Image
-                                        src="/images/wallet/small-logo.png"
+                                        src="/images/wallet/logo.png"
                                         alt="Car Icon"
                                         width={48}
                                         height={56}

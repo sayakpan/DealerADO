@@ -6,9 +6,9 @@ export default async function CategoriesPage() {
     const allCategories = await getAllCategories();
 
     return (
-        <main>
+        <div>
             <CategoryHero />
             <CategoryList allCategories={allCategories} />
-        </main>
+        </div>
     )
 }
