@@ -86,7 +86,7 @@ export default function FooterContent() {
                                 About Us
                             </Link>
                             <Link
-                                href="/contact"
+                                href="/contact-us"
                                 className="text-white font-medium hover:text-gray-300 transition-colors
                                                            text-sm sm:text-base lg:text-lg"
                             >

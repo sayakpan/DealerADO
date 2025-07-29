@@ -20,7 +20,7 @@ export default function Header({ currentPage = "" }) {
                 <nav className="flex flex-wrap gap-4 sm:gap-6 lg:gap-8">
                     <Link href="/" className="text-white text-sm sm:text-base lg:text-lg font-medium hover:text-white/80 transition-colors">Home</Link>
                     <Link href="/about" className="text-white text-sm sm:text-base lg:text-lg font-medium hover:text-white/80 transition-colors">About Us</Link>
-                    <Link href="/contact" className="text-white text-sm sm:text-base lg:text-lg font-medium hover:text-white/80 transition-colors">Contact Us</Link>
+                    <Link href="/contact-us" className="text-white text-sm sm:text-base lg:text-lg font-medium hover:text-white/80 transition-colors">Contact Us</Link>
                 </nav>
                 
                 {/* Auth buttons - Responsive sizing */}
