@@ -256,10 +256,10 @@ const ServicePage = ({ params }) => {
             {/* Service Content */}
             <div className="max-w-7xl mx-auto px-4 py-8">
                 {/* Single Responsive Layout */}
-                <div className="flex flex-col lg:flex-row justify-center items-start gap-8">
+                <div className="flex flex-col lg:flex-row justify-center items-center lg:items-start gap-8">
                     {/* Service Form */}
                     {service?.form_fields && service.form_fields.length > 0 && (
-                        <div className="w-full max-w-[570px] px-5 py-7 bg-white rounded-[20px] shadow-[0px_4px_40px_5px_rgba(0,0,0,0.08)] flex flex-col justify-start items-start gap-4">
+                        <div className="w-full max-w-[570px] mx-auto lg:mx-0 px-5 py-7 bg-white rounded-[20px] shadow-[0px_4px_40px_5px_rgba(0,0,0,0.08)] flex flex-col justify-start items-start gap-4">
                             <div className="w-full flex flex-col gap-4">
                                 {service.form_fields.map((field, index) => (
                                     <React.Fragment key={field.key}>
@@ -275,7 +275,7 @@ const ServicePage = ({ params }) => {
                                                         placeholder={field.placeholder}
                                                         value={formData[field.key] || ''}
                                                         onChange={(e) => handleInputChange(field.key, e.target.value)}
-                                                        className="w-full bg-transparent border-none outline-none text-slate-700 text-2xl font-medium placeholder:text-slate-400"
+                                                        className="w-full bg-transparent border-none outline-none text-slate-700 text-2xl font-medium placeholder:text-slate-400 [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [-moz-appearance:textfield]"
                                                         required={field.is_required}
                                                     />
                                                 )}
@@ -295,9 +295,9 @@ const ServicePage = ({ params }) => {
                                                 group.fields.includes(field.key) &&
                                                 group.fields.includes(service.form_fields[index + 1].key)
                                             ) && (
-                                                <div className="w-full inline-flex justify-start items-center gap-3">
+                                                <div className="w-full inline-flex justify-center items-center gap-3">
                                                     <div className="flex-1 h-0 outline outline-[0.50px] outline-offset-[-0.25px] outline-gray-200"></div>
-                                                    <div className="text-center justify-start text-zinc-500 text-base font-semibold">OR</div>
+                                                    <div className="text-center text-zinc-500 text-base font-semibold">OR</div>
                                                     <div className="flex-1 h-0 outline outline-[0.50px] outline-offset-[-0.25px] outline-gray-200"></div>
                                                 </div>
                                             )}
@@ -318,9 +318,9 @@ const ServicePage = ({ params }) => {
                     )}
 
                     {/* Service Details */}
-                    <div className="w-full max-w-[570px] flex flex-col gap-6">
+                    <div className="w-full max-w-[570px] mx-auto lg:mx-0 flex flex-col gap-6">
                         {/* Service Details Title */}
-                        <div className="text-slate-700 text-2xl font-bold">
+                        <div className="text-slate-700 text-2xl font-bold text-center lg:text-left">
                             Service Details:
                         </div>
 
