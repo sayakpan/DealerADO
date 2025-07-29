@@ -1,6 +1,7 @@
 "use client"
 import Image from 'next/image'
 import ServiceHeader from "@/components/ui/serviceHeader"
+import SmartLink from '@/components/utils/SmartLink'
 
 const SettingsPage = () => {
     return (
@@ -11,7 +12,7 @@ const SettingsPage = () => {
                 <div className="bg-white rounded-[20px] p-6 shadow-sm">
                     <div className="flex flex-col justify-center items-end gap-5">
                         {/* Change Password Setting */}
-                        <div className="self-stretch flex justify-between items-center cursor-pointer">
+                        <SmartLink href="/settings/change-password" className="self-stretch flex justify-between items-center cursor-pointer hover:bg-gray-50 rounded-lg p-2 -m-2 transition-colors">
                             <div className="flex justify-start items-center gap-3">
                                 {/* Background Circle with Password Icon */}
                                 <div className="w-[50px] h-[50px] rounded-full bg-[#F9EEEE] flex items-center justify-center relative">
@@ -31,7 +32,7 @@ const SettingsPage = () => {
                                     strokeLinejoin="round"
                                 />
                             </svg>
-                        </div>
+                        </SmartLink>
                         {/* Divider Line */}
                         <div className="w-full h-0 opacity-5 border-t border-black"></div>
                         {/* Deactivate Account Setting */}
