@@ -13,14 +13,15 @@ import { getUserDetails } from "@/lib/auth";
 import ClientOnly from "../utils/ClientOnly";
 import { toast } from "@/plugin/toast";
 import { ChevronRight } from "lucide-react";
+import GlobalModal from "@/components/ui/global-modal";
 
 export default function Navbar() {
     const pathname = usePathname();
     const [scrolled, setScrolled] = useState(false);
     const [menuOpen, setMenuOpen] = useState(false);
 
-    const fixedNavPathList = ['/login', '/signup', '/forgot-password', '/reset-password', '/contact-us', '/wallet'];
-    const fixedNav = fixedNavPathList.includes(pathname);
+    const fixedNavPathList = ['/login', '/signup', '/forgot-password', '/reset-password', '/contact-us', '/wallet', '/profile'];
+    const fixedNav = fixedNavPathList.includes(pathname) || pathname.startsWith('/categories/') || pathname.startsWith('/settings');
 
     useEffect(() => {
         const handleScroll = () => {
@@ -37,7 +38,7 @@ export default function Navbar() {
     const navLinks = [
         { href: "/", label: "Home" },
         { href: "/about", label: "About Us" },
-        { href: "/contact", label: "Contact Us" },
+        { href: "/contact-us", label: "Contact Us" },
     ];
 
     const textColor = fixedNav ? "text-white hover:text-gray-300" : "text-slate-800 hover:text-slate-600";
@@ -129,13 +130,26 @@ export default function Navbar() {
 
                                                 <div className="border-t border-gray-100 my-2" />
 
-                                                <button
-                                                    onClick={() => handleLogout()}
-                                                    className="flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50 w-full text-left cursor-pointer"
-                                                >
-                                                    <LogOut className="w-4 h-4" />
-                                                    Logout
-                                                </button>
+                                                <GlobalModal
+                                                    trigger={
+                                                        <button className="flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50 w-full text-left cursor-pointer">
+                                                            <LogOut className="w-4 h-4" />
+                                                            Logout
+                                                        </button>
+                                                    }
+                                                    title="Log Out"
+                                                    description="Are you sure you want to log out of your account?"
+                                                    icon={LogOut}
+                                                    iconColor="text-red-600"
+                                                    primaryButton={{
+                                                        text: "Yes, Log Out",
+                                                        action: handleLogout,
+                                                    }}
+                                                    secondaryButton={{
+                                                        text: "Cancel",
+                                                        action: () => {},
+                                                    }}
+                                                />
                                             </NavigationMenu.Content>
                                         </NavigationMenu.Item>
                                     </NavigationMenu.List>
@@ -224,7 +238,7 @@ export default function Navbar() {
                             {[
                                 { href: "/", label: "Home", icon: <Home strokeWidth={1.5} className="w-7 h-7 bg-rose-50 p-1.5 rounded-full" /> },
                                 { href: "/about", label: "About Us", icon: <Info strokeWidth={1.5} className="w-7 h-7 bg-rose-50 p-1.5 rounded-full" /> },
-                                { href: "/contact", label: "Contact Us", icon: <Headset strokeWidth={1.5} className="w-7 h-7 bg-rose-50 p-1.5 rounded-full" /> },
+                                { href: "/contact-us", label: "Contact Us", icon: <Headset strokeWidth={1.5} className="w-7 h-7 bg-rose-50 p-1.5 rounded-full" /> },
                                 ...(isAuthenticated()
                                     ? [
                                         { href: "/wallet", label: "Wallet", icon: <Wallet strokeWidth={1.5} className="w-7 h-7 bg-rose-50 p-1.5 rounded-full" /> },
@@ -249,16 +263,29 @@ export default function Navbar() {
                             ))}
 
                             {isAuthenticated() ? (
-                                <button
-                                    onClick={() => {
-                                        setMenuOpen(false);
-                                        handleLogout();
+                                <GlobalModal
+                                    trigger={
+                                        <button className="flex items-center gap-3 px-0 py-2 text-slate-800 rounded-md hover:bg-red-50 transition-colors text-sm font-medium w-full">
+                                            <LogOut strokeWidth={1.5} className="w-7 h-7 bg-rose-50 p-1.5 rounded-full" />
+                                            Logout
+                                        </button>
+                                    }
+                                    title="Log Out"
+                                    description="Are you sure you want to log out of your account?"
+                                    icon={LogOut}
+                                    iconColor="text-red-600"
+                                    primaryButton={{
+                                        text: "Yes, Log Out",
+                                        action: () => {
+                                            setMenuOpen(false);
+                                            handleLogout();
+                                        },
                                     }}
-                                    className="flex items-center gap-3 px-0 py-2 text-slate-800 rounded-md hover:bg-red-50 transition-colors text-sm font-medium"
-                                >
-                                    <LogOut strokeWidth={1.5} className="w-7 h-7 bg-rose-50 p-1.5 rounded-full" />
-                                    Logout
-                                </button>
+                                    secondaryButton={{
+                                        text: "Cancel",
+                                        action: () => {},
+                                    }}
+                                />
                             ) : (
                                 <>
                                     <SmartLink
