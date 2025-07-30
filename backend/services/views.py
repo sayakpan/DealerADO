@@ -1,9 +1,12 @@
+import stat
 from rest_framework.generics import ListAPIView, RetrieveAPIView
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework import status
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AnonymousUser
+from django.http import HttpResponse
+from services.utils import build_absolute_pdf_url, generate_service_pdf
 from .models import ServiceCategory, Service
 from .serializers import ServiceCategoryDetailSerializer, ServiceCategorySerializer, ServiceDetailSerializer
 from rest_framework.permissions import IsAuthenticated
@@ -13,7 +16,10 @@ from django.views.decorators.http import require_POST
 from services.models import Service, ServiceUsageLog
 from wallet.models import Wallet, TransactionLog
 from django.db import transaction
+from django.core.files.base import ContentFile
+from django.core.files.storage import default_storage
 from django.utils.timezone import now
+import time
 import requests
 import json
 
@@ -126,9 +132,10 @@ def submit_service_form(request, slug):
             price_at_time=service.price_per_hit
         )
         return JsonResponse({
+            "code": response.status_code,
             "message": "External API call failed.",
             "details": str(e)
-        }, status=status.HTTP_502_BAD_GATEWAY)
+        }, status=status.HTTP_503_SERVICE_UNAVAILABLE)
         
     try:
         response_json = response.json()
@@ -173,7 +180,7 @@ def submit_service_form(request, slug):
             return JsonResponse({
                 "error": "Wallet deduction failed after API call. Please contact support."
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-            
+    
     # Step 7: Return final result
     if not external_success:
         return JsonResponse({
@@ -181,8 +188,35 @@ def submit_service_form(request, slug):
             "response": response_json
         }, status=status.HTTP_400_BAD_REQUEST)
 
+    # Step 6: Generate and save PDF
+    pdf_buffer = generate_service_pdf(service.name, response_json, user)
+    timestamp = int(time.time())
+    pdf_filename = f"service_reports/{slug}_{user.id}_{timestamp}.pdf"
+    pdf_file = ContentFile(pdf_buffer.getvalue())
+    default_storage.save(pdf_filename, pdf_file)
+    pdf_url = build_absolute_pdf_url(pdf_filename)
+
     return JsonResponse({
         "message": "Success",
         "service": service.name,
-        "response": response_json
+        "response": response_json,
+        "pdf_url": pdf_url,
+        "pdf_filename": pdf_filename
     })
+    
+
+@api_view(["DELETE"])
+@permission_classes([IsAuthenticated])
+def delete_service_pdf(request):
+    filename = request.data.get("filename")
+    if not filename:
+        return JsonResponse({"error": "Filename is required"}, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        if default_storage.exists(filename):
+            default_storage.delete(filename)
+            return JsonResponse({"message": "PDF deleted successfully."})
+        else:
+            return JsonResponse({"error": "File does not exist."}, status=status.HTTP_404_NOT_FOUND)
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
