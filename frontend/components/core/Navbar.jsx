@@ -147,7 +147,7 @@ export default function Navbar() {
                                                     }}
                                                     secondaryButton={{
                                                         text: "Cancel",
-                                                        action: () => {},
+                                                        action: () => { },
                                                     }}
                                                 />
                                             </NavigationMenu.Content>
@@ -283,7 +283,7 @@ export default function Navbar() {
                                     }}
                                     secondaryButton={{
                                         text: "Cancel",
-                                        action: () => {},
+                                        action: () => { },
                                     }}
                                 />
                             ) : (
