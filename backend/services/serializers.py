@@ -23,7 +23,12 @@ class ServiceCategorySerializer(serializers.ModelSerializer):
         return None
     
     def get_service_count(self, obj):
-        return obj.services.count()
+        return obj.services.filter(is_active=True).count()
+    
+    def get_services(self, obj):
+        request = self.context.get("request")
+        active_services = obj.services.filter(is_active=True)
+        return ServiceListItemSerializer(active_services, many=True, context={"request": request}).data
     
     
 class ServiceListItemSerializer(serializers.ModelSerializer):
@@ -41,7 +46,7 @@ class ServiceListItemSerializer(serializers.ModelSerializer):
         
         
 class ServiceCategoryDetailSerializer(serializers.ModelSerializer):
-    services = ServiceListItemSerializer(many=True, read_only=True)
+    services = serializers.SerializerMethodField()
 
     class Meta:
         model = ServiceCategory
@@ -52,6 +57,11 @@ class ServiceCategoryDetailSerializer(serializers.ModelSerializer):
             'description',
             'services'
         ]
+        
+    def get_services(self, obj):
+        request = self.context.get("request")
+        active_services = obj.services.filter(is_active=True)
+        return ServiceListItemSerializer(active_services, many=True, context={"request": request}).data
         
 
 class ServiceFormFieldSerializer(serializers.ModelSerializer):

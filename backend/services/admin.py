@@ -3,8 +3,12 @@ from .models import Secrets, ServiceCategory, Service, ServiceFormField, Service
 from django.utils.safestring import mark_safe
 from django import forms
 from django_ckeditor_5.widgets import CKEditor5Widget
+from import_export import resources
+from import_export.admin import ExportMixin
+from import_export.formats.base_formats import CSV, XLSX
+from django.utils.html import format_html
 
-            
+
 @admin.register(Secrets)
 class SecretsAdmin(admin.ModelAdmin):
     list_display = ('id', 'provider_name', 'auth_type', 'created_at', 'updated_at')
@@ -87,10 +91,43 @@ class ServiceFormFieldAdmin(admin.ModelAdmin):
     validation_guide_display.short_description = "Validation Rules Reference"
 
 
+
+class ServiceUsageLogResource(resources.ModelResource):
+    class Meta:
+        model = ServiceUsageLog
+        fields = (
+            "id", 
+            "user__username", 
+            "service__name", 
+            "status", 
+            "created_at", 
+            "full_url", 
+            "http_status_code", 
+            "response_time_ms", 
+            "price_at_time", 
+            "form_data_sent", 
+            "api_response"
+        )
+        export_order = (
+            "id", 
+            "user__username", 
+            "service__name", 
+            "status", 
+            "created_at", 
+            "full_url", 
+            "http_status_code", 
+            "response_time_ms", 
+            "price_at_time", 
+            "form_data_sent", 
+            "api_response")
+        import_id_fields = [] 
+
 @admin.register(ServiceUsageLog)
-class ServiceUsageLogAdmin(admin.ModelAdmin):
+class ServiceUsageLogAdmin(ExportMixin, admin.ModelAdmin):
+    resource_class = ServiceUsageLogResource
+    formats = [CSV, XLSX]
     list_display = (
-        'id', 'user_display', 'service', 'status',
+        'id', 'user_display', 'service', 'colored_status',
         'http_status_code', 'created_at'
     )
     list_filter = ('service', 'status', 'created_at')
@@ -111,3 +148,13 @@ class ServiceUsageLogAdmin(admin.ModelAdmin):
     def user_display(self, obj):
         return f"{obj.user.get_full_name() if obj.user else 'Anonymous'}"
     user_display.short_description = 'User'
+    
+    def colored_status(self, obj):
+        status_text = obj.status.capitalize()
+        if obj.status.lower() == "success":
+            return format_html('<span style="color: green;">{}</span>', status_text)
+        elif obj.status.lower() == "failed":
+            return format_html('<span style="color: red;">{}</span>', status_text)
+        return status_text  # fallback for other statuses
+
+    colored_status.short_description = "Status"
