@@ -46,7 +46,7 @@ class ServiceCategoryDetailAPIView(RetrieveAPIView):
 class ServiceDetailAPIView(RetrieveAPIView):
     permission_classes = [IsAuthenticated]
     
-    queryset = Service.objects.prefetch_related('form_fields')
+    queryset = Service.objects.filter(is_active=True).prefetch_related('form_fields')
     serializer_class = ServiceDetailSerializer
     lookup_field = 'slug'
     
