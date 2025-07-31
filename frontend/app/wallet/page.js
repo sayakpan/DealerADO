@@ -167,11 +167,11 @@ const WalletPage = () => {
                                                 </div>
                                             </div>
                                             <div className={`font-semibold ${
-                                                parseFloat(transaction.amount_change) > 0 
+                                                transaction.transaction_type !== 'debit' 
                                                     ? 'text-green-600' 
                                                     : 'text-red-600'
                                             }`}>
-                                                {parseFloat(transaction.amount_change) > 0 ? '(+)' : '(-)'} {Math.abs(parseFloat(transaction.amount_change)).toFixed(0)}
+                                                {transaction.transaction_type !== 'debit' ? '(+)' : '(-)'} {Math.abs(parseFloat(transaction.amount_change)).toFixed(0)}
                                             </div>
                                         </div>
                                     ))

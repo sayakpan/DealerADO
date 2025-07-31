@@ -5,15 +5,14 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 import SmartLink from "../utils/SmartLink";
 import { ChevronDown, Headset, Home, Info, Menu, X } from "lucide-react";
-import { isAuthenticated, logout } from "@/lib/auth";
+import { isAuthenticated } from "@/lib/auth";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import * as NavigationMenu from "@radix-ui/react-navigation-menu";
 import { Wallet, PackageSearch, Settings, LogOut } from "lucide-react";
 import { getUserDetails } from "@/lib/auth";
 import ClientOnly from "../utils/ClientOnly";
-import { toast } from "@/plugin/toast";
 import { ChevronRight } from "lucide-react";
-import GlobalModal from "@/components/ui/global-modal";
+import LogoutModal from "@/components/ui/logout-modal";
 
 export default function Navbar() {
     const pathname = usePathname();
@@ -44,18 +43,7 @@ export default function Navbar() {
     const textColor = fixedNav ? "text-white hover:text-gray-300" : "text-slate-800 hover:text-slate-600";
 
 
-    const handleLogout = async () => {
-        try {
-            const response = await logout();
-            if (response.success) {
-                window.location.href = "/";
-            } else {
-                toast.error(response.message || "Logout failed");
-            }
-        } catch (error) {
-            toast.error(error.message || "An error occurred during logout");
-        }
-    }
+
 
     return (
         <ClientOnly>
@@ -130,25 +118,13 @@ export default function Navbar() {
 
                                                 <div className="border-t border-gray-100 my-2" />
 
-                                                <GlobalModal
+                                                <LogoutModal
                                                     trigger={
                                                         <button className="flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50 w-full text-left cursor-pointer">
                                                             <LogOut className="w-4 h-4" />
                                                             Logout
                                                         </button>
                                                     }
-                                                    title="Log Out"
-                                                    description="Are you sure you want to log out of your account?"
-                                                    icon={LogOut}
-                                                    iconColor="text-red-600"
-                                                    primaryButton={{
-                                                        text: "Yes, Log Out",
-                                                        action: handleLogout,
-                                                    }}
-                                                    secondaryButton={{
-                                                        text: "Cancel",
-                                                        action: () => {},
-                                                    }}
                                                 />
                                             </NavigationMenu.Content>
                                         </NavigationMenu.Item>
@@ -263,28 +239,14 @@ export default function Navbar() {
                             ))}
 
                             {isAuthenticated() ? (
-                                <GlobalModal
+                                <LogoutModal
                                     trigger={
                                         <button className="flex items-center gap-3 px-0 py-2 text-slate-800 rounded-md hover:bg-red-50 transition-colors text-sm font-medium w-full">
                                             <LogOut strokeWidth={1.5} className="w-7 h-7 bg-rose-50 p-1.5 rounded-full" />
                                             Logout
                                         </button>
                                     }
-                                    title="Log Out"
-                                    description="Are you sure you want to log out of your account?"
-                                    icon={LogOut}
-                                    iconColor="text-red-600"
-                                    primaryButton={{
-                                        text: "Yes, Log Out",
-                                        action: () => {
-                                            setMenuOpen(false);
-                                            handleLogout();
-                                        },
-                                    }}
-                                    secondaryButton={{
-                                        text: "Cancel",
-                                        action: () => {},
-                                    }}
+                                    onLogoutSuccess={() => setMenuOpen(false)}
                                 />
                             ) : (
                                 <>

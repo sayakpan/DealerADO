@@ -4,11 +4,10 @@ import React, { useState } from 'react'
 import ServiceHeader from '@/components/ui/serviceHeader'
 import { Eye, EyeOff } from 'lucide-react'
 import { changePassword } from '@/services/settings'
-import { toast } from "@/plugin/toast"
-import { useRouter } from 'next/navigation'
+import PasswordChangeSuccessModal from '@/components/ui/password-change-success-modal'
+import InvalidErrorModal from '@/components/ui/invalid-error-modal'
 
 const ChangePasswordPage = () => {
-    const router = useRouter()
     const [formData, setFormData] = useState({
         currentPassword: '',
         newPassword: '',
@@ -20,8 +19,9 @@ const ChangePasswordPage = () => {
         confirm: false
     })
     const [loading, setLoading] = useState(false)
-    const [error, setError] = useState('')
-    const [success, setSuccess] = useState('')
+    const [showSuccessModal, setShowSuccessModal] = useState(false)
+    const [showErrorModal, setShowErrorModal] = useState(false)
+    const [errorMessage, setErrorMessage] = useState('')
 
     const handleInputChange = (e) => {
         const { name, value } = e.target
@@ -29,8 +29,7 @@ const ChangePasswordPage = () => {
             ...prev,
             [name]: value
         }))
-        // Clear error when user starts typing
-        if (error) setError('')
+        // Clear error when user starts typing (no longer needed with modal)
     }
 
     const togglePasswordVisibility = (field) => {
@@ -42,23 +41,28 @@ const ChangePasswordPage = () => {
 
     const validateForm = () => {
         if (!formData.currentPassword) {
-            setError('Current password is required')
+            setErrorMessage('Current password is required')
+            setShowErrorModal(true)
             return false
         }
         if (!formData.newPassword) {
-            setError('New password is required')
+            setErrorMessage('New password is required')
+            setShowErrorModal(true)
             return false
         }
         if (formData.newPassword.length < 8) {
-            setError('New password must be at least 8 characters long')
+            setErrorMessage('New password must be at least 8 characters long')
+            setShowErrorModal(true)
             return false
         }
         if (formData.newPassword !== formData.confirmPassword) {
-            setError('New passwords do not match')
+            setErrorMessage('New passwords do not match')
+            setShowErrorModal(true)
             return false
         }
         if (formData.currentPassword === formData.newPassword) {
-            setError('New password must be different from current password')
+            setErrorMessage('New password must be different from current password')
+            setShowErrorModal(true)
             return false
         }
         return true
@@ -70,33 +74,26 @@ const ChangePasswordPage = () => {
         if (!validateForm()) return
 
         setLoading(true)
-        setError('')
-        setSuccess('')
 
-            const response = await changePassword(formData)
-            // Show success toast
-            if(response?.status === 400){
-                console.log(response?.error)
-                // toast.error(response?.error || 'Something went wrong', {
-                //     duration: 3000
-                // })
-                setLoading(false)
-            }else{
-                toast.success(response?.message || 'Password changed successfully!', {
-                    duration: 3000
-                })
-                setSuccess(response?.message || 'Password changed successfully!')
-                setFormData({
-                    currentPassword: '',
-                    newPassword: '',
-                    confirmPassword: ''
-                })
-                // Redirect to login or settings after successful change
-                setTimeout(() => {
-                    router.push('/login')
-                }, 2000)
-                setLoading(false)
-            }
+        const response = await changePassword(formData)
+
+        if (response?.status === 400 || response?.data?.error) {
+            console.log(response?.data?.error)
+            setErrorMessage(response?.data?.error || 'Something went wrong')
+            setShowErrorModal(true)
+            setLoading(false)
+        } else {
+            console.log(response)
+            // Clear form data
+            setFormData({
+                currentPassword: '',
+                newPassword: '',
+                confirmPassword: ''
+            })
+            setLoading(false)
+            // Show success modal
+            setShowSuccessModal(true)
+        }
 
     }
 
@@ -205,19 +202,9 @@ const ChangePasswordPage = () => {
                                 </button>
                             </div>
 
-                            {/* Error Message */}
-                            {error && (
-                                <div className="bg-red-50 border border-red-200 rounded-lg p-3 sm:p-4">
-                                    <div className="text-red-800 text-sm sm:text-base">{error}</div>
-                                </div>
-                            )}
 
-                            {/* Success Message */}
-                            {success && (
-                                <div className="bg-green-50 border border-green-200 rounded-lg p-3 sm:p-4">
-                                    <div className="text-green-800 text-sm sm:text-base">{success}</div>
-                                </div>
-                            )}
+
+
 
                             {/* Submit Button */}
                             <div className="w-full h-11 sm:h-12 lg:h-14 p-2 sm:p-2.5 bg-red-700 rounded-xl sm:rounded-2xl shadow-[0px_4px_16px_0px_rgba(0,0,0,0.20)] flex justify-center items-center gap-2.5 mt-2 sm:mt-4">
@@ -240,6 +227,20 @@ const ChangePasswordPage = () => {
                     </div>
                 </div>
             </div>
+
+            {/* Password Change Success Modal */}
+            <PasswordChangeSuccessModal
+                open={showSuccessModal}
+                onOpenChange={setShowSuccessModal}
+            />
+
+            {/* Invalid Error Modal */}
+            <InvalidErrorModal
+                open={showErrorModal}
+                onOpenChange={setShowErrorModal}
+                title="Invalid Error"
+                description={errorMessage}
+            />
         </div>
     )
 }
