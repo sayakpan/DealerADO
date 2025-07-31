@@ -23,6 +23,7 @@ export default function GlobalModal({
 	onOpenChange,
 	showCloseButton = true, // New prop to control close button visibility
 	allowOutsideClick = true, // New prop to control outside click closing
+	buttonLayout = "horizontal", // New prop: "horizontal" or "vertical"
 }) {
 	const [internalOpen, setInternalOpen] = useState(false);
 
@@ -186,7 +187,7 @@ export default function GlobalModal({
 					top: '200px',
 					left: '0',
 					right: '0',
-					bottom: '80px',
+					bottom: buttonLayout === 'vertical' && secondaryButton ? '140px' : '80px',
 					display: 'flex',
 					flexDirection: 'column',
 					justifyContent: 'center',
@@ -218,7 +219,8 @@ export default function GlobalModal({
 								fontWeight: 'normal',
 								lineHeight: '1.5',
 								margin: 0,
-								maxWidth: '90%'
+								maxWidth: '90%',
+								textAlign: 'center'
 							}}>
 								{description}
 							</DialogDescription>
@@ -233,51 +235,99 @@ export default function GlobalModal({
 					left: '20px',
 					right: '20px',
 					display: 'flex',
+					flexDirection: buttonLayout === 'vertical' ? 'column' : 'row',
 					gap: '12px'
 				}}>
 					{secondaryButton ? (
-						<>
-							<button
-								onClick={handleSecondaryAction}
-								style={{
-									flex: 1,
-									height: '48px',
-									backgroundColor: 'white',
-									border: '2px solid #374151',
-									borderRadius: '16px',
-									color: '#374151',
-									fontSize: '16px',
-									fontWeight: '500',
-									cursor: 'pointer',
-									transition: 'background-color 0.2s',
-									outline: 'none'
-								}}
-								onMouseEnter={(e) => e.target.style.backgroundColor = '#f9fafb'}
-								onMouseLeave={(e) => e.target.style.backgroundColor = 'white'}
-							>
-								{secondaryButton.text}
-							</button>
-							<button
-								onClick={handlePrimaryAction}
-								style={{
-									flex: 1,
-									height: '48px',
-									backgroundColor: '#374151',
-									border: 'none',
-									borderRadius: '16px',
-									color: 'white',
-									fontSize: '16px',
-									fontWeight: '500',
-									cursor: 'pointer',
-									transition: 'background-color 0.2s',
-									outline: 'none'
-								}}
-								onMouseEnter={(e) => e.target.style.backgroundColor = '#1f2937'}
-								onMouseLeave={(e) => e.target.style.backgroundColor = '#374151'}
-							>
-								{primaryButton.text}
-							</button>
-						</>
+						buttonLayout === 'vertical' ? (
+							<>
+								{/* Vertical layout - Primary button first */}
+								<button
+									onClick={handlePrimaryAction}
+									style={{
+										width: '100%',
+										height: '48px',
+										backgroundColor: '#374151',
+										border: 'none',
+										borderRadius: '24px',
+										color: 'white',
+										fontSize: '16px',
+										fontWeight: '500',
+										cursor: 'pointer',
+										transition: 'background-color 0.2s',
+										outline: 'none'
+									}}
+									onMouseEnter={(e) => e.target.style.backgroundColor = '#1f2937'}
+									onMouseLeave={(e) => e.target.style.backgroundColor = '#374151'}
+								>
+									{primaryButton.text}
+								</button>
+								<button
+									onClick={handleSecondaryAction}
+									style={{
+										width: '100%',
+										height: '48px',
+										backgroundColor: 'white',
+										border: '2px solid #374151',
+										borderRadius: '24px',
+										color: '#374151',
+										fontSize: '16px',
+										fontWeight: '500',
+										cursor: 'pointer',
+										transition: 'background-color 0.2s',
+										outline: 'none'
+									}}
+									onMouseEnter={(e) => e.target.style.backgroundColor = '#f9fafb'}
+									onMouseLeave={(e) => e.target.style.backgroundColor = 'white'}
+								>
+									{secondaryButton.text}
+								</button>
+							</>
+						) : (
+							<>
+								{/* Horizontal layout - Secondary button first */}
+								<button
+									onClick={handleSecondaryAction}
+									style={{
+										flex: 1,
+										height: '48px',
+										backgroundColor: 'white',
+										border: '2px solid #374151',
+										borderRadius: '24px',
+										color: '#374151',
+										fontSize: '16px',
+										fontWeight: '500',
+										cursor: 'pointer',
+										transition: 'background-color 0.2s',
+										outline: 'none'
+									}}
+									onMouseEnter={(e) => e.target.style.backgroundColor = '#f9fafb'}
+									onMouseLeave={(e) => e.target.style.backgroundColor = 'white'}
+								>
+									{secondaryButton.text}
+								</button>
+								<button
+									onClick={handlePrimaryAction}
+									style={{
+										flex: 1,
+										height: '48px',
+										backgroundColor: '#374151',
+										border: 'none',
+										borderRadius: '24px',
+										color: 'white',
+										fontSize: '16px',
+										fontWeight: '500',
+										cursor: 'pointer',
+										transition: 'background-color 0.2s',
+										outline: 'none'
+									}}
+									onMouseEnter={(e) => e.target.style.backgroundColor = '#1f2937'}
+									onMouseLeave={(e) => e.target.style.backgroundColor = '#374151'}
+								>
+									{primaryButton.text}
+								</button>
+							</>
+						)
 					) : (
 						<button
 							onClick={handlePrimaryAction}
@@ -286,7 +336,7 @@ export default function GlobalModal({
 								height: '48px',
 								backgroundColor: '#374151',
 								border: 'none',
-								borderRadius: '16px',
+								borderRadius: '24px',
 								color: 'white',
 								fontSize: '16px',
 								fontWeight: '500',
