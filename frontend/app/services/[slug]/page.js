@@ -12,6 +12,7 @@ const ServicePage = ({ params }) => {
     const [formData, setFormData] = useState({})
     const [formErrors, setFormErrors] = useState({})
     const [validationRules, setValidationRules] = useState({})
+    const [touchedFields, setTouchedFields] = useState({})
 
     // Unwrap params using React.use()
     const resolvedParams = use(params)
@@ -111,19 +112,121 @@ const ServicePage = ({ params }) => {
         fetchService()
     }, [slug])
 
+    const validateSingleFieldLogic = (fieldKey, value) => {
+        const field = service?.form_fields?.find(f => f.key === fieldKey)
+        if (!field) return null
+
+        // First, check OR groups to see if at least one field in each group is filled
+        const orGroupErrors = {}
+        if (service?.or_groups) {
+            service.or_groups.forEach(group => {
+                const hasAtLeastOneField = group.fields.some(key => {
+                    const fieldValue = key === fieldKey ? value : formData[key]
+                    return fieldValue && fieldValue.toString().trim() !== ''
+                })
+
+                if (!hasAtLeastOneField) {
+                    // If no field in the OR group is filled, mark all fields in the group as required
+                    group.fields.forEach(key => {
+                        orGroupErrors[key] = group.message || "This field is required"
+                    })
+                }
+            })
+        }
+
+        const fieldValue = value
+        const isInOrGroup = service.or_groups?.some(group => group.fields.includes(fieldKey))
+        const orGroupSatisfied = isInOrGroup && !orGroupErrors[fieldKey]
+
+        // Check required validation
+        if (field.is_required && !orGroupSatisfied && isInOrGroup) {
+            // OR group validation
+            if (orGroupErrors[fieldKey]) {
+                return orGroupErrors[fieldKey]
+            }
+        } else if (field.is_required && !isInOrGroup) {
+            // Regular required field validation
+            if (!fieldValue || fieldValue.toString().trim() === '') {
+                return "This field is required"
+            }
+        }
+
+        // Apply other validation rules only if field has a value
+        if (fieldValue && fieldValue.toString().trim() !== '' && field.validation_rules) {
+            for (const rule of field.validation_rules) {
+                let validator = null
+
+                switch (rule.type) {
+                    case 'alphaNum':
+                        validator = validators.alphaNum
+                        break
+                    case 'numeric':
+                        validator = validators.numeric
+                        break
+                    case 'email':
+                        validator = validators.email
+                        break
+                    case 'minLength':
+                        validator = validators.minLength(rule.value)
+                        break
+                    case 'maxLength':
+                        validator = validators.maxLength(rule.value)
+                        break
+                    case 'hasLength':
+                        validator = validators.hasLength(rule.value)
+                        break
+                    case 'hasMultipleLengths':
+                        validator = validators.hasMultipleLengths(rule.values)
+                        break
+                    case 'integer':
+                        validator = validators.integer
+                        break
+                    case 'decimal':
+                        validator = validators.decimal
+                        break
+                }
+
+                if (validator) {
+                    const validationError = validator(fieldValue)
+                    if (validationError) {
+                        return validationError
+                    }
+                }
+            }
+        }
+
+        return null
+    }
+
     const handleInputChange = (fieldKey, value) => {
         setFormData(prev => ({
             ...prev,
             [fieldKey]: value
         }))
 
-        // Clear error for this field when user starts typing
-        if (formErrors[fieldKey]) {
+        // Only validate on typing if the field has been touched and has errors
+        if (touchedFields[fieldKey] && formErrors[fieldKey]) {
+            const error = validateSingleFieldLogic(fieldKey, value)
             setFormErrors(prev => ({
                 ...prev,
-                [fieldKey]: null
+                [fieldKey]: error
             }))
         }
+    }
+
+    const handleInputBlur = (fieldKey) => {
+        // Mark field as touched
+        setTouchedFields(prev => ({
+            ...prev,
+            [fieldKey]: true
+        }))
+
+        // Validate the field on blur
+        const error = validateSingleFieldLogic(fieldKey, formData[fieldKey])
+        setFormErrors(prev => ({
+            ...prev,
+            [fieldKey]: error
+        }))
     }
 
     const validateForm = () => {
@@ -275,6 +378,7 @@ const ServicePage = ({ params }) => {
                                                         placeholder={field.placeholder}
                                                         value={formData[field.key] || ''}
                                                         onChange={(e) => handleInputChange(field.key, e.target.value)}
+                                                        onBlur={() => handleInputBlur(field.key)}
                                                         className="w-full bg-transparent border-none outline-none text-slate-700 text-2xl font-medium placeholder:text-slate-400 [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [-moz-appearance:textfield]"
                                                         required={field.is_required}
                                                     />
