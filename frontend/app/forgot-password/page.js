@@ -3,6 +3,8 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
+import UserNotExistModal from "@/components/ui/user-not-exist-modal";
+import ResetLinkSentModal from "@/components/ui/reset-link-sent-modal";
 
 // import Header from "@/components/core/header";
 // import FooterContent from "@/components/core/footer";
@@ -11,14 +13,47 @@ import { useState } from "react";
 export default function ForgotPasswordPage() {
     const [email, setEmail] = useState("johndoe@gmail.com");
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [showUserNotExistModal, setShowUserNotExistModal] = useState(false);
+    const [showResetLinkSentModal, setShowResetLinkSentModal] = useState(false);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setIsSubmitting(true);
-        setTimeout(() => {
-            alert("Reset link sent to your email!");
+        
+        try {
+            // TODO: Replace with actual forgot password API call
+            // const response = await forgotPasswordAPI(email);
+            
+            // Simulate API response for demonstration
+            // You can replace this with actual API logic
+            const simulateUserExists = Math.random() > 0.5; // 50% chance for demo
+            
+            setTimeout(() => {
+                if (simulateUserExists) {
+                    // User exists, show success modal
+                    setShowResetLinkSentModal(true);
+                } else {
+                    // User doesn't exist, show error modal
+                    setShowUserNotExistModal(true);
+                }
+                setIsSubmitting(false);
+            }, 2000);
+            
+        } catch (error) {
+            console.error('Forgot password error:', error);
+            setShowUserNotExistModal(true);
             setIsSubmitting(false);
-        }, 2000);
+        }
+    };
+
+    const handleRetry = () => {
+        // Clear the email field or keep it for retry
+        // setEmail(''); // Uncomment if you want to clear the field
+    };
+
+    const handleOkay = () => {
+        // Optionally redirect to login page or clear form
+        // window.location.href = '/login';
     };
 
     return (
@@ -104,6 +139,20 @@ export default function ForgotPasswordPage() {
 
             {/* Footer */}
             {/* <FooterContent /> */}
+
+            {/* User Not Exist Modal */}
+            <UserNotExistModal
+                open={showUserNotExistModal}
+                onOpenChange={setShowUserNotExistModal}
+                onRetry={handleRetry}
+            />
+
+            {/* Reset Link Sent Modal */}
+            <ResetLinkSentModal
+                open={showResetLinkSentModal}
+                onOpenChange={setShowResetLinkSentModal}
+                onOkay={handleOkay}
+            />
         </div>
     );
 }
