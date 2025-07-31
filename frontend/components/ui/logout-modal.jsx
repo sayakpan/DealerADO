@@ -1,43 +1,46 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
 import GlobalModal from "@/components/ui/global-modal";
-import { LogOut } from "lucide-react";
+import { logout } from "@/lib/auth";
+import { toast } from "@/plugin/toast";
 
-export default function LogoutModal({ onLogout }) {
-  const handleLogout = () => {
-    if (onLogout) {
-      onLogout();
-    } else {
-      // Default logout logic
-      console.log("User logged out");
-    }
-  };
+export default function LogoutModal({ 
+    trigger, 
+    onLogoutSuccess = () => {}, 
+    open, 
+    onOpenChange 
+}) {
+    const handleLogout = async () => {
+        try {
+            const response = await logout();
+            if (response.success) {
+                onLogoutSuccess();
+                window.location.href = "/";
+            } else {
+                toast.error(response.message || "Logout failed");
+            }
+        } catch (error) {
+            toast.error(error.message || "An error occurred during logout");
+        }
+    };
 
-  const handleCancel = () => {
-    console.log("Logout cancelled");
-  };
-
-  return (
-    <GlobalModal
-      trigger={
-        <Button variant="outline" className="flex items-center gap-2 bg-transparent">
-          <LogOut className="w-4 h-4" />
-          Open Logout Modal
-        </Button>
-      }
-      title="Log Out"
-      description="Are you sure you want to Log Out your account?"
-      icon={LogOut}
-      iconColor="text-red-600"
-      primaryButton={{
-        text: "Yes",
-        action: handleLogout,
-      }}
-      secondaryButton={{
-        text: "No",
-        action: handleCancel,
-      }}
-    />
-  );
+    return (
+        <GlobalModal
+            trigger={trigger}
+            title="Log Out"
+            description="Are you sure you want to log out of your account?"
+            imageSrc="/images/modal/logout.png"
+            imageAlt="Logout icon"
+            primaryButton={{
+                text: "Yes",
+                action: handleLogout,
+            }}
+            secondaryButton={{
+                text: "No",
+                action: () => {},
+            }}
+            open={open}
+            onOpenChange={onOpenChange}
+        />
+    );
 }

@@ -1,9 +1,28 @@
 "use client"
+import { useState } from 'react'
 import Image from 'next/image'
 import ServiceHeader from "@/components/ui/serviceHeader"
 import SmartLink from '@/components/utils/SmartLink'
+import DeactivateAccountModal from '@/components/ui/deactivate-account-modal'
 
 const SettingsPage = () => {
+    const [showDeactivateModal, setShowDeactivateModal] = useState(false)
+
+    // Mock deactivate account function - replace with actual API call
+    const handleDeactivateAccount = async () => {
+        try {
+            // TODO: Replace with actual deactivate account API call
+            // const response = await deactivateAccount();
+            // return response;
+            
+            // For now, just simulate success
+            console.log('Account deactivation requested');
+            return { success: true };
+        } catch (error) {
+            console.error('Deactivation failed:', error);
+            throw error;
+        }
+    }
     return (
         <div className="min-h-screen bg-gray-50">
             <ServiceHeader title="Settings" />
@@ -36,7 +55,10 @@ const SettingsPage = () => {
                         {/* Divider Line */}
                         <div className="w-full h-0 opacity-5 border-t border-black"></div>
                         {/* Deactivate Account Setting */}
-                        <div className="self-stretch flex justify-between items-center cursor-pointer">
+                        <div 
+                            className="self-stretch flex justify-between items-center cursor-pointer hover:bg-gray-50 rounded-lg p-2 -m-2 transition-colors"
+                            onClick={() => setShowDeactivateModal(true)}
+                        >
                             <div className="flex justify-start items-center gap-3">
                                 {/* Background Circle with Deactivate Icon */}
                                 <div className="w-[50px] h-[50px] rounded-full bg-[#F9EEEE] flex items-center justify-center relative">
@@ -60,6 +82,13 @@ const SettingsPage = () => {
                     </div>
                 </div>
             </div>
+
+            {/* Deactivate Account Modal */}
+            <DeactivateAccountModal
+                open={showDeactivateModal}
+                onOpenChange={setShowDeactivateModal}
+                onDeactivate={handleDeactivateAccount}
+            />
         </div>
     )
 }
