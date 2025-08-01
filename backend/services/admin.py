@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Secrets, ServiceCategory, Service, ServiceFormField, ServiceUsageLog
+from .models import Secrets, ServiceCategory, Service, ServiceFormField, ServiceUsageLog, HTTPStatusCode
 from django.utils.safestring import mark_safe
 from django import forms
 from django_ckeditor_5.widgets import CKEditor5Widget
@@ -14,7 +14,11 @@ class SecretsAdmin(admin.ModelAdmin):
     list_display = ('id', 'provider_name', 'auth_type', 'created_at', 'updated_at')
     search_fields = ('provider_name',)
     list_filter = ('auth_type', 'created_at')
-    
+
+@admin.register(HTTPStatusCode)
+class HTTPStatusCodeAdmin(admin.ModelAdmin):
+    list_display = ('id', 'code', 'description')
+    search_fields = ('code', 'description')
 
 @admin.register(ServiceCategory)
 class ServiceCategoryAdmin(admin.ModelAdmin):
@@ -33,6 +37,7 @@ class ServiceAdminForm(forms.ModelForm):
 @admin.register(Service)
 class ServiceAdmin(admin.ModelAdmin):
     form = ServiceAdminForm
+    filter_horizontal = ('deductible_codes',)
     list_display = ('id', 'name', 'category', 'api_url','price_per_hit', 'is_active')
     search_fields = ('name', 'api_url')
     list_filter = ('category', 'is_active', 'api_method')

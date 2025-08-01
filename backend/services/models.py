@@ -51,6 +51,20 @@ class Secrets(models.Model):
 
         if self.auth_type == 'custom_headers' and not self.headers:
             raise ValidationError({'headers': 'Custom headers are required for custom_headers auth.'})
+        
+        
+class HTTPStatusCode(models.Model):
+    code = models.PositiveIntegerField(unique=True)
+    description = models.CharField(max_length=255, blank=True)
+
+    class Meta:
+        verbose_name = "HTTP Status Code"
+        verbose_name_plural = "HTTP Status Codes"
+        ordering = ["code"]
+
+    def __str__(self):
+        return f"{self.code} - {self.description or 'No Description'}"
+    
 
 class ServiceCategory(models.Model):
     name = models.CharField(max_length=100, verbose_name="Category Name")
@@ -95,6 +109,13 @@ class Service(models.Model):
     )
     secret = models.ForeignKey(Secrets, on_delete=models.SET_NULL, null=True, blank=True, related_name='services', verbose_name="Linked Secret", help_text="Which secret this service should use for authentication")
     price_per_hit = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Price Per Hit")
+    deductible_codes = models.ManyToManyField(
+        HTTPStatusCode,
+        blank=True,
+        related_name='services',
+        verbose_name="Deductible Status Codes",
+        help_text="Wallet will be deducted only if the response status code is in this list."
+    )
     cover_image = models.ImageField(upload_to="services/covers/", blank=True, null=True, verbose_name="Cover Image")
     description = CKEditor5Field(blank=True, verbose_name="Description")
 
