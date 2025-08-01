@@ -142,10 +142,10 @@ def submit_service_form(request, slug):
     except ValueError:
         response_json = {"raw_response": response.text}
         
-    external_success = (
-        response_json.get("code") in [200, "200"]
-        or response_json.get("status") == "success"
-    )
+    deductible_codes = set(service.deductible_codes.values_list("code", flat=True))
+    should_deduct = response.status_code in deductible_codes
+
+    external_success = should_deduct or response_json.get("status") == "success"
     
     usage_log = ServiceUsageLog.objects.create(
         user=user,
@@ -159,7 +159,7 @@ def submit_service_form(request, slug):
         price_at_time=service.price_per_hit
     )
     
-    if external_success:
+    if should_deduct:
         try:
             with transaction.atomic():
                 previous = wallet.balance
@@ -182,28 +182,56 @@ def submit_service_form(request, slug):
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     
     # Step 7: Return final result
-    if not external_success:
+    if not should_deduct:
         return JsonResponse({
             "error": "External API responded with failure.",
             "response": response_json
         }, status=status.HTTP_400_BAD_REQUEST)
 
-    # Step 6: Generate and save PDF
-    pdf_buffer = generate_service_pdf(service.name, response_json, user)
-    timestamp = int(time.time())
-    pdf_filename = f"service_reports/{slug}_{user.id}_{timestamp}.pdf"
-    pdf_file = ContentFile(pdf_buffer.getvalue())
-    default_storage.save(pdf_filename, pdf_file)
-    pdf_url = build_absolute_pdf_url(pdf_filename)
-
     return JsonResponse({
         "message": "Success",
         "service": service.name,
         "response": response_json,
-        "pdf_url": pdf_url,
-        "pdf_filename": pdf_filename
+        "log_id": usage_log.id,
     })
     
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def generate_pdf_from_log(request):
+    log_id = request.GET.get("log_id")
+    if not log_id:
+        return JsonResponse({"error": "log_id is required"}, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        usage_log = ServiceUsageLog.objects.get(id=log_id, user=request.user)
+    except ServiceUsageLog.DoesNotExist:
+        return JsonResponse({"error": "Service usage log not found"}, status=status.HTTP_404_NOT_FOUND)
+
+    if usage_log.status != "success":
+        return JsonResponse({"error": "Cannot generate PDF for failed log."}, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        pdf_buffer = generate_service_pdf(
+            usage_log.service.name,
+            usage_log.api_response,
+            usage_log.user
+        )
+        timestamp = int(time.time())
+        pdf_filename = f"service_reports/{usage_log.service.slug}_{usage_log.user.id}_{timestamp}.pdf"
+        pdf_file = ContentFile(pdf_buffer.getvalue())
+        default_storage.save(pdf_filename, pdf_file)
+        pdf_url = build_absolute_pdf_url(pdf_filename)
+
+        return JsonResponse({
+            "message": "PDF generated successfully.",
+            "pdf_url": pdf_url,
+            "pdf_filename": pdf_filename
+        })
+
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 
 @api_view(["DELETE"])
 @permission_classes([IsAuthenticated])

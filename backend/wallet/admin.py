@@ -67,4 +67,9 @@ class TransactionLogAdmin(ExportMixin, admin.ModelAdmin):
         return False  # disallow adding logs manually
 
     def has_change_permission(self, request, obj=None):
-        return False
+        return True if obj else False
+    
+    def get_readonly_fields(self, request, obj=None):
+        if obj:  # editing an existing object
+            return [f.name for f in self.model._meta.fields if f.name != 'note']
+        return super().get_readonly_fields(request, obj)
