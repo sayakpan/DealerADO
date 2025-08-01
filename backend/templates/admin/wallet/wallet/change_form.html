@@ -1,0 +1,48 @@
+{% extends "admin/change_form.html" %}
+{% load static %}
+
+{% block object-tools %}
+  {{ block.super }}
+  <style>
+    .wallet-tools {
+        margin-top: 12px;
+        display: flex;
+        justify-content: flex-end;
+        gap: 5px;
+        flex-wrap: wrap;
+    }
+
+    .wallet-tools a.button {
+        padding: 6px 14px;
+        border-radius: 4px;
+        font-weight: 500;
+        font-size: 14px;
+        text-decoration: none;
+        display: inline-block;
+        transition: background-color 0.2s ease, color 0.2s ease;
+    }
+
+    .wallet-tools a.recharge {
+        background-color: #00861f;
+        color: white;
+    }
+
+    .wallet-tools a.recharge:hover {
+        background-color: #218838;
+    }
+
+    .wallet-tools a.deduct {
+        background-color: #b91122;
+        color: white;
+    }
+
+    .wallet-tools a.deduct:hover {
+        background-color: #c82333;
+    }
+  </style>
+
+  <div class="wallet-tools">
+    <a class="button recharge" href="{{ custom_transaction_url }}?type=recharge">Recharge</a>
+    <a class="button deduct" href="{{ custom_transaction_url }}?type=debit">Deduct</a>
+  </div>
+{% endblock %}

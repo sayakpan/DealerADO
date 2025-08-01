@@ -1,0 +1,57 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+
+{% block content %}
+<div style="max-width: 680px; margin: auto; padding: 4px;">
+    <h2 style="margin-bottom: 24px; margin-top: 0px; font-size: 24px; color: #2c3e50;">Wallet Transaction</h2>
+
+    <div
+        style="margin-bottom: 30px; background: #f1f1f1; padding: 16px 20px; border-left: 4px solid #007bff; border-radius: 6px;">
+        <p style="margin: 0;"><strong>Wallet User:</strong> {{ wallet.user.get_full_name }}</p>
+        <p style="margin: 0;"><strong>Current Balance:</strong> ₹{{ wallet.balance }} {{ wallet.currency }}</p>
+    </div>
+
+    <form method="post" style="background: #fff; padding: 24px 20px; border-radius: 6px; border: 1px solid #ccc;">
+        {% csrf_token %}
+        <table class="admin-form-table" style="width: 100%; border-spacing: 14px;">
+            {{ form.as_table }}
+        </table>
+
+        <div style="
+    margin-top: 24px;
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+    align-items: center;
+">
+
+            <a href="{{ request.META.HTTP_REFERER }}" class="button" style="
+        padding: 8px 20px;
+        background-color: #e0e0e0;
+        color: #333;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        text-decoration: none;
+        font-weight: 500;
+        transition: background-color 0.2s ease;
+     " onmouseover="this.style.backgroundColor='#d5d5d5'" onmouseout="this.style.backgroundColor='#e0e0e0'">
+                Cancel
+            </a>
+
+            <button type="submit" style="
+            padding: 8px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+          " onmouseover="this.style.backgroundColor='#0069d9'" onmouseout="this.style.backgroundColor='#007bff'">
+                Submit
+            </button>
+
+        </div>
+    </form>
+</div>
+{% endblock %}
