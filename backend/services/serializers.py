@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Service, ServiceCategory, ServiceFormField
+from .models import Service, ServiceCategory, ServiceFormField, ServiceUsageLog
 
 class ServiceCategorySerializer(serializers.ModelSerializer):
     logo_url = serializers.SerializerMethodField()
@@ -113,4 +113,25 @@ class ServiceDetailSerializer(serializers.ModelSerializer):
                 "message": f"Please enter any one of: {', '.join(f.label for f in group_fields)}"
             }
             for group_fields in groups.values() if len(group_fields) > 1
+        ]
+        
+        
+class ServiceUsageLogSerializer(serializers.ModelSerializer):
+    service_name = serializers.CharField(source='service.name', read_only=True)
+    wallet_txn_id = serializers.CharField(source='wallet_transaction.id', read_only=True)
+
+    class Meta:
+        model = ServiceUsageLog
+        fields = [
+            'id',
+            'service_name',
+            'full_url',
+            'form_data_sent',
+            'api_response',
+            'status',
+            'http_status_code',
+            'response_time_ms',
+            'price_at_time',
+            'wallet_txn_id',
+            'created_at',
         ]

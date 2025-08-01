@@ -8,7 +8,7 @@ from django.contrib.auth.models import AnonymousUser
 from django.http import HttpResponse
 from services.utils import build_absolute_pdf_url, generate_service_pdf
 from .models import ServiceCategory, Service
-from .serializers import ServiceCategoryDetailSerializer, ServiceCategorySerializer, ServiceDetailSerializer
+from .serializers import ServiceCategoryDetailSerializer, ServiceCategorySerializer, ServiceDetailSerializer, ServiceUsageLogSerializer
 from rest_framework.permissions import IsAuthenticated
 from django.http import JsonResponse, Http404
 from django.views.decorators.csrf import csrf_exempt
@@ -49,6 +49,15 @@ class ServiceDetailAPIView(RetrieveAPIView):
     queryset = Service.objects.filter(is_active=True).prefetch_related('form_fields')
     serializer_class = ServiceDetailSerializer
     lookup_field = 'slug'
+    
+    
+    
+class UserServiceUsageLogListView(ListAPIView):
+    serializer_class = ServiceUsageLogSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return ServiceUsageLog.objects.filter(user=self.request.user).order_by('-created_at')    
     
     
     
@@ -143,8 +152,13 @@ def submit_service_form(request, slug):
         response_json = {"raw_response": response.text}
         
     deductible_codes = set(service.deductible_codes.values_list("code", flat=True))
+    if not deductible_codes:
+        return JsonResponse({
+            "code": status.HTTP_500_INTERNAL_SERVER_ERROR,
+            "error": "No deductible codes configured for this service."
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
     should_deduct = response.status_code in deductible_codes
-
     external_success = should_deduct or response_json.get("status") == "success"
     
     usage_log = ServiceUsageLog.objects.create(
@@ -182,9 +196,9 @@ def submit_service_form(request, slug):
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     
     # Step 7: Return final result
-    if not should_deduct:
+    if not external_success:
         return JsonResponse({
-            "error": "External API responded with failure.",
+            "error": "External API responded with failure. No wallet deduction made.",
             "response": response_json
         }, status=status.HTTP_400_BAD_REQUEST)
 
