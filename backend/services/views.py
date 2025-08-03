@@ -79,27 +79,47 @@ def submit_service_form(request, slug):
     try:
         wallet = user.wallet
     except Wallet.DoesNotExist:
-        return JsonResponse({"error": "Wallet not found"}, status=status.HTTP_403_FORBIDDEN)
+        return JsonResponse({
+            "success": False,
+            "message": "Wallet not found",
+            "service": service.name,
+            "log_id": None,
+            "response": {}
+        }, status=status.HTTP_403_FORBIDDEN)
 
     if wallet.balance < service.price_per_hit:
         return JsonResponse({
-            "error": "Insufficient wallet balance",
-            "balance": float(wallet.balance),
-            "required": float(service.price_per_hit)
+            "success": False,
+            "message": "Insufficient wallet balance",
+            "service": service.name,
+            "log_id": None,
+            "response": {
+                "balance": float(wallet.balance),
+                "required": float(service.price_per_hit)
+            }
         }, status=status.HTTP_402_PAYMENT_REQUIRED)
 
     # Step 2: Validate payload
     try:
         data = json.loads(request.body)
     except json.JSONDecodeError:
-        return JsonResponse({"message": "Invalid JSON"}, status=status.HTTP_400_BAD_REQUEST)
+        return JsonResponse({
+            "success": False,
+            "message": "Invalid JSON",
+            "service": service.name,
+            "log_id": None,
+            "response": {}
+        }, status=status.HTTP_400_BAD_REQUEST)
 
     expected_keys = list(service.form_fields.values_list('key', flat=True))
     missing_keys = [key for key in expected_keys if key not in data]
     if missing_keys:
         return JsonResponse({
+            "success": False,
             "message": "Missing required fields.",
-            "missing": missing_keys
+            "service": service.name,
+            "log_id": None,
+            "response": {"missing": missing_keys}
         }, status=status.HTTP_400_BAD_REQUEST)
         
     sanitized_data = {
@@ -121,6 +141,8 @@ def submit_service_form(request, slug):
             })
         
     # Step 4: Call external API 
+    response = None
+    full_url = service.api_url
     try:
         if service.api_method.upper() == 'GET':
             full_url = requests.Request('GET', service.api_url, params=sanitized_data).prepare().url
@@ -130,20 +152,24 @@ def submit_service_form(request, slug):
             response = requests.post(full_url, json=sanitized_data, headers=headers, timeout=15)
         response.raise_for_status()
     except requests.RequestException as e:
+        http_status = getattr(e.response, 'status_code', 500) if hasattr(e, 'response') and e.response else 500
+        
         ServiceUsageLog.objects.create(
             user=user,
             service=service,
             full_url=full_url,
             form_data_sent=sanitized_data,
             api_response={"error": str(e)},
-            http_status_code=response.status_code,
+            http_status_code=http_status,
             status='failed',
             price_at_time=service.price_per_hit
         )
         return JsonResponse({
-            "code": response.status_code,
+            "success": False,
             "message": "External API call failed.",
-            "details": str(e)
+            "service": service.name,
+            "log_id": None,
+            "response": {"error": str(e)}
         }, status=status.HTTP_503_SERVICE_UNAVAILABLE)
         
     try:
@@ -154,8 +180,11 @@ def submit_service_form(request, slug):
     deductible_codes = set(service.deductible_codes.values_list("code", flat=True))
     if not deductible_codes:
         return JsonResponse({
-            "code": status.HTTP_500_INTERNAL_SERVER_ERROR,
-            "error": "No deductible codes configured for this service."
+            "success": False,
+            "message": "No deductible codes configured for this service.",
+            "service": service.name,
+            "log_id": None,
+            "response": {}
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
     should_deduct = response.status_code in deductible_codes
@@ -192,21 +221,29 @@ def submit_service_form(request, slug):
                 usage_log.save()
         except ValueError:
             return JsonResponse({
-                "error": "Wallet deduction failed after API call. Please contact support."
+                "success": False,
+                "message": "Wallet deduction failed after API call. Please contact support.",
+                "service": service.name,
+                "log_id": usage_log.id,
+                "response": {}
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     
     # Step 7: Return final result
     if not external_success:
         return JsonResponse({
-            "error": "External API responded with failure. No wallet deduction made.",
+            "success": False,
+            "message": "External API responded with failure. No wallet deduction made.",
+            "service": service.name,
+            "log_id": usage_log.id,
             "response": response_json
         }, status=status.HTTP_400_BAD_REQUEST)
-
+        
     return JsonResponse({
+        "success": True,
         "message": "Success",
         "service": service.name,
-        "response": response_json,
         "log_id": usage_log.id,
+        "response": response_json
     })
     
 

@@ -5,8 +5,8 @@ import Link from "next/link";
 import { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import { login } from "@/lib/auth";
-import { toast } from "@/plugin/toast";
 import { validateFields, validators } from "@/utils/validations";
+import { toast } from "@/plugin/toast";
 // import FooterContent from "@/components/core/Footer";
 
 export default function LoginPage() {
@@ -32,12 +32,13 @@ export default function LoginPage() {
         try {
             const response = await login({ user_email: email, password: password });
             if (response.success) {
+                toast.success("Login successful, Please Wait...", { duration: 3000, title: 'Success' });
                 window.location.href = "/categories";
             } else {
-                toast.error(response.message || "Login failed");
+                toast.error(response.error[0] || "Login failed", { duration: 3000, title: 'Error' });
             }
         } catch (error) {
-            toast.error(error.message || "An error occurred during login");
+            toast.error("An error occurred during login", { duration: 3000, title: 'Error' });
         } finally {
             setIsSubmitting(false);
         }
