@@ -1,6 +1,15 @@
 const API_BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 import Cookies from 'universal-cookie';
 import { getServerToken } from '@/utils/getCookiesOnServer';
+import { 
+    TOKEN_COOKIE_KEY, 
+    TOKEN_EXPIRATION_COOKIE_KEY, 
+    USER_FIRST_NAME_COOKIE_KEY,
+    USER_LAST_NAME_COOKIE_KEY,
+    USER_MOBILE_COOKIE_KEY,
+    USER_EMAIL_COOKIE_KEY,
+    USER_ROLE_COOKIE_KEY
+} from '@/lib/auth';
 
 
 // LRU Cache implementation remains the same
@@ -56,7 +65,13 @@ export async function getValidToken() {
 function handleAuthError() {
     const cookies = new Cookies();
     // Remove auth cookies immediately
-    ['token', 'tokenExpiration'].forEach(key => cookies.remove(key));
+    cookies.remove(TOKEN_COOKIE_KEY, { path: '/' });
+    cookies.remove(TOKEN_EXPIRATION_COOKIE_KEY, { path: '/' });
+    cookies.remove(USER_FIRST_NAME_COOKIE_KEY, { path: '/' });
+    cookies.remove(USER_LAST_NAME_COOKIE_KEY, { path: '/' });
+    cookies.remove(USER_MOBILE_COOKIE_KEY, { path: '/' });
+    cookies.remove(USER_EMAIL_COOKIE_KEY, { path: '/' });
+    cookies.remove(USER_ROLE_COOKIE_KEY, { path: '/' });
     
     if (typeof window !== 'undefined') {
         // Prevent multiple redirects with a flag

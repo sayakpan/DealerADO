@@ -3,13 +3,13 @@ import Cookies from 'universal-cookie';
 
 const cookies = new Cookies();
 
-const TOKEN_COOKIE_KEY = 'token';
-const TOKEN_EXPIRATION_COOKIE_KEY = 'tokenExpiration';
-const USER_FIRST_NAME_COOKIE_KEY = 'userFirstName';
-const USER_LAST_NAME_COOKIE_KEY = 'userLastName';
-const USER_MOBILE_COOKIE_KEY = 'userMobile';
-const USER_EMAIL_COOKIE_KEY = 'userEmail';
-const USER_ROLE_COOKIE_KEY = 'userRole';
+export const TOKEN_COOKIE_KEY = 'token';
+export const TOKEN_EXPIRATION_COOKIE_KEY = 'tokenExpiration';
+export const USER_FIRST_NAME_COOKIE_KEY = 'userFirstName';
+export const USER_LAST_NAME_COOKIE_KEY = 'userLastName';
+export const USER_MOBILE_COOKIE_KEY = 'userMobile';
+export const USER_EMAIL_COOKIE_KEY = 'userEmail';
+export const USER_ROLE_COOKIE_KEY = 'userRole';
 
 const COOKIE_OPTIONS = {
     maxAge: 1209600,
@@ -27,7 +27,7 @@ export async function login({ user_email, password }) {
         const res = await fetchWithAuth.post(`/api/accounts/login/`, payload);
 
         if (!res.success) {
-            throw new Error(res.message || 'Login failed');
+            return res;
         }
 
         const { first_name, last_name, mobile_number, email, role } = res.data.user;
@@ -54,7 +54,7 @@ export async function register({ email, password, first_name, last_name }) {
         const res = await fetchWithAuth.post(`/api/accounts/register/`, payload);
 
         if (!res.success) {
-            throw new Error(res.message || 'Registration failed');
+            return res;
         }
 
         return res;
@@ -69,7 +69,7 @@ export async function logout() {
     try {
         const res = await fetchWithAuth.post(`/api/accounts/logout/`);
         if (!res.success) {
-            throw new Error(res.message || 'Logout failed');
+            return res;
         }
 
         cookies.remove(TOKEN_COOKIE_KEY, { path: '/' });

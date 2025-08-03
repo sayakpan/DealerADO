@@ -4,6 +4,7 @@ import Navbar from "@/components/core/Navbar";
 import FooterContent from "@/components/core/footer";
 import { LoadingProvider } from "@/contexts/LoadingContext";
 import { Suspense } from "react";
+import { ToasterProvider } from "@/contexts/ToastContext";
 
 const geistSans = Geist({
     variable: "--font-geist-sans",
@@ -28,9 +29,11 @@ export default function RootLayout({ children }) {
             >
                 <Suspense fallback={null}>
                     <LoadingProvider>
-                        <Navbar />
-                        {children}
-                        <FooterContent />
+                        <ToasterProvider>
+                            <Navbar />
+                            {children}
+                            <FooterContent />
+                        </ToasterProvider>
                     </LoadingProvider>
                 </Suspense>
             </body>
