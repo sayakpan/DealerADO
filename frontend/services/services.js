@@ -1,17 +1,56 @@
 import { fetchWithAuth } from "@/utils/api";
 
 export async function getServiceBySlug(slug) {
-	const response = await fetchWithAuth(`/api/services/service/${slug}/`);
-	return response?.data;
+	try {
+		const response = await fetchWithAuth.get(`/api/services/service/${slug}/`);
+
+		if (!response.success) {
+			throw new Error(response.message || 'Failed to fetch service');
+		}
+
+		return response.data;
+	} catch (error) {
+		throw new Error(error.message || 'Failed to fetch service');
+	}
 }
 
 export async function submitServiceData(slug, formData) {
-	const response = await fetchWithAuth(`/api/services/service/${slug}/submit/`, {
-		method: 'POST',
-		headers: {
-			'Content-Type': 'application/json',
-		},
-		body: JSON.stringify(formData)
-	});
-	return response?.data;
+	try {
+		const response = await fetchWithAuth.post(`/api/services/service/${slug}/submit/`, formData);
+
+		if (!response.success) {
+			// Create error object with status for proper error handling
+			const error = new Error(response.message || 'Failed to submit service data');
+			error.status = response.status;
+			error.statusCode = response.status;
+			error.response = { status: response.status };
+			throw error;
+		}
+
+		return response.data;
+	} catch (error) {
+		// Preserve error status information for proper error handling
+		if (error.status || error.statusCode || error.response?.status) {
+			throw error;
+		}
+
+		// For network errors or other issues, create a generic error
+		const newError = new Error(error.message || 'Failed to submit service data');
+		newError.status = 0;
+		throw newError;
+	}
+}
+
+export async function getServiceHistory() {
+	try {
+		const response = await fetchWithAuth.get(`/api/services/history/`);
+
+		if (!response.success) {
+			throw new Error(response.message || 'Failed to fetch service history');
+		}
+
+		return response.data;
+	} catch (error) {
+		throw new Error(error.message || 'Failed to fetch service history');
+	}
 }
