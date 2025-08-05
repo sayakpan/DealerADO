@@ -1,110 +1,147 @@
-"use client"
+'use client';
 
-import React, { useState, useEffect } from 'react'
-import ServiceHeader from '@/components/ui/serviceHeader'
-import { getServiceHistory } from '@/services/services'
-import { formatDate } from '@/utils/dateUtils'
+import { useState, useEffect, useRef, useCallback } from 'react';
+import { getUsageLogs } from '@/services/services';
+import { formatDate } from '@/utils/dateUtils';
+import { Download, Clock, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
+import ServiceHeader from '@/components/ui/serviceHeader';
 
-const ServiceHistoryPage = () => {
-    const [history, setHistory] = useState([])
-    const [loading, setLoading] = useState(true)
-    const [error, setError] = useState(null)
-    const [filter, setFilter] = useState('all') // all, success, failed
+export default function ServiceHistoryPage() {
+    const [logs, setLogs] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [loadingMore, setLoadingMore] = useState(false);
+    const [nextUrl, setNextUrl] = useState(null);
+    const [error, setError] = useState(null);
+    const [filter, setFilter] = useState('all');
+    const observerRef = useRef();
+
+    const loadLogs = useCallback(async (url = null) => {
+        try {
+            if (url) {
+                setLoadingMore(true);
+            } else {
+                setLoading(true);
+            }
+
+            const response = await getUsageLogs(url);
+
+            if (url) {
+                setLogs(prev => [...prev, ...response.results]);
+            } else {
+                setLogs(response.results);
+            }
+
+            setNextUrl(response.next);
+        } catch (err) {
+            setError('Failed to load usage logs');
+            console.error('Error loading logs:', err);
+        } finally {
+            setLoading(false);
+            setLoadingMore(false);
+        }
+    }, []);
 
     useEffect(() => {
-        const fetchHistory = async () => {
-            try {
-                setLoading(true)
-                const historyData = await getServiceHistory()
-                setHistory(historyData)
-            } catch (err) {
-                setError(err.message)
-                console.error("Error fetching service history:", err)
-            } finally {
-                setLoading(false)
+        loadLogs();
+    }, [loadLogs]);
+
+    // Intersection Observer for infinite scroll
+    const lastLogElementRef = useCallback(node => {
+        if (loading || loadingMore || !nextUrl) return;
+        if (observerRef.current) observerRef.current.disconnect();
+
+        observerRef.current = new IntersectionObserver(entries => {
+            if (entries[0].isIntersecting && nextUrl && !loading && !loadingMore) {
+                loadLogs(nextUrl);
             }
-        }
+        });
 
-        fetchHistory()
-    }, [])
+        if (node) observerRef.current.observe(node);
+    }, [loading, loadingMore, nextUrl, loadLogs]);
 
-    const filteredHistory = history.filter(item => {
-        if (filter === 'all') return true
-        if (filter === 'success') return item.status === 'success'
-        if (filter === 'failed') return item.status === 'failed'
-        return true
-    })
+    const filteredLogs = logs.filter(item => {
+        if (filter === 'all') return true;
+        if (filter === 'success') return item.status === 'success';
+        if (filter === 'failed') return item.status === 'failed';
+        return true;
+    });
 
     const getStatusColor = (status) => {
         switch (status) {
             case 'success':
-                return 'bg-green-100 text-green-800 border-green-200'
+                return 'text-green-600 bg-green-50 border-green-200';
             case 'failed':
-                return 'bg-red-100 text-red-800 border-red-200'
-            case 'pending':
-                return 'bg-yellow-100 text-yellow-800 border-yellow-200'
+                return 'text-red-600 bg-red-50 border-red-200';
             default:
-                return 'bg-gray-100 text-gray-800 border-gray-200'
+                return 'text-yellow-600 bg-yellow-50 border-yellow-200';
         }
-    }
+    };
 
     const getStatusIcon = (status) => {
         switch (status) {
             case 'success':
-                return (
-                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                    </svg>
-                )
+                return <CheckCircle className="w-4 h-4 text-green-500" />;
             case 'failed':
-                return (
-                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
-                    </svg>
-                )
-            case 'pending':
-                return (
-                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
-                    </svg>
-                )
+                return <XCircle className="w-4 h-4 text-red-500" />;
             default:
-                return null
+                return <AlertCircle className="w-4 h-4 text-yellow-500" />;
         }
-    }
+    };
 
-    if (loading) {
+    const downloadResponse = (log) => {
+        const dataStr = JSON.stringify(log.api_response, null, 2);
+        const dataBlob = new Blob([dataStr], { type: 'application/json' });
+        const url = URL.createObjectURL(dataBlob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `${log.service_name}_${log.id}_response.json`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+    };
+
+    if (loading && logs.length === 0) {
         return (
-            <div className="min-h-screen bg-gray-50">
-                <ServiceHeader title="Service History" />
-                <div className="max-w-6xl mx-auto px-4 py-8">
-                    <div className="flex justify-center items-center h-64">
-                        <div className="text-lg text-gray-600">Loading service history...</div>
+            <div className="min-h-screen bg-gray-50 py-8">
+                <div className="max-w-6xl mx-auto px-4">
+                    <div className="flex items-center justify-center h-64">
+                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-600"></div>
                     </div>
                 </div>
             </div>
-        )
+        );
     }
 
     if (error) {
         return (
-            <div className="min-h-screen bg-gray-50">
-                <ServiceHeader title="Service History" />
-                <div className="max-w-6xl mx-auto px-4 py-8">
-                    <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-                        <div className="text-[#B52628]">Error loading service history: {error}</div>
+            <div className="min-h-screen bg-gray-50 py-8">
+                <div className="max-w-6xl mx-auto px-4">
+                    <div className="text-center py-12">
+                        <XCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
+                        <h2 className="text-xl font-semibold text-gray-900 mb-2">Error Loading Service History</h2>
+                        <p className="text-gray-600">{error}</p>
+                        <button
+                            onClick={() => loadLogs()}
+                            className="mt-4 px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors"
+                        >
+                            Try Again
+                        </button>
                     </div>
                 </div>
             </div>
-        )
+        );
     }
 
     return (
         <div className="min-h-screen bg-gray-50">
-            <ServiceHeader title="Service History" />
+            <div className="mb-6 sm:mb-8">
+                <ServiceHeader title="Service History" />
+                {/* <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Service History</h1>
+                <p className="text-sm sm:text-base text-gray-600">View your complete service usage history and responses</p> */}
+            </div>
+            <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
 
-            {/* Service History Content */}
-            <div className="max-w-6xl mx-auto px-4 py-8">
                 {/* Filter Tabs */}
                 <div className="mb-6">
                     <div className="flex space-x-1 bg-gray-100 p-1 rounded-lg w-fit">
@@ -116,11 +153,10 @@ const ServiceHistoryPage = () => {
                             <button
                                 key={tab.key}
                                 onClick={() => setFilter(tab.key)}
-                                className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
-                                    filter === tab.key
-                                        ? 'bg-white text-[#B52628] shadow-sm'
+                                className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${filter === tab.key
+                                        ? 'bg-white text-red-600 shadow-sm'
                                         : 'text-gray-600 hover:text-gray-900'
-                                }`}
+                                    }`}
                             >
                                 {tab.label}
                             </button>
@@ -128,90 +164,109 @@ const ServiceHistoryPage = () => {
                     </div>
                 </div>
 
-                {/* History List */}
-                {filteredHistory.length === 0 ? (
+                {logs.length === 0 ? (
                     <div className="text-center py-12">
-                        <div className="text-gray-500 text-lg mb-2">No service history found</div>
-                        <div className="text-gray-400 text-sm">
-                            {filter !== 'all' 
-                                ? `No ${filter} services found. Try changing the filter.`
-                                : 'You haven\'t used any services yet.'
-                            }
-                        </div>
+                        <Clock className="w-12 h-12 sm:w-16 sm:h-16 text-gray-400 mx-auto mb-4" />
+                        <h2 className="text-lg sm:text-xl font-semibold text-gray-900 mb-2">No Service History Found</h2>
+                        <p className="text-sm sm:text-base text-gray-600">You haven't used any services yet.</p>
                     </div>
                 ) : (
-                    <div className="space-y-4">
-                        {filteredHistory.map((item, index) => (
-                            <div
-                                key={item.id || index}
-                                className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow"
-                            >
-                                <div className="flex items-start justify-between">
-                                    <div className="flex-1">
-                                        <div className="flex items-center gap-3 mb-2">
-                                            <h3 className="text-lg font-semibold text-gray-900">
-                                                {item.service_name || 'Unknown Service'}
-                                            </h3>
-                                            <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium border ${getStatusColor(item.status)}`}>
-                                                {getStatusIcon(item.status)}
-                                                {item.status?.charAt(0).toUpperCase() + item.status?.slice(1) || 'Unknown'}
-                                            </span>
-                                        </div>
-                                        
-                                        <div className="text-sm text-gray-600 mb-3">
-                                            <div className="flex items-center gap-4">
-                                                <span>
-                                                    <strong>Date:</strong> {formatDate(item.created_at) || 'Unknown'}
-                                                </span>
-                                                {item.request_data && (
-                                                    <span>
-                                                        <strong>Input:</strong> {JSON.stringify(item.request_data).substring(0, 50)}...
-                                                    </span>
-                                                )}
-                                            </div>
-                                        </div>
+                    <div className="space-y-4 sm:space-y-6">
+                        {filteredLogs.map((log, index) => {
+                            const isLast = index === filteredLogs.length - 1;
 
-                                        {item.error_message && (
-                                            <div className="text-sm text-red-600 mb-2">
-                                                <strong>Error:</strong> {item.error_message}
+                            return (
+                                <div key={log.id} className="w-full">
+                                    {/* Main Card */}
+                                    <div
+                                        ref={isLast && nextUrl ? lastLogElementRef : null}
+                                        className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden"
+                                    >
+                                        <div className="p-4 sm:p-6">
+                                            <div className="flex items-start justify-between mb-4">
+                                                <div className="flex-1">
+                                                    <div className="flex items-center gap-3 mb-2">
+                                                        {getStatusIcon(log.status)}
+                                                        <h3 className="text-lg font-semibold text-gray-900">
+                                                            {log.service_name}
+                                                        </h3>
+                                                        <span className={`px-2 py-1 rounded-full text-xs font-medium border ${getStatusColor(log.status)}`}>
+                                                            {log.status}
+                                                        </span>
+                                                    </div>
+                                                    <p className="text-sm text-gray-600 mb-2">
+                                                        {formatDate(log.created_at)}
+                                                    </p>
+                                                    <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500">
+                                                        <span>Price: ₹{log.price_at_time}</span>
+                                                        {log.response_time_ms && (
+                                                            <span>Response Time: {log.response_time_ms}ms</span>
+                                                        )}
+                                                        <span>Status Code: {log.http_status_code}</span>
+                                                        {log.wallet_txn_id && (
+                                                            <span>Transaction ID: {log.wallet_txn_id}</span>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                                <div className="flex items-center gap-2">
+                                                    <button
+                                                        onClick={() => downloadResponse(log)}
+                                                        className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-md transition-colors"
+                                                        title="Download Response"
+                                                    >
+                                                        <Download className="w-4 h-4" />
+                                                    </button>
+                                                </div>
                                             </div>
-                                        )}
+
+                                            {/* Request Data */}
+                                            {log.form_data_sent && (
+                                                <div className="mb-4">
+                                                    <h4 className="text-sm font-medium text-gray-900 mb-2 flex items-center gap-2">
+                                                        <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
+                                                        Request Data
+                                                    </h4>
+                                                    <div className="bg-gray-50 rounded-md p-3 text-sm text-gray-700">
+                                                        <pre className="whitespace-pre-wrap break-words">
+                                                            {JSON.stringify(log.form_data_sent, null, 2)}
+                                                        </pre>
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </div>
                                     </div>
 
-                                    <div className="flex items-center gap-2 ml-4">
-                                        {item.status === 'success' && item.result_data && (
-                                            <button
-                                                onClick={() => {
-                                                    // TODO: Implement download functionality
-                                                    console.log('Download result for:', item.id)
-                                                }}
-                                                className="px-3 py-1.5 bg-[#B52628] hover:bg-[#9e1f21] text-white text-xs font-medium rounded-md transition-colors flex items-center gap-1"
-                                            >
-                                                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                                </svg>
-                                                Download
-                                            </button>
-                                        )}
-                                        
-                                        <button
-                                            onClick={() => {
-                                                // TODO: Implement view details functionality
-                                                console.log('View details for:', item.id)
-                                            }}
-                                            className="px-3 py-1.5 border border-gray-300 hover:border-gray-400 text-gray-700 text-xs font-medium rounded-md transition-colors"
-                                        >
-                                            View Details
-                                        </button>
+                                    {/* API Response Code Block - Always Visible */}
+                                    <div className="mt-3">
+                                        <div className="bg-slate-900 rounded-lg border border-gray-300 overflow-hidden">
+                                            <div className="bg-gray-100 px-3 py-2 border-b border-gray-300 flex items-center justify-between">
+                                                <span className="text-xs font-medium text-gray-600">API Response</span>
+                                            </div>
+                                            <div className="p-3 overflow-auto max-h-64 sm:max-h-80">
+                                                <pre className="text-xs sm:text-sm text-cyan-300 font-mono leading-relaxed whitespace-pre-wrap break-words">
+                                                    {JSON.stringify(log.api_response, null, 2)}
+                                                </pre>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
+                            );
+                        })}
+
+                        {loadingMore && (
+                            <div className="flex justify-center py-8">
+                                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-red-600"></div>
                             </div>
-                        ))}
+                        )}
+
+                        {!nextUrl && logs.length > 0 && (
+                            <div className="text-center py-8">
+                                <p className="text-sm sm:text-base text-gray-500">You've reached the end of your service history</p>
+                            </div>
+                        )}
                     </div>
                 )}
             </div>
         </div>
-    )
+    );
 }
-
-export default ServiceHistoryPage

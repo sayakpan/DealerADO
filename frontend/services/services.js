@@ -41,16 +41,45 @@ export async function submitServiceData(slug, formData) {
 	}
 }
 
-export async function getServiceHistory() {
+export async function getServiceHistory(page = 1, pageSize = 10) {
 	try {
-		const response = await fetchWithAuth.get(`/api/services/history/`);
+		const response = await fetchWithAuth.get(`/api/services/usage-logs/?page=${page}&page_size=${pageSize}`);
 
 		if (!response.success) {
 			throw new Error(response.message || 'Failed to fetch service history');
 		}
 
-		return response.data;
+		return {
+			count: response.data.count,
+			next: response.data.next,
+			previous: response.data.previous,
+			results: response.data.results,
+			hasMore: !!response.data.next
+		};
 	} catch (error) {
 		throw new Error(error.message || 'Failed to fetch service history');
+	}
+}
+
+export async function getUsageLogs(url = null) {
+	try {
+		let apiUrl;
+		if (url) {
+			// Extract the path and query from the full URL
+			const urlObj = new URL(url);
+			apiUrl = urlObj.pathname + urlObj.search;
+		} else {
+			apiUrl = '/api/services/usage-logs/';
+		}
+
+		const response = await fetchWithAuth.get(apiUrl);
+
+		if (!response.success) {
+			throw new Error(response.message || 'Failed to fetch usage logs');
+		}
+
+		return response.data;
+	} catch (error) {
+		throw new Error(error.message || 'Failed to fetch usage logs');
 	}
 }
