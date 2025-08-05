@@ -4,7 +4,6 @@ import React, { useState, useEffect, use } from 'react'
 import ServiceHeader from '@/components/ui/serviceHeader'
 import { getServiceBySlug, submitServiceData } from '@/services/services'
 import { validators, validateSingleField } from '@/utils/validations'
-import ServiceSuccessModal from '@/components/ui/service-success-modal'
 import ServiceErrorModal from '@/components/ui/service-error-modal'
 
 const ServicePage = ({ params }) => {
@@ -18,7 +17,6 @@ const ServicePage = ({ params }) => {
     const [submitting, setSubmitting] = useState(false)
     const [serviceResult, setServiceResult] = useState(null)
     const [submitError, setSubmitError] = useState(null)
-    const [showSuccessModal, setShowSuccessModal] = useState(false)
     const [showErrorModal, setShowErrorModal] = useState(false)
 
     // Unwrap params using React.use()
@@ -347,19 +345,18 @@ const ServicePage = ({ params }) => {
                 setServiceResult(result)
                 console.log('Service result:', result)
 
-                // Show success modal
-                setShowSuccessModal(true)
+                // Don't show success modal, just display the result directly
 
             } catch (err) {
                 console.error('Error submitting service data:', err)
 
                 // Check if it's a 400 status code error
                 // The error might have different structures depending on how fetchWithAuth handles it
-                const isClientError = err.status === 400 || 
-                                    err.statusCode === 400 || 
-                                    err.response?.status === 400 ||
-                                    err.message.includes('400') ||
-                                    err.message.includes('Bad Request');
+                const isClientError = err.status === 400 ||
+                    err.statusCode === 400 ||
+                    err.response?.status === 400 ||
+                    err.message.includes('400') ||
+                    err.message.includes('Bad Request');
 
                 if (isClientError) {
                     setShowErrorModal(true)
@@ -376,6 +373,11 @@ const ServicePage = ({ params }) => {
     const handleDownload = () => {
         // TODO: Implement download functionality
         console.log('Download clicked', serviceResult)
+    }
+
+    // Test function to show error modal (for testing purposes)
+    const handleTestErrorModal = () => {
+        setShowErrorModal(true)
     }
 
     const handleViewDetail = () => {
@@ -522,8 +524,21 @@ const ServicePage = ({ params }) => {
                             {/* Service Result */}
                             {serviceResult && (
                                 <div className="w-full">
-                                    <div className="text-slate-700 text-lg font-semibold mb-3">
-                                        Service Result:
+                                    <div className="flex justify-between items-center mb-3">
+                                        <div className="text-slate-700 text-lg font-semibold">
+                                            Service Result:
+                                        </div>
+                                        <button
+                                            onClick={handleDownload}
+                                            className="px-4 py-2 bg-[#B52628] hover:bg-[#9e1f21] text-white text-sm font-semibold rounded-lg transition-colors duration-200 flex items-center gap-2"
+                                        >
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                <path d="M21 15V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V15" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                                <path d="M7 10L12 15L17 10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                                <path d="M12 15V3" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                            </svg>
+                                            Download PDF
+                                        </button>
                                     </div>
                                     <div className="bg-green-50 border border-green-200 rounded-lg p-4">
                                         <pre className="text-slate-700 text-sm font-mono whitespace-pre-wrap overflow-x-auto">
@@ -546,25 +561,22 @@ const ServicePage = ({ params }) => {
                             {/* Default message when no result */}
                             {!service?.description && !serviceResult && !submitError && (
                                 <div className="w-full text-center py-8">
-                                    <div className="text-gray-500 text-sm">
+                                    <div className="text-gray-500 text-sm mb-4">
                                         Fill out the form and click "Fetch Details" to see the service results here.
                                     </div>
+                                    {/* Test button to show error modal */}
+                                    <button
+                                        onClick={handleTestErrorModal}
+                                        className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-semibold rounded-lg transition-colors duration-200"
+                                    >
+                                        Test Error Modal
+                                    </button>
                                 </div>
                             )}
                         </div>
                     </div>
                 </div>
             </div>
-
-            {/* Success Modal */}
-            <ServiceSuccessModal
-                open={showSuccessModal}
-                onOpenChange={setShowSuccessModal}
-                title="Vehicle Basic Detail Fetched Successfully"
-                description="You can check that we have found the data of your vehicle from your register number."
-                onDownload={handleDownload}
-                onViewDetail={handleViewDetail}
-            />
 
             {/* Error Modal */}
             <ServiceErrorModal
