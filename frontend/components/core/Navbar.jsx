@@ -8,7 +8,7 @@ import { ChevronDown, Headset, Home, Info, Menu, X } from "lucide-react";
 import { isAuthenticated } from "@/lib/auth";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import * as NavigationMenu from "@radix-ui/react-navigation-menu";
-import { Wallet, PackageSearch, Settings, LogOut, History } from "lucide-react";
+import { Wallet, PackageSearch, Settings, LogOut } from "lucide-react";
 import { getUserDetails } from "@/lib/auth";
 import ClientOnly from "../utils/ClientOnly";
 import { ChevronRight } from "lucide-react";
@@ -19,7 +19,7 @@ export default function Navbar() {
     const [scrolled, setScrolled] = useState(false);
     const [menuOpen, setMenuOpen] = useState(false);
 
-    const fixedNavPathList = ['/login', '/signup', '/forgot-password', '/reset-password', '/contact-us', '/wallet', '/profile', '/service-history'];
+    const fixedNavPathList = ['/login', '/signup', '/forgot-password', '/reset-password', '/contact-us', '/wallet', '/profile'];
     const fixedNav = fixedNavPathList.includes(pathname) || pathname.startsWith('/categories/') || pathname.startsWith('/settings');
 
     useEffect(() => {
@@ -98,14 +98,6 @@ export default function Navbar() {
                                                 >
                                                     <Wallet className="w-4 h-4" />
                                                     Wallet
-                                                </SmartLink>
-
-                                                <SmartLink
-                                                    href="/service-history"
-                                                    className="flex items-center gap-2 px-4 py-2 text-sm text-gray-900 hover:bg-gray-100"
-                                                >
-                                                    <History className="w-4 h-4" />
-                                                    History
                                                 </SmartLink>
 
                                                 <SmartLink
@@ -226,7 +218,6 @@ export default function Navbar() {
                                 ...(isAuthenticated()
                                     ? [
                                         { href: "/wallet", label: "Wallet", icon: <Wallet strokeWidth={1.5} className="w-7 h-7 bg-rose-50 p-1.5 rounded-full" /> },
-                                        { href: "/service-history", label: "History", icon: <History strokeWidth={1.5} className="w-7 h-7 bg-rose-50 p-1.5 rounded-full" /> },
                                         { href: "/orders", label: "Orders", icon: <PackageSearch strokeWidth={1.5} className="w-7 h-7 bg-rose-50 p-1.5 rounded-full" /> },
                                         { href: "/settings", label: "Settings", icon: <Settings strokeWidth={1.5} className="w-7 h-7 bg-rose-50 p-1.5 rounded-full" /> },
                                     ]
