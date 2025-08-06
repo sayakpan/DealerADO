@@ -10,3 +10,13 @@ export async function changePassword(passwordData) {
     });
     return response;
 }
+
+export async function deactivateAccount(password) {
+    const response = await fetchWithAuth(`/api/accounts/deactivate/`, {
+        method: 'POST',
+        body: JSON.stringify({
+            password: password
+        }),
+    });
+    return response;
+}

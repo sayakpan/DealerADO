@@ -5,6 +5,7 @@ import ServiceHeader from '@/components/ui/serviceHeader'
 import { getServiceBySlug, submitServiceData } from '@/services/services'
 import { validators, validateSingleField } from '@/utils/validations'
 import ServiceErrorModal from '@/components/ui/service-error-modal'
+import { ServiceFormSkeleton, ServiceResultSkeleton } from '@/components/skeletons/ServiceSkeleton'
 
 const ServicePage = ({ params }) => {
     const [service, setService] = useState(null)
@@ -398,16 +399,7 @@ const ServicePage = ({ params }) => {
     }
 
     if (loading) {
-        return (
-            <div className="min-h-screen bg-gray-50">
-                <ServiceHeader title="Loading..." />
-                <div className="max-w-6xl mx-auto px-4 py-8">
-                    <div className="flex justify-center items-center h-64">
-                        <div className="text-lg text-gray-600">Loading service...</div>
-                    </div>
-                </div>
-            </div>
-        )
+        return <ServiceFormSkeleton />
     }
 
     if (error) {
@@ -519,6 +511,11 @@ const ServicePage = ({ params }) => {
                                         Error: {submitError}
                                     </div>
                                 </div>
+                            )}
+
+                            {/* Loading Skeleton while submitting */}
+                            {submitting && !serviceResult && (
+                                <ServiceResultSkeleton />
                             )}
 
                             {/* Service Result */}

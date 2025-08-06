@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react'
 import Image from 'next/image'
 import ServiceHeader from '@/components/ui/serviceHeader'
 import { getWalletData } from '@/services/wallet'
+import { WalletSkeleton } from '@/components/skeletons/WalletSkeleton'
 
 const WalletPage = () => {
     const [walletData, setWalletData] = useState(null)
@@ -53,16 +54,7 @@ const WalletPage = () => {
     }
 
     if (loading) {
-        return (
-            <div className="min-h-screen bg-gray-50">
-                <ServiceHeader title="Wallet" />
-                <div className="container mx-auto px-4 py-8 max-w-6xl">
-                    <div className="flex justify-center items-center h-64">
-                        <div className="text-lg text-gray-600">Loading wallet...</div>
-                    </div>
-                </div>
-            </div>
-        )
+        return <WalletSkeleton />
     }
 
     if (error) {

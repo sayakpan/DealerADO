@@ -1,28 +1,13 @@
 "use client"
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import ServiceHeader from "@/components/ui/serviceHeader"
 import SmartLink from '@/components/utils/SmartLink'
 import DeactivateAccountModal from '@/components/ui/deactivate-account-modal'
+import { SettingsSkeleton } from '@/components/skeletons/SettingsSkeleton'
 
 const SettingsPage = () => {
     const [showDeactivateModal, setShowDeactivateModal] = useState(false)
-
-    // Mock deactivate account function - replace with actual API call
-    const handleDeactivateAccount = async () => {
-        try {
-            // TODO: Replace with actual deactivate account API call
-            // const response = await deactivateAccount();
-            // return response;
-            
-            // For now, just simulate success
-            console.log('Account deactivation requested');
-            return { success: true };
-        } catch (error) {
-            console.error('Deactivation failed:', error);
-            throw error;
-        }
-    }
     return (
         <div className="min-h-screen bg-gray-50">
             <ServiceHeader title="Settings" />
@@ -87,7 +72,6 @@ const SettingsPage = () => {
             <DeactivateAccountModal
                 open={showDeactivateModal}
                 onOpenChange={setShowDeactivateModal}
-                onDeactivate={handleDeactivateAccount}
             />
         </div>
     )

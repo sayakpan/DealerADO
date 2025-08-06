@@ -4,6 +4,7 @@ import { useState, useEffect } from "react"
 import CategoryHero from "@/components/categories/CategoryHero"
 import CategoryList from "@/components/categories/CategoryList"
 import { getCategories } from "@/services/categories"
+import { CategoryListSkeleton } from "@/components/skeletons/CategorySkeleton"
 
 export default function CategoriesPage() {
     const [categories, setCategories] = useState([])
@@ -57,13 +58,9 @@ export default function CategoriesPage() {
 
     if (loading) {
         return (
-            <div>
+            <div className="bg-white">
                 <CategoryHero />
-                <div className="max-w-6xl mx-auto px-4 py-8">
-                    <div className="flex justify-center items-center h-64">
-                        <div className="text-lg text-gray-600">Loading categories...</div>
-                    </div>
-                </div>
+                <CategoryListSkeleton count={6} />
             </div>
         )
     }

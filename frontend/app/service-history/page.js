@@ -5,6 +5,7 @@ import { getUsageLogs } from '@/services/services';
 import { formatDate } from '@/utils/dateUtils';
 import { Download, Clock, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
 import ServiceHeader from '@/components/ui/serviceHeader';
+import { ServiceHistorySkeleton, ServiceHistoryCardSkeleton } from '@/components/skeletons/ServiceHistorySkeleton';
 
 export default function ServiceHistoryPage() {
     const [logs, setLogs] = useState([]);
@@ -102,15 +103,7 @@ export default function ServiceHistoryPage() {
     };
 
     if (loading && logs.length === 0) {
-        return (
-            <div className="min-h-screen bg-gray-50 py-8">
-                <div className="max-w-6xl mx-auto px-4">
-                    <div className="flex items-center justify-center h-64">
-                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-600"></div>
-                    </div>
-                </div>
-            </div>
-        );
+        return <ServiceHistorySkeleton count={4} />;
     }
 
     if (error) {
@@ -253,9 +246,11 @@ export default function ServiceHistoryPage() {
                             );
                         })}
                         {loadingMore && (
-                            <div className="flex justify-center py-8">
-                                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-red-600"></div>
-                            </div>
+                            <>
+                                {Array.from({ length: 2 }).map((_, index) => (
+                                    <ServiceHistoryCardSkeleton key={`loading-${index}`} />
+                                ))}
+                            </>
                         )}
 
                         {!nextUrl && logs.length > 0 && (
