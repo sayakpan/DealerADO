@@ -227,7 +227,7 @@ class ServiceUsageLog(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.service.name} by {self.user or 'Anonymous'} at {self.created_at}"
+        return f"{self.service.name} ({self.user or 'Anonymous'}) - {self.status}"
     
     class Meta:
         verbose_name = "Service Usage Log"
