@@ -125,7 +125,6 @@ class ServiceUsageLogSerializer(serializers.ModelSerializer):
         fields = [
             'id',
             'service_name',
-            'full_url',
             'form_data_sent',
             'api_response',
             'status',
@@ -135,3 +134,18 @@ class ServiceUsageLogSerializer(serializers.ModelSerializer):
             'wallet_txn_id',
             'created_at',
         ]
+    
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+
+        # Clean error message if present
+        api_response = data.get("api_response")
+        if isinstance(api_response, dict) and "error" in api_response:
+            raw_error = api_response["error"]
+            if isinstance(raw_error, str):
+                import re
+                match = re.match(r'^(\d{3} [A-Za-z ]+):', raw_error)
+                cleaned_error = match.group(1).strip() if match else raw_error.split(" for url")[0].strip()
+                data["api_response"]["error"] = cleaned_error
+
+        return data
