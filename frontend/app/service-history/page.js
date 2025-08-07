@@ -6,6 +6,7 @@ import { formatDate } from '@/utils/dateUtils';
 import { Download, Clock, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
 import ServiceHeader from '@/components/ui/serviceHeader';
 import { ServiceHistorySkeleton, ServiceHistoryCardSkeleton } from '@/components/skeletons/ServiceHistorySkeleton';
+import { downloadServiceResponsePDF } from '@/utils/pdfUtils';
 
 export default function ServiceHistoryPage() {
     const [logs, setLogs] = useState([]);
@@ -89,17 +90,8 @@ export default function ServiceHistoryPage() {
         }
     };
 
-    const downloadResponse = (log) => {
-        const dataStr = JSON.stringify(log.api_response, null, 2);
-        const dataBlob = new Blob([dataStr], { type: 'application/json' });
-        const url = URL.createObjectURL(dataBlob);
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = `${log.service_name}_${log.id}_response.json`;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        URL.revokeObjectURL(url);
+    const downloadResponse = async (log) => {
+        await downloadServiceResponsePDF(log);
     };
 
     if (loading && logs.length === 0) {
