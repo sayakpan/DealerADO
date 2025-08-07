@@ -120,7 +120,7 @@ const tokenizeJSON = (jsonString) => {
 /**
  * Adds syntax-highlighted JSON to PDF with proper background coverage
  */
-const addHighlightedJSON = (pdf, jsonObj, startX, startY, maxWidth, maxHeight) => {
+const addHighlightedJSON = (pdf, jsonObj, startX, startY, maxWidth) => {
     const jsonString = JSON.stringify(jsonObj, null, 2);
     const lines = jsonString.split('\n');
 
@@ -146,7 +146,6 @@ const addHighlightedJSON = (pdf, jsonObj, startX, startY, maxWidth, maxHeight) =
     };
 
     let currentY = startY;
-    let currentPage = pdf.internal.getCurrentPageInfo().pageNumber;
 
     // Add background for first page
     const firstPageHeight = Math.min(totalContentHeight, availableHeight);
@@ -268,7 +267,7 @@ export const generateServiceResponsePDF = async (logData) => {
         `Service: ${logData.service_name}`,
         `Date: ${new Date(logData.created_at).toLocaleString()}`,
         `Status: ${logData.status.toUpperCase()}`,
-        `Price: ₹${logData.price_at_time}`,
+        `Price: Rs. ${logData.price_at_time}`,
         `HTTP Status: ${logData.http_status_code}`,
         `Log ID: ${logData.id}`
     ];
@@ -293,14 +292,12 @@ export const generateServiceResponsePDF = async (logData) => {
     yPosition += 12;
 
     // Add syntax-highlighted JSON
-    const remainingHeight = pageHeight - yPosition - 30; // Leave space for footer
     yPosition = addHighlightedJSON(
         pdf,
         logData.api_response,
         margin,
         yPosition,
-        contentWidth,
-        remainingHeight
+        contentWidth
     );
 
     // Add footer on last page
