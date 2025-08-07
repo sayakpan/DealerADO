@@ -107,7 +107,7 @@ def draw_wrapped_string(p, x, y, text, max_chars=100, line_height=0.6 * cm, font
 def render_data_recursive(p, data, x, y, indent=0, page_height=A4[1]):
     indent_space = 0.5 * cm * indent
     line_height = 0.6 * cm
-    x_offset = x + indent_space
+    x_offset = x
 
     def check_page_space(p, y):
         if y < 2.5 * cm:
@@ -161,11 +161,11 @@ def render_data_recursive(p, data, x, y, indent=0, page_height=A4[1]):
                     y = draw_bold_key_with_wrapped_value(p, x_offset, y, prettify_key(key), "Not Available", max_width=A4[0] - x_offset - 2 * cm)
                     y -= 0.4 * cm
                 elif isinstance(value, (str, int, float, bool)) or value is None:
-                    y = draw_bold_key_with_wrapped_value( p, x + indent * 1.2 * cm, y, pretty_key, value, max_width=A4[0] - (x + indent * 1.2 * cm) - 2 * cm )
+                    y = draw_bold_key_with_wrapped_value( p, x, y, pretty_key, value, max_width=A4[0] - (x) - 2 * cm )
                     y -= 0.4 * cm
                 else:
                     p.setFont("Helvetica-Bold", 14)
-                    p.drawString(x + indent * 1.2 * cm, y, f"{pretty_key}:")
+                    p.drawString(x, y, f"{pretty_key}:")
                     y -= 0.6 * cm
                     y = render_data_recursive(p, value, x, y, indent + 1, page_height)
                     y -= 0.9 * cm
@@ -174,14 +174,14 @@ def render_data_recursive(p, data, x, y, indent=0, page_height=A4[1]):
     elif isinstance(data, list):
         if len(data) == 0:
             p.setFont("Helvetica", 11)
-            p.drawString(x + indent * 1.2 * cm, y, "Not Available")
+            p.drawString(x, y, "Not Available")
             y -= 0.5 * cm
             return y
         if all(isinstance(item, (str, int, float, bool)) for item in data):
             p.setFont("Helvetica", 11)
             for idx, item in enumerate(data):
                 y = check_page_space(p, y)
-                p.drawString(x + indent * 1.2 * cm, y, f"{idx + 1}. {item}")
+                p.drawString(x, y, f"{idx + 1}. {item}")
                 y -= 0.5 * cm
             return y
         elif all(isinstance(item, dict) for item in data) and len(data) > 0:
@@ -229,7 +229,7 @@ def render_data_recursive(p, data, x, y, indent=0, page_height=A4[1]):
             for idx, item in enumerate(data):
                 y = check_page_space(p, y)
                 p.setFont("Helvetica-Bold", 11)
-                p.drawString(x + indent * 1.2 * cm, y, f"{idx + 1})")
+                p.drawString(x, y, f"{idx + 1})")
                 y -= 0.5 * cm
                 y = render_data_recursive(p, item, x, y, indent + 1, page_height)
                 y -= 0.4 * cm
