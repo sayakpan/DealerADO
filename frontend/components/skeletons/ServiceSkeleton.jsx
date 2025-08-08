@@ -57,7 +57,7 @@ export function ServiceFormSkeleton() {
 
 export function ServiceResultSkeleton() {
     return (
-        <div className="mt-8 bg-white rounded-2xl p-6 shadow-sm">
+        <div className="mt-8 bg-white rounded-2xl p-6 shadow-sm w-full">
             <div className="flex items-center justify-between mb-6">
                 <Skeleton className="h-7 w-32" />
                 <Skeleton className="h-10 w-28 rounded-lg" />

@@ -63,6 +63,24 @@ export async function register({ email, password, first_name, last_name }) {
     }
 }
 
+export async function forgotPassword({ email }) {
+    try {
+        if (!email) {
+            throw new Error('Email is required');
+        }
+        const payload = { email };
+        const res = await fetchWithAuth.post(`/api/accounts/reset-password/`, payload, {}, true, false);
+
+        if (!res.success) {
+            return res;
+        }
+
+        return res;
+    } catch (error) {
+        return { success: false, message: error.message };
+    }
+}
+
 export async function logout() {
     const token = getToken();
 
