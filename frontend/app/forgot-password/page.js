@@ -5,13 +5,14 @@ import Link from "next/link";
 import { useState } from "react";
 import UserNotExistModal from "@/components/ui/user-not-exist-modal";
 import ResetLinkSentModal from "@/components/ui/reset-link-sent-modal";
+import { forgotPassword } from "@/lib/auth";
 
 // import Header from "@/components/core/header";
 // import FooterContent from "@/components/core/footer";
 // import FooterContent from "@/components/core/Footer1";
 
 export default function ForgotPasswordPage() {
-    const [email, setEmail] = useState("johndoe@gmail.com");
+    const [email, setEmail] = useState("");
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [showUserNotExistModal, setShowUserNotExistModal] = useState(false);
     const [showResetLinkSentModal, setShowResetLinkSentModal] = useState(false);
@@ -19,29 +20,28 @@ export default function ForgotPasswordPage() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setIsSubmitting(true);
-        
+
         try {
-            // TODO: Replace with actual forgot password API call
-            // const response = await forgotPasswordAPI(email);
-            
-            // Simulate API response for demonstration
-            // You can replace this with actual API logic
-            const simulateUserExists = Math.random() > 0.5; // 50% chance for demo
-            
-            setTimeout(() => {
-                if (simulateUserExists) {
-                    // User exists, show success modal
-                    setShowResetLinkSentModal(true);
+            const response = await forgotPassword({ email });
+
+            if (response.success) {
+                // Reset link sent successfully
+                setShowResetLinkSentModal(true);
+            } else {
+                // Handle different error cases
+                if (response.status === 404 || response.message?.toLowerCase().includes('user') || response.message?.toLowerCase().includes('not found')) {
+                    // User doesn't exist
+                    setShowUserNotExistModal(true);
                 } else {
-                    // User doesn't exist, show error modal
+                    // Other errors - still show user not exist modal for security
                     setShowUserNotExistModal(true);
                 }
-                setIsSubmitting(false);
-            }, 2000);
-            
+            }
+
         } catch (error) {
             console.error('Forgot password error:', error);
             setShowUserNotExistModal(true);
+        } finally {
             setIsSubmitting(false);
         }
     };
@@ -57,9 +57,9 @@ export default function ForgotPasswordPage() {
     };
 
     return (
-        <div className="min-h-screen bg-red-700 relative overflow-hidden">
+        <div className="bg-red-700 relative overflow-hidden">
             {/* Single Responsive Layout */}
-            <div className="w-full pt-20 h-[800px] sm:h-[1050px] lg:h-[540px] lg:min-h-[600px] relative bg-red-700 overflow-hidden">
+            <div className="w-full pt-20 h-[800px] sm:h-[1050px] lg:h-[540px] lg:min-h-[590px] relative bg-red-700 overflow-hidden">
 
                 {/* Decorative ellipses - Responsive positioning */}
                 <div className="w-[240px] max-w-[240px] aspect-square absolute -left-[105px] -top-[50px] opacity-20 rounded-full border-[25px] border-[35px] border-white" />
