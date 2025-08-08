@@ -20,7 +20,7 @@ export default function Navbar() {
     const [menuOpen, setMenuOpen] = useState(false);
 
     const fixedNavPathList = ['/login', '/signup', '/forgot-password', '/reset-password', '/contact-us', '/wallet', '/profile', '/service-history'];
-    const fixedNav = fixedNavPathList.includes(pathname) || pathname.startsWith('/categories/') || pathname.startsWith('/settings');
+    const fixedNav = fixedNavPathList.includes(pathname) || pathname.startsWith('/categories/') || pathname.startsWith('/settings') || pathname.startsWith('/services/');
 
     useEffect(() => {
         const handleScroll = () => {
