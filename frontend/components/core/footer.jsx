@@ -79,7 +79,7 @@ export default function FooterContent() {
                                 Home
                             </Link>
                             <Link
-                                href="/about"
+                                href="/about-us"
                                 className="text-white font-medium hover:text-gray-300 transition-colors
                                                          text-sm sm:text-base lg:text-lg"
                             >
@@ -160,18 +160,18 @@ export default function FooterContent() {
                                           flex-wrap justify-center md:justify-start"
                             >
                                 <Link
-                                    href="/privacy"
+                                    href="/privacy-policy"
                                     className="text-white font-medium hover:text-gray-300 transition-colors
                                                                text-xs sm:text-sm lg:text-sm"
                                 >
                                     Privacy Policy
                                 </Link>
                                 <Link
-                                    href="/terms"
+                                    href="/terms-and-conditions"
                                     className="text-white font-medium hover:text-gray-300 transition-colors
                                                              text-xs sm:text-sm lg:text-sm"
                                 >
-                                    Terms & Condition
+                                    Terms & Conditions
                                 </Link>
                             </div>
                             <p

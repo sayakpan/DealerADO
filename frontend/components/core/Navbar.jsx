@@ -8,7 +8,7 @@ import { ChevronDown, Headset, Home, Info, Menu, X } from "lucide-react";
 import { isAuthenticated } from "@/lib/auth";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import * as NavigationMenu from "@radix-ui/react-navigation-menu";
-import { Wallet, PackageSearch, Settings, LogOut, History } from "lucide-react";
+import { Wallet, Settings, LogOut, History } from "lucide-react";
 import { getUserDetails } from "@/lib/auth";
 import ClientOnly from "../utils/ClientOnly";
 import { ChevronRight } from "lucide-react";
@@ -19,8 +19,8 @@ export default function Navbar() {
     const [scrolled, setScrolled] = useState(false);
     const [menuOpen, setMenuOpen] = useState(false);
 
-    const fixedNavPathList = ['/login', '/signup', '/forgot-password', '/reset-password', '/contact-us', '/wallet', '/profile', '/service-history'];
-    const fixedNav = fixedNavPathList.includes(pathname) || pathname.startsWith('/categories/') || pathname.startsWith('/services/') || pathname.startsWith('/settings');
+    const fixedNavPathList = ['/login', '/signup', '/forgot-password', '/reset-password', '/contact-us', '/wallet', '/profile', '/service-history', '/about-us', '/privacy-policy', '/terms-and-conditions'];
+    const fixedNav = fixedNavPathList.includes(pathname) || pathname.startsWith('/categories/') || pathname.startsWith('/settings') || pathname.startsWith('/services/');
 
     useEffect(() => {
         const handleScroll = () => {
@@ -36,7 +36,7 @@ export default function Navbar() {
 
     const navLinks = [
         { href: "/", label: "Home" },
-        { href: "/about", label: "About Us" },
+        { href: "/about-us", label: "About Us" },
         { href: "/contact-us", label: "Contact Us" },
     ];
 
@@ -109,14 +109,6 @@ export default function Navbar() {
                                                 </SmartLink>
 
                                                 <SmartLink
-                                                    href="/orders"
-                                                    className="flex items-center gap-2 px-4 py-2 text-sm text-gray-900 hover:bg-gray-100"
-                                                >
-                                                    <PackageSearch className="w-4 h-4" />
-                                                    Orders
-                                                </SmartLink>
-
-                                                <SmartLink
                                                     href="/settings"
                                                     className="flex items-center gap-2 px-4 py-2 text-sm text-gray-900 hover:bg-gray-100"
                                                 >
@@ -150,7 +142,7 @@ export default function Navbar() {
                                         <span className="text-base font-semibold">Sign In</span>
                                     </SmartLink>
                                     <SmartLink
-                                        href="/login"
+                                        href="/signup"
                                         className="w-32 h-10 px-4 bg-white border border-red-700 rounded-md flex justify-center items-center hover:bg-gray-200 transition"
                                     >
                                         <span className="text-slate-700 text-base font-semibold">Sign Up</span>
@@ -221,13 +213,12 @@ export default function Navbar() {
                         <nav className="flex flex-col gap-1 text-slate-800">
                             {[
                                 { href: "/", label: "Home", icon: <Home strokeWidth={1.5} className="w-7 h-7 bg-rose-50 p-1.5 rounded-full" /> },
-                                { href: "/about", label: "About Us", icon: <Info strokeWidth={1.5} className="w-7 h-7 bg-rose-50 p-1.5 rounded-full" /> },
+                                { href: "/about-us", label: "About Us", icon: <Info strokeWidth={1.5} className="w-7 h-7 bg-rose-50 p-1.5 rounded-full" /> },
                                 { href: "/contact-us", label: "Contact Us", icon: <Headset strokeWidth={1.5} className="w-7 h-7 bg-rose-50 p-1.5 rounded-full" /> },
                                 ...(isAuthenticated()
                                     ? [
                                         { href: "/wallet", label: "Wallet", icon: <Wallet strokeWidth={1.5} className="w-7 h-7 bg-rose-50 p-1.5 rounded-full" /> },
                                         { href: "/service-history", label: "History", icon: <History strokeWidth={1.5} className="w-7 h-7 bg-rose-50 p-1.5 rounded-full" /> },
-                                        { href: "/orders", label: "Orders", icon: <PackageSearch strokeWidth={1.5} className="w-7 h-7 bg-rose-50 p-1.5 rounded-full" /> },
                                         { href: "/settings", label: "Settings", icon: <Settings strokeWidth={1.5} className="w-7 h-7 bg-rose-50 p-1.5 rounded-full" /> },
                                     ]
                                     : []
@@ -267,7 +258,7 @@ export default function Navbar() {
                                         Sign In
                                     </SmartLink>
                                     <SmartLink
-                                        href="/login"
+                                        href="/signup"
                                         onClick={() => setMenuOpen(false)}
                                         className="w-full text-center py-2 px-4 border border-red-700 text-slate-800 rounded-md hover:bg-gray-100 transition mt-1"
                                     >
