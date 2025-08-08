@@ -169,7 +169,7 @@ def submit_service_form(request, slug):
             "message": "External API call failed.",
             "service": service.name,
             "log_id": None,
-            "response": {"error": str(e)}
+            "response": {"error": "Failed to connect to service."}
         }, status=status.HTTP_503_SERVICE_UNAVAILABLE)
         
     try:
@@ -273,7 +273,10 @@ def generate_pdf_from_log(request):
         pdf_file = ContentFile(pdf_buffer.getvalue())
         default_storage.save(pdf_filename, pdf_file)
         pdf_url = build_absolute_pdf_url(pdf_filename)
-
+        
+        # response = HttpResponse(pdf_buffer.getvalue(), content_type='application/pdf')
+        # response['Content-Disposition'] = f'inline; filename="{usage_log.service.slug}_{usage_log.user.id}_{timestamp}_report.pdf"'
+        # return response
         return JsonResponse({
             "message": "PDF generated successfully.",
             "pdf_url": pdf_url,
@@ -299,3 +302,5 @@ def delete_service_pdf(request):
             return JsonResponse({"error": "File does not exist."}, status=status.HTTP_404_NOT_FOUND)
     except Exception as e:
         return JsonResponse({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    
