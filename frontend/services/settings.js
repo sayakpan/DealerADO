@@ -8,6 +8,12 @@ export async function changePassword(passwordData) {
             new_password: passwordData.newPassword
         }),
     });
+    
+    if (response.status === 401) {
+        window.location.href = '/login?status=401';
+        return;
+    }
+    
     return response;
 }
 
@@ -18,5 +24,11 @@ export async function deactivateAccount(password) {
             password: password
         }),
     });
+    
+    if (response.status === 401) {
+        window.location.href = '/login?status=401';
+        return;
+    }
+    
     return response;
 }

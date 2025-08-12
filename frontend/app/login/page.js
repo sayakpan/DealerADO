@@ -2,11 +2,13 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import { Eye, EyeOff } from "lucide-react";
 import { login } from "@/lib/auth";
 import { validateFields, validators } from "@/utils/validations";
 import { toast } from "@/plugin/toast";
+import Cookies from 'universal-cookie';
 // import FooterContent from "@/components/core/Footer";
 
 export default function LoginPage() {
@@ -15,11 +17,52 @@ export default function LoginPage() {
     const [showPassword, setShowPassword] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [errors, setErrors] = useState({});
+    const searchParams = useSearchParams();
 
     const validationRules = {
         email: [validators.required, validators.email],
         password: [validators.required, validators.minLength(6)]
     };
+
+    // Clear tokens and cookies when redirected with status=401
+    useEffect(() => {
+        const status = searchParams.get('status');
+        if (status === '401') {
+            // Clear all cookies
+            const cookies = new Cookies();
+            
+            // Clear authentication tokens
+            cookies.remove('access_token', { path: '/' });
+            cookies.remove('refresh_token', { path: '/' });
+            cookies.remove('token', { path: '/' });
+            cookies.remove('authToken', { path: '/' });
+            cookies.remove('user', { path: '/' });
+            
+            // Clear localStorage
+            if (typeof window !== 'undefined') {
+                localStorage.removeItem('access_token');
+                localStorage.removeItem('refresh_token');
+                localStorage.removeItem('token');
+                localStorage.removeItem('authToken');
+                localStorage.removeItem('user');
+                localStorage.clear();
+                
+                // Clear sessionStorage
+                sessionStorage.removeItem('access_token');
+                sessionStorage.removeItem('refresh_token');
+                sessionStorage.removeItem('token');
+                sessionStorage.removeItem('authToken');
+                sessionStorage.removeItem('user');
+                sessionStorage.clear();
+            }
+            
+            // Show toast message
+            toast.error("Your session has expired. Please log in again.", { 
+                duration: 4000, 
+                title: 'Session Expired' 
+            });
+        }
+    }, [searchParams]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();

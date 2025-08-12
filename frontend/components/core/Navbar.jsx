@@ -2,10 +2,10 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import SmartLink from "../utils/SmartLink";
 import { ChevronDown, Headset, Home, Info, Menu, X } from "lucide-react";
-import { isAuthenticated } from "@/lib/auth";
+import { isAuthenticated, logout } from "@/lib/auth";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import * as NavigationMenu from "@radix-ui/react-navigation-menu";
 import { Wallet, Settings, LogOut, History } from "lucide-react";
@@ -13,11 +13,27 @@ import { getUserDetails } from "@/lib/auth";
 import ClientOnly from "../utils/ClientOnly";
 import { ChevronRight } from "lucide-react";
 import LogoutModal from "@/components/ui/logout-modal";
+import Cookies from "universal-cookie";
 
 export default function Navbar() {
     const pathname = usePathname();
     const [scrolled, setScrolled] = useState(false);
     const [menuOpen, setMenuOpen] = useState(false);
+    const cookies = new Cookies();
+    const searchParams = useSearchParams();
+    const status = searchParams.get('status');
+    console.log(status);
+
+    if(status === '401') {
+        cookies.remove('token', { path: '/' });
+        cookies.remove('tokenExpiration', { path: '/' });
+        cookies.remove('userFirstName', { path: '/' });
+        cookies.remove('userLastName', { path: '/' });
+        cookies.remove('userMobile', { path: '/' });
+        cookies.remove('userEmail', { path: '/' });
+        cookies.remove('userRole', { path: '/' });
+        window.location.href = "/login";
+    }
 
     const fixedNavPathList = ['/login', '/signup', '/forgot-password', '/reset-password', '/contact-us', '/wallet', '/profile', '/service-history', '/about-us', '/privacy-policy', '/terms-and-conditions'];
     const fixedNav = fixedNavPathList.includes(pathname) || pathname.startsWith('/categories/') || pathname.startsWith('/settings') || pathname.startsWith('/services/');
@@ -41,9 +57,6 @@ export default function Navbar() {
     ];
 
     const textColor = fixedNav ? "text-white hover:text-gray-300" : "text-slate-800 hover:text-slate-600";
-
-
-
 
     return (
         <ClientOnly>

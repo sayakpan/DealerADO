@@ -107,6 +107,7 @@ export async function logout() {
 }
 
 export function getToken() {
+    //check the path query is /login?s
     return cookies.get(TOKEN_COOKIE_KEY);
 }
 
