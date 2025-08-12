@@ -1,10 +1,11 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import "@/public/globals.css";
-import Navbar from "@/components/core/Navbar";
+import ServerNavbar from "@/components/core/ServerNavbar";
 import FooterContent from "@/components/core/footer";
 import { LoadingProvider } from "@/contexts/LoadingContext";
 import { Suspense } from "react";
 import { ToasterProvider } from "@/contexts/ToastContext";
+import ClientCleanup from "@/components/utils/ClientCleanup";
 
 const geistSans = Geist({
     variable: "--font-geist-sans",
@@ -30,7 +31,8 @@ export default function RootLayout({ children }) {
                 <Suspense fallback={null}>
                     <LoadingProvider>
                         <ToasterProvider>
-                            <Navbar />
+                            <ClientCleanup />
+                            <ServerNavbar />
                             {children}
                             <FooterContent />
                         </ToasterProvider>
