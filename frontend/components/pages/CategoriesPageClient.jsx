@@ -4,7 +4,6 @@ import { useState } from "react"
 import CategoryHero from "@/components/categories/CategoryHero"
 import CategoryList from "@/components/categories/CategoryList"
 import { getCategories } from "@/services/categories"
-import { CategoryListSkeleton } from "@/components/skeletons/CategorySkeleton"
 
 export default function CategoriesPageClient({ initialCategories, initialTotalCount, initialHasMore }) {
     const [categories, setCategories] = useState(initialCategories || [])
