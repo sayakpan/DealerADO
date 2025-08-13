@@ -22,13 +22,17 @@ const WalletPageClient = ({ walletData }) => {
         }
     }
 
-    const formatDate = (timestamp) => {
-        return new Date(timestamp).toLocaleDateString('en-IN', {
+    const formatDateTime = (timestamp) => {
+        return new Date(timestamp).toLocaleString('en-IN', {
             day: '2-digit',
             month: 'short',
-            year: 'numeric'
-        })
-    }
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: true // for AM/PM format
+        });
+    };
+    
 
     return (
         <div className="min-h-screen bg-gray-50">
@@ -115,7 +119,7 @@ const WalletPageClient = ({ walletData }) => {
                                                     {transaction.service_name && transaction.service_name !== 'Manual Admin Adjustment' && ':'}
                                                 </div>
                                                 <div className="text-gray-500 text-sm">
-                                                    {transaction.service_name +' '+ formatDate(transaction.timestamp)}
+                                                    {transaction.service_name +' '+ formatDateTime(transaction.timestamp)}
                                                 </div>
                                             </div>
                                             <div className={`font-semibold ${

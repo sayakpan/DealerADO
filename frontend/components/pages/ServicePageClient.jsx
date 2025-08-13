@@ -5,8 +5,7 @@ import ServiceHeader from '@/components/ui/serviceHeader'
 import { submitServiceData } from '@/services/services'
 import { validators } from '@/utils/validations'
 import ServiceErrorModal from '@/components/ui/service-error-modal'
-import { ServiceResultSkeleton } from '@/components/skeletons/ServiceSkeleton'
-import { toast } from '@/plugin/toast'
+import ServiceSuccessModal from '@/components/ui/service-success-modal'
 
 const ServicePageClient = ({ service, slug }) => {
     const [formData, setFormData] = useState({})
@@ -16,6 +15,7 @@ const ServicePageClient = ({ service, slug }) => {
     const [serviceResult, setServiceResult] = useState(null)
     const [submitError, setSubmitError] = useState(null)
     const [showErrorModal, setShowErrorModal] = useState(false)
+    const [showSuccessModal, setShowSuccessModal] = useState(false)
 
     useEffect(() => {
         // Initialize form data with default values from API or empty strings
@@ -238,24 +238,11 @@ const ServicePageClient = ({ service, slug }) => {
 
                 const result = await submitServiceData(slug, submitData)
                 setServiceResult(result)
+                setShowSuccessModal(true)
 
             } catch (err) {
                 console.error('Error submitting service data:', err)
-
-                const isClientError = err.status === 400 ||
-                    err.statusCode === 400 ||
-                    err.response?.status === 400 ||
-                    err.message.includes('400') ||
-                    err.message.includes('Bad Request');
-
-                if (isClientError) {
-                    setShowErrorModal(true)
-                } else {
-                    // Show error in toast instead of replacing service description
-                    const errorMessage = err.message || 'An error occurred while fetching service details'
-                    toast.error(errorMessage)
-                    setServiceResult({ error: true, message: errorMessage })
-                }
+                setShowErrorModal(true)
             } finally {
                 setSubmitting(false)
             }
@@ -264,16 +251,24 @@ const ServicePageClient = ({ service, slug }) => {
 
     const handleDownload = () => {
         console.log('Download clicked', serviceResult)
+        // Add download logic here
+    }
+
+    const handleViewDetail = () => {
+        console.log('View Detail clicked', serviceResult)
+        // Add view detail logic here
     }
 
     const handleRetry = () => {
         setSubmitError(null)
         setServiceResult(null)
+        setShowErrorModal(false)
     }
 
     const handleCancel = () => {
         setSubmitError(null)
         setServiceResult(null)
+        setShowErrorModal(false)
     }
 
     return (
@@ -371,60 +366,11 @@ const ServicePageClient = ({ service, slug }) => {
                                 </div>
                             )}
 
-                            {/* Show loading skeleton while submitting */}
-                            {submitting && !serviceResult && (
-                                <ServiceResultSkeleton />
-                            )}
-
-                            {/* Show service result (success or error) */}
-                            {serviceResult && (
-                                <div className="w-full">
-                                    {serviceResult.error ? (
-                                        // Error result
-                                        <div>
-                                            <div className="text-slate-700 text-lg font-semibold mb-3">
-                                                Service Result:
-                                            </div>
-                                            <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-                                                <div className="text-[#B52628] text-sm font-medium">
-                                                    Error: {serviceResult.message}
-                                                </div>
-                                            </div>
-                                        </div>
-                                    ) : (
-                                        // Success result
-                                        <div>
-                                            <div className="flex justify-between items-center mb-3">
-                                                <div className="text-slate-700 text-lg font-semibold">
-                                                    Service Result:
-                                                </div>
-                                                <button
-                                                    onClick={handleDownload}
-                                                    className="px-4 py-2 bg-[#B52628] hover:bg-[#9e1f21] text-white text-sm font-semibold rounded-lg transition-colors duration-200 flex items-center gap-2"
-                                                >
-                                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                        <path d="M21 15V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V15" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                                                        <path d="M7 10L12 15L17 10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                                                        <path d="M12 15V3" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                                                    </svg>
-                                                    Download PDF
-                                                </button>
-                                            </div>
-                                            <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-                                                <pre className="text-slate-700 text-sm font-mono whitespace-pre-wrap overflow-x-auto">
-                                                    {JSON.stringify(serviceResult, null, 2)}
-                                                </pre>
-                                            </div>
-                                        </div>
-                                    )}
-                                </div>
-                            )}
-
-                            {/* Show placeholder when no description and no result */}
-                            {!service?.description && !serviceResult && (
+                            {/* Show placeholder when no description */}
+                            {!service?.description && (
                                 <div className="w-full text-center py-8">
                                     <div className="text-gray-500 text-sm mb-4">
-                                        Fill out the form and click "Fetch Details" to see the service results here.
+                                        Fill out the form and click "Fetch Details" to get your service results.
                                     </div>
                                 </div>
                             )}
@@ -440,6 +386,15 @@ const ServicePageClient = ({ service, slug }) => {
                 description="Please retry ! Enter your correct register number so that the data can be fetched."
                 onRetry={handleRetry}
                 onCancel={handleCancel}
+            />
+
+            <ServiceSuccessModal
+                open={showSuccessModal}
+                onOpenChange={setShowSuccessModal}
+                title="Vehicle Basic Detail Fetched Successfully"
+                description="You can check that we have found the data of your vehicle from your register number."
+                onDownload={handleDownload}
+                onViewDetail={handleViewDetail}
             />
         </div>
     )
