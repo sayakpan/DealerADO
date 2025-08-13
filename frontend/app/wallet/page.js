@@ -1,7 +1,5 @@
 import { getServerWalletData } from "@/services/serverServices"
 import WalletPageClient from "@/components/pages/WalletPageClient"
-import ServiceHeader from '@/components/ui/serviceHeader'
-import { WalletSkeleton } from '@/components/skeletons/WalletSkeleton'
 import { redirect } from 'next/navigation';
 
 export default async function WalletPage() {

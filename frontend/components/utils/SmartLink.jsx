@@ -82,10 +82,16 @@ export default function SmartLink({
             return;
         }
 
-        setIsLoading(true);
-        router.push(targetHref);
-        if (scrollEnabled) window.scrollTo({ top: 0, behavior: 'instant' });
-        if (onClick) onClick(e);
+        try {
+            setIsLoading(true);
+            await router.push(targetHref);
+            if (scrollEnabled) window.scrollTo({ top: 0, behavior: 'instant' });
+        } catch (error) {
+            console.error('Navigation error:', error);
+            setIsLoading(false); // Clear loading on error
+        } finally {
+            if (onClick) onClick(e);
+        }
     };
 
     return (
