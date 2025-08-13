@@ -6,7 +6,7 @@ import { formatDate } from '@/utils/dateUtils';
 import { Download, Clock, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
 import ServiceHeader from '@/components/ui/serviceHeader';
 import { ServiceHistoryCardSkeleton } from '@/components/skeletons/ServiceHistorySkeleton';
-import { downloadServiceResponsePDF } from '@/utils/pdfUtils';
+import { fetchWithAuth } from '@/utils/api';
 
 export default function ServiceHistoryPageClient({ initialLogs, initialNextUrl }) {
     const [logs, setLogs] = useState(initialLogs || []);
@@ -74,7 +74,20 @@ export default function ServiceHistoryPageClient({ initialLogs, initialNextUrl }
     };
 
     const downloadResponse = async (log) => {
-        await downloadServiceResponsePDF(log);
+        try {
+            const response = await fetchWithAuth.download(
+                `/api/services/generate-pdf/?log_id=${log.id}`,
+                { filename: `${log.service_name}_${log.id}_response.pdf` }
+            );
+            
+            if (!response.success) {
+                console.error('PDF download failed:', response.error);
+                // You could show a toast notification here
+            }
+        } catch (error) {
+            console.error('Error downloading PDF:', error);
+            // You could show a toast notification here
+        }
     };
 
     if (error) {

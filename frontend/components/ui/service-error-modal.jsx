@@ -2,13 +2,13 @@
 
 import GlobalModal from "@/components/ui/global-modal";
 
-export default function ServiceErrorModal({ 
-    open, 
+export default function ServiceErrorModal({
+    open,
     onOpenChange,
     title = "Unsuccessful",
     description = "Please retry ! Enter your correct register number so that the data can be fetched.",
-    onRetry = () => {},
-    onCancel = () => {},
+    onRetry = () => { },
+    onCancel = () => { },
     trigger
 }) {
     const handleRetry = () => {
