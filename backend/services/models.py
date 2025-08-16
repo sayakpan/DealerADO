@@ -118,6 +118,7 @@ class Service(models.Model):
     )
     cover_image = models.ImageField(upload_to="services/covers/", blank=True, null=True, verbose_name="Cover Image")
     description = CKEditor5Field(blank=True, verbose_name="Description")
+    created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         verbose_name = "Service"
@@ -232,5 +233,50 @@ class ServiceUsageLog(models.Model):
     class Meta:
         verbose_name = "Service Usage Log"
         verbose_name_plural = "Service Usage Logs"
+        
+
+def default_spec():
+    return {
+        "service": None,
+        "map": {},
+        "formatters": {},
+        "header": {
+            "left": {"type": "text", "label": "Title", "source": None, "bold": True, "size": 16},
+            "right": {"type": "kv", "label": "Ref", "source": None, "align": "right"}
+        },
+        "sections": [],
+        "security": {"mask": [], "redact": []}
+    }
+
+
+class RenderSchema(models.Model):
+    service = models.OneToOneField(
+        "services.Service",
+        related_name="schema",
+        on_delete=models.CASCADE
+    )
+    spec = models.JSONField(default=default_spec)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = "render_schema"
+        verbose_name = "Render Schema"
+        verbose_name_plural = "Render Schemas"
+        
+    def __str__(self):
+        return f"Schema for {self.service.name} ({self.service.pk})"
+    
+    def clean(self):
+        if not isinstance(self.spec, dict):
+            raise ValidationError({"spec": "Spec must be a JSON object."})
+        for key in ["service", "map", "header", "sections"]:
+            if key not in self.spec:
+                raise ValidationError({"spec": f"Missing required key: '{key}'"})
+        if not isinstance(self.spec.get("map"), dict):
+            raise ValidationError({"spec": "'map' must be an object."})
+        header = self.spec.get("header")
+        if not isinstance(header, dict) or "left" not in header or "right" not in header:
+            raise ValidationError({"spec": "'header' must have 'left' and 'right' blocks."})
         
         
