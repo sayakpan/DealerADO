@@ -159,16 +159,17 @@ def render_data_recursive(p, data, x, y, indent=0, page_height=A4[1]):
                 pretty_key = prettify_key(key)
                 if is_falsy(value):
                     y = draw_bold_key_with_wrapped_value(p, x_offset, y, prettify_key(key), "Not Available", max_width=A4[0] - x_offset - 2 * cm)
-                    y -= 0.4 * cm
+                    # y -= 0.4 * cm
                 elif isinstance(value, (str, int, float, bool)) or value is None:
                     y = draw_bold_key_with_wrapped_value( p, x, y, pretty_key, value, max_width=A4[0] - (x) - 2 * cm )
-                    y -= 0.4 * cm
+                    # y -= 0.4 * cm
                 else:
-                    p.setFont("Helvetica-Bold", 14)
-                    p.drawString(x, y, f"{pretty_key}:")
+                    p.setFont("Helvetica-Bold", 13)
                     y -= 0.6 * cm
+                    p.drawString(x, y, f"{pretty_key} -")
+                    y -= 0.4 * cm
                     y = render_data_recursive(p, value, x, y, indent + 1, page_height)
-                    y -= 0.9 * cm
+                    y -= 0.6 * cm
 
     # === If it's a list ===
     elif isinstance(data, list):

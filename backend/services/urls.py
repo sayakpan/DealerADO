@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import ServiceCategoryDetailAPIView, ServiceCategoryListAPIView, ServiceDetailAPIView, UserServiceUsageLogListView, delete_service_pdf, generate_pdf_from_log, submit_service_form
+from .views import RenderFromLogAPIView, ServiceCategoryDetailAPIView, ServiceCategoryListAPIView, ServiceDetailAPIView, UserServiceUsageLogListView, delete_service_pdf, generate_pdf_from_log, submit_service_form
 
 urlpatterns = [
     path('categories/', ServiceCategoryListAPIView.as_view(), name='service-category-list'),
@@ -9,4 +9,5 @@ urlpatterns = [
     path("usage-logs/", UserServiceUsageLogListView.as_view(), name="user-service-usage-logs"),
     path("generate-pdf/", generate_pdf_from_log, name="generate-pdf-from-log"),
     path("delete-pdf/", delete_service_pdf, name="delete_service_pdf"),
+    path("render/", RenderFromLogAPIView.as_view(), name="services-render-from-log"),
 ]

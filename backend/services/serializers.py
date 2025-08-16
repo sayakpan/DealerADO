@@ -149,3 +149,9 @@ class ServiceUsageLogSerializer(serializers.ModelSerializer):
                 data["api_response"]["error"] = cleaned_error
 
         return data
+    
+    
+
+class RenderPreviewInputSerializer(serializers.Serializer):
+    service_slug = serializers.SlugField()
+    payload = serializers.JSONField()
