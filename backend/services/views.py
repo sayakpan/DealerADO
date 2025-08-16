@@ -1,24 +1,25 @@
 import stat
 from rest_framework.generics import ListAPIView, RetrieveAPIView
+from rest_framework.views import APIView
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework import status
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AnonymousUser
 from django.http import HttpResponse
+from services.pdf_renderer import render_ast_to_pdf
 from services.utils import build_absolute_pdf_url, generate_service_pdf
-from .models import ServiceCategory, Service
-from .serializers import ServiceCategoryDetailSerializer, ServiceCategorySerializer, ServiceDetailSerializer, ServiceUsageLogSerializer
+from .models import ServiceCategory, Service, RenderSchema
+from .serializers import RenderPreviewInputSerializer, ServiceCategoryDetailSerializer, ServiceCategorySerializer, ServiceDetailSerializer, ServiceUsageLogSerializer
 from rest_framework.permissions import IsAuthenticated
 from django.http import JsonResponse, Http404
-from django.views.decorators.csrf import csrf_exempt
-from django.views.decorators.http import require_POST
 from services.models import Service, ServiceUsageLog
 from wallet.models import Wallet, TransactionLog
 from django.db import transaction
 from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage
-from django.utils.timezone import now
+from .rendering import render_response_with_schema
+from .serializers import RenderPreviewInputSerializer
 import time
 import requests
 import json
@@ -59,6 +60,53 @@ class UserServiceUsageLogListView(ListAPIView):
     def get_queryset(self):
         return ServiceUsageLog.objects.filter(user=self.request.user).order_by('-created_at')    
     
+    
+    
+class RenderFromLogAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        log_id = request.query_params.get("log_id")
+        if not log_id:
+            return Response({"detail": "log_id is required."}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            usage_log = ServiceUsageLog.objects.select_related("service").get(id=log_id, user=request.user)
+        except ServiceUsageLog.DoesNotExist:
+            return Response({"detail": "Service usage log not found."}, status=status.HTTP_404_NOT_FOUND)
+
+        if usage_log.status != "success":
+            return Response({"detail": "Cannot render schema for a failed log."}, status=status.HTTP_400_BAD_REQUEST)
+
+        service = usage_log.service
+        schema = getattr(service, "schema", None)
+        if not schema or not schema.spec:
+            return Response({"detail": "Schema not configured for this service."}, status=status.HTTP_404_NOT_FOUND)
+
+        spec = dict(schema.spec)
+        if not spec.get("service"):
+            spec["service"] = service.slug
+
+        rendered = render_response_with_schema(service, usage_log.api_response)
+
+        return Response(
+            {
+                "service": {
+                    "name": service.name,
+                    "slug": service.slug
+                },
+                "log": {
+                    "id": usage_log.id,
+                    "status": usage_log.status,
+                    "http_status_code": usage_log.http_status_code,
+                    "created_at": usage_log.created_at
+                },
+                "rendered": rendered,
+                "api_response": usage_log.api_response,
+            },
+            status=status.HTTP_200_OK
+        )
+        
     
     
 # Function Based Views
@@ -149,7 +197,7 @@ def submit_service_form(request, slug):
             response = requests.get(full_url, headers=headers, timeout=15)
         else:
             full_url = service.api_url
-            response = requests.post(full_url, json=sanitized_data, headers=headers, timeout=15)
+            response = requests.post(full_url, json=sanitized_data, headers=headers, timeout=30)
         response.raise_for_status()
     except requests.RequestException as e:
         http_status = getattr(e.response, 'status_code', 500) if hasattr(e, 'response') and e.response else 500
@@ -263,20 +311,22 @@ def generate_pdf_from_log(request):
         return JsonResponse({"error": "Cannot generate PDF for failed log."}, status=status.HTTP_400_BAD_REQUEST)
 
     try:
-        pdf_buffer = generate_service_pdf(
-            usage_log.service.name,
-            usage_log.api_response,
-            usage_log.user
+        rendered = render_response_with_schema(usage_log.service, usage_log.api_response)
+        pdf_bytes = render_ast_to_pdf(
+            service_title=usage_log.service.name,
+            ast=rendered,
+            user_label=f"{request.user.first_name} {request.user.last_name}"
         )
         timestamp = int(time.time())
         pdf_filename = f"service_reports/{usage_log.service.slug}_{usage_log.user.id}_{timestamp}.pdf"
-        pdf_file = ContentFile(pdf_buffer.getvalue())
+        
+        pdf_file = ContentFile(pdf_bytes)
         default_storage.save(pdf_filename, pdf_file)
         pdf_url = build_absolute_pdf_url(pdf_filename)
-        
-        # response = HttpResponse(pdf_buffer.getvalue(), content_type='application/pdf')
-        # response['Content-Disposition'] = f'inline; filename="{usage_log.service.slug}_{usage_log.user.id}_{timestamp}_report.pdf"'
-        # return response
+
+        response = HttpResponse(pdf_bytes, content_type='application/pdf')
+        response['Content-Disposition'] = f'inline; filename="{usage_log.service.slug}_{usage_log.user.id}_{timestamp}_report.pdf"'
+
         return JsonResponse({
             "message": "PDF generated successfully.",
             "pdf_url": pdf_url,
