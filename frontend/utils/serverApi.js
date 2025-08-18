@@ -8,7 +8,7 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
  */
 
 async function getServerToken() {
-    const cookieStore = cookies();
+    const cookieStore = await cookies();
     const token = cookieStore.get('token')?.value;
     const tokenExpiration = cookieStore.get('tokenExpiration')?.value;
 

@@ -4,8 +4,8 @@ import React, { useState, useEffect } from 'react'
 import ServiceHeader from '@/components/ui/serviceHeader'
 import { submitServiceData } from '@/services/services'
 import { validators } from '@/utils/validations'
-import ServiceErrorModal from '@/components/ui/service-error-modal'
-import ServiceSuccessModal from '@/components/ui/service-success-modal'
+import RenderedLogClient from '@/components/ui/RenderedLogClient'
+import { fetchWithAuth } from '@/utils/api'
 
 const ServicePageClient = ({ service, slug }) => {
     const [formData, setFormData] = useState({})
@@ -14,8 +14,7 @@ const ServicePageClient = ({ service, slug }) => {
     const [submitting, setSubmitting] = useState(false)
     const [serviceResult, setServiceResult] = useState(null)
     const [submitError, setSubmitError] = useState(null)
-    const [showErrorModal, setShowErrorModal] = useState(false)
-    const [showSuccessModal, setShowSuccessModal] = useState(false)
+    const [submittedData, setSubmittedData] = useState(null)
 
     useEffect(() => {
         // Initialize form data with default values from API or empty strings
@@ -222,12 +221,18 @@ const ServicePageClient = ({ service, slug }) => {
         return Object.keys(errors).length === 0
     }
 
+    const handleFormSubmit = (e) => {
+        e.preventDefault();
+        handleFetchDetails();
+    };
+
     const handleFetchDetails = async () => {
         if (validateForm()) {
             try {
                 setSubmitting(true)
                 setSubmitError(null)
                 setServiceResult(null)
+                setSubmittedData(null)
 
                 const submitData = {}
                 Object.keys(formData).forEach(key => {
@@ -235,41 +240,39 @@ const ServicePageClient = ({ service, slug }) => {
                         submitData[key] = formData[key]
                     }
                 })
+                setSubmittedData(submitData)
 
                 const result = await submitServiceData(slug, submitData)
                 setServiceResult(result)
-                setShowSuccessModal(true)
 
             } catch (err) {
                 console.error('Error submitting service data:', err)
-                setShowErrorModal(true)
+                setSubmitError(err.message || 'An error occurred while fetching details.')
             } finally {
                 setSubmitting(false)
             }
         }
     }
 
-    const handleDownload = () => {
-        console.log('Download clicked', serviceResult)
-        // Add download logic here
-    }
-
-    const handleViewDetail = () => {
-        console.log('View Detail clicked', serviceResult)
-        // Add view detail logic here
-    }
-
-    const handleRetry = () => {
-        setSubmitError(null)
-        setServiceResult(null)
-        setShowErrorModal(false)
-    }
-
-    const handleCancel = () => {
-        setSubmitError(null)
-        setServiceResult(null)
-        setShowErrorModal(false)
-    }
+    const handleDownloadPDF = async () => {
+        if (serviceResult && serviceResult.log_id) {
+            try {
+                const response = await fetchWithAuth.get(`/services/generate-pdf/?log_id=${serviceResult.log_id}`, {
+                    responseType: 'blob',
+                });
+                const url = window.URL.createObjectURL(new Blob([response.data]));
+                const link = document.createElement('a');
+                link.href = url;
+                link.setAttribute('download', `service_report_${serviceResult.log_id}.pdf`);
+                document.body.appendChild(link);
+                link.click();
+                link.remove();
+            } catch (error) {
+                console.error('Error downloading PDF:', error);
+                // Handle error appropriately, maybe show a toast notification
+            }
+        }
+    };
 
     return (
         <div className="min-h-screen bg-gray-50">
@@ -279,7 +282,7 @@ const ServicePageClient = ({ service, slug }) => {
                 <div className="flex flex-col lg:flex-row justify-center items-center lg:items-start gap-8">
                     {/* Service Form */}
                     {service?.form_fields && service.form_fields.length > 0 && (
-                        <div className="w-full max-w-[570px] mx-auto lg:mx-0 px-5 py-7 bg-white rounded-[20px] shadow-[0px_4px_40px_5px_rgba(0,0,0,0.08)] flex flex-col justify-start items-start gap-4">
+                        <form onSubmit={handleFormSubmit} className="w-full max-w-[570px] mx-auto lg:mx-0 px-5 py-7 bg-white rounded-[20px] shadow-[0px_4px_40px_5px_rgba(0,0,0,0.08)] flex flex-col justify-start items-start gap-4">
                             <div className="w-full flex flex-col gap-4">
                                 {service.form_fields.map((field, index) => (
                                     <React.Fragment key={field.key}>
@@ -331,8 +334,8 @@ const ServicePageClient = ({ service, slug }) => {
                                     : 'bg-[#B52628] hover:bg-[#9e1f21] cursor-pointer'
                                     }`}>
                                     <button
+                                        type="submit"
                                         className="w-full h-full bg-transparent border-none text-white text-base font-semibold capitalize transition-colors duration-200 disabled:cursor-not-allowed"
-                                        onClick={handleFetchDetails}
                                         disabled={submitting}
                                     >
                                         {submitting ? (
@@ -346,7 +349,7 @@ const ServicePageClient = ({ service, slug }) => {
                                     </button>
                                 </div>
                             </div>
-                        </div>
+                        </form>
                     )}
 
                     {/* Service Details */}
@@ -356,9 +359,9 @@ const ServicePageClient = ({ service, slug }) => {
                         </div>
 
                         <div className="px-4 py-3.5 bg-white rounded-xl shadow-[0px_4px_40px_5px_rgba(0,0,0,0.08)] border border-gray-200 flex flex-col justify-start items-start gap-5">
-                            {/* Show service description if available */}
+                            {/* Service Description */}
                             {service?.description && (
-                                <div className="w-full">
+                                <div className="w-full pb-4 border-b border-gray-200">
                                     <div
                                         className="opacity-60 text-slate-700 text-sm font-normal leading-tight prose prose-sm max-w-none"
                                         dangerouslySetInnerHTML={{ __html: service.description }}
@@ -366,36 +369,53 @@ const ServicePageClient = ({ service, slug }) => {
                                 </div>
                             )}
 
-                            {/* Show placeholder when no description */}
-                            {!service?.description && (
-                                <div className="w-full text-center py-8">
-                                    <div className="text-gray-500 text-sm mb-4">
-                                        Fill out the form and click "Fetch Details" to get your service results.
+                            {/* Submitted Data */}
+                            {submittedData && (
+                                <div className="w-full">
+                                    <h3 className="text-base font-semibold text-slate-700 mb-2">Input Parameters</h3>
+                                    <div className="border border-gray-200 rounded-lg p-3 bg-gray-50/50">
+                                        {Object.entries(submittedData).map(([key, value]) => {
+                                            const field = service?.form_fields?.find(f => f.key === key);
+                                            return (
+                                                <div key={key} className="flex justify-between items-center py-1.5 border-b border-gray-200 last:border-b-0 text-sm">
+                                                    <span className="text-gray-600">{field?.label || key}:</span>
+                                                    <span className="text-gray-900 font-medium">{value}</span>
+                                                </div>
+                                            )
+                                        })}
                                     </div>
+                                </div>
+                            )}
+
+                            {/* Error Message */}
+                            {submitError && (
+                                <div className="w-full text-center py-8 text-red-500">
+                                    <div className="text-lg mb-4">Error</div>
+                                    <p>{submitError}</p>
+                                </div>
+                            )}
+
+                            {/* Service Result */}
+                            {serviceResult && (
+                                <div className="w-full">
+                                    <div className="flex justify-between items-center my-4">
+                                        <h3 className="text-lg font-semibold">Response</h3>
+                                        <div className="flex gap-2">
+                                            <button
+                                                onClick={handleDownloadPDF}
+                                                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+                                            >
+                                                Download PDF
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <RenderedLogClient log={serviceResult} />
                                 </div>
                             )}
                         </div>
                     </div>
                 </div>
             </div>
-
-            <ServiceErrorModal
-                open={showErrorModal}
-                onOpenChange={setShowErrorModal}
-                title="Unsuccessful"
-                description="Please retry ! Enter your correct register number so that the data can be fetched."
-                onRetry={handleRetry}
-                onCancel={handleCancel}
-            />
-
-            <ServiceSuccessModal
-                open={showSuccessModal}
-                onOpenChange={setShowSuccessModal}
-                title="Vehicle Basic Detail Fetched Successfully"
-                description="You can check that we have found the data of your vehicle from your register number."
-                onDownload={handleDownload}
-                onViewDetail={handleViewDetail}
-            />
         </div>
     )
 }

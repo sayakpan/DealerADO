@@ -5,7 +5,7 @@ import { ServiceFormSkeleton } from '@/components/skeletons/ServiceSkeleton'
 import { redirect } from 'next/navigation';
 
 export default async function ServicePage({ params }) {
-    const { slug } = params
+    const { slug } = await params
 
     const service = await getServerServiceBySlug(slug);
 

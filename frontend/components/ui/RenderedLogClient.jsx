@@ -63,8 +63,8 @@ const Section = ({ section }) => (
   </div>
 )
 
-const RenderedLogClient = ({ data }) => {
-  if (!data || !data.rendered) {
+const RenderedLogClient = ({ log }) => {
+  if (!log || !log.rendered) {
     return (
       <div className="p-8 text-center bg-white rounded-lg border border-gray-200">
         <p className="text-gray-500">No data to display.</p>
@@ -72,7 +72,7 @@ const RenderedLogClient = ({ data }) => {
     )
   }
 
-  const { rendered } = data
+  const { rendered } = log
 
   return (
     <div className="bg-gray-50 min-h-screen p-4">
