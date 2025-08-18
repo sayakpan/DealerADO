@@ -58,8 +58,8 @@ class HTTPStatusCode(models.Model):
     description = models.CharField(max_length=255, blank=True)
 
     class Meta:
-        verbose_name = "HTTP Status Code"
-        verbose_name_plural = "HTTP Status Codes"
+        verbose_name = "Status Code"
+        verbose_name_plural = "Status Codes"
         ordering = ["code"]
 
     def __str__(self):
