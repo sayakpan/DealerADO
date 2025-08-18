@@ -43,7 +43,7 @@ class Secrets(models.Model):
         verbose_name_plural = "Secrets"
 
     def __str__(self):
-        return f"{self.provider_name} ({self.get_auth_type_display()}) - {self.id}"
+        return f"{self.provider_name} - {self.id}"
     
     def clean(self):
         if self.auth_type == 'bearer_token' and not self.bearer_token:

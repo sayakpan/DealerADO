@@ -50,7 +50,6 @@ class ServiceFormFieldAdmin(admin.ModelAdmin):
     list_display = ('id', 'label', 'service', 'key', 'input_type', 'is_required')
     search_fields = ('label', 'key', 'service__name')
     list_filter = ('input_type', 'is_required')
-    ordering = ('service__name', 'label')
     readonly_fields = ('validation_guide_display',)
     autocomplete_fields = ['service']
     fieldsets = (
