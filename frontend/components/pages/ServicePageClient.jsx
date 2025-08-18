@@ -2,10 +2,9 @@
 
 import React, { useState, useEffect } from 'react'
 import ServiceHeader from '@/components/ui/serviceHeader'
-import { submitServiceData } from '@/services/services'
+import { deletePdf, generatePdf, submitServiceData } from '@/services/services'
 import { validators } from '@/utils/validations'
 import RenderedLogClient from '@/components/ui/RenderedLogClient'
-import { fetchWithAuth } from '@/utils/api'
 
 const ServicePageClient = ({ service, slug }) => {
     const [formData, setFormData] = useState({})
@@ -257,16 +256,15 @@ const ServicePageClient = ({ service, slug }) => {
     const handleDownloadPDF = async () => {
         if (serviceResult && serviceResult.log_id) {
             try {
-                const response = await fetchWithAuth.get(`/services/generate-pdf/?log_id=${serviceResult.log_id}`, {
-                    responseType: 'blob',
-                });
-                const url = window.URL.createObjectURL(new Blob([response.data]));
-                const link = document.createElement('a');
-                link.href = url;
-                link.setAttribute('download', `service_report_${serviceResult.log_id}.pdf`);
-                document.body.appendChild(link);
-                link.click();
-                link.remove();
+
+                const pdfData = await generatePdf(serviceResult.log_id);
+
+                // Step 2: Open the PDF in a new tab
+                window.open(pdfData.pdf_url, '_blank');
+
+                // Step 3: Delete the PDF from the server
+                await deletePdf(pdfData.pdf_filename);
+
             } catch (error) {
                 console.error('Error downloading PDF:', error);
                 // Handle error appropriately, maybe show a toast notification
