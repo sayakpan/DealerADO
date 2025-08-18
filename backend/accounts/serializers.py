@@ -20,13 +20,28 @@ class RegisterSerializer(serializers.ModelSerializer):
         if User.objects.filter(email=value).exists():
             raise serializers.ValidationError("A user with this email already exists.")
         return value
+    
+    def generate_unique_username(self, base_username):
+        """
+        Generates a unique username by appending a number to the base username
+        if a user with that username already exists.
+        """
+        username = base_username
+        counter = 1
+        while User.objects.filter(username=username).exists():
+            username = f"{base_username}{counter}"
+            counter += 1
+        return username
 
     def create(self, validated_data):
         email = validated_data['email']
         password = validated_data['password']
         first_name = validated_data['first_name']
         last_name = validated_data['last_name']
-        username = email.split('@')[0]
+        base_username = email.split('@')[0]
+        
+        # Ensure username uniqueness
+        username = self.generate_unique_username(base_username)
 
         user = User.objects.create_user(
             username=username,
