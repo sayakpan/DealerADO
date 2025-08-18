@@ -1,12 +1,13 @@
 'use client';
 
 import { useState, useRef, useCallback } from 'react';
-import { getUsageLogs } from '@/services/services';
+import { getUsageLogs, getRenderedLog, generatePdf, deletePdf } from '@/services/services';
 import { formatDate } from '@/utils/dateUtils';
-import { Download, Clock, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
+import { Download, Clock, CheckCircle, XCircle, AlertCircle, Eye } from 'lucide-react';
 import ServiceHeader from '@/components/ui/serviceHeader';
 import { ServiceHistoryCardSkeleton } from '@/components/skeletons/ServiceHistorySkeleton';
-import { fetchWithAuth } from '@/utils/api';
+import { ModalSkeleton } from '@/components/skeletons/ModalSkeleton';
+import RenderedLogClient from '../ui/RenderedLogClient';
 
 export default function ServiceHistoryPageClient({ initialLogs, initialNextUrl }) {
     const [logs, setLogs] = useState(initialLogs || []);
@@ -15,6 +16,29 @@ export default function ServiceHistoryPageClient({ initialLogs, initialNextUrl }
     const [error, setError] = useState(null);
     const [filter, setFilter] = useState('all');
     const observerRef = useRef();
+    const [expandedLogId, setExpandedLogId] = useState(null);
+    const [renderedLog, setRenderedLog] = useState(null);
+    const [loadingDetails, setLoadingDetails] = useState(false);
+
+    const handleViewDetails = async (logId) => {
+        if (expandedLogId === logId) {
+            setExpandedLogId(null);
+            setRenderedLog(null);
+            return;
+        }
+
+        setExpandedLogId(logId);
+        setLoadingDetails(true);
+        setRenderedLog(null);
+        try {
+            const data = await getRenderedLog(logId);
+            setRenderedLog(data);
+        } catch (error) {
+            console.error('Failed to fetch rendered log:', error);
+        } finally {
+            setLoadingDetails(false);
+        }
+    };
 
     const loadMoreLogs = useCallback(async (url) => {
         try {
@@ -75,18 +99,18 @@ export default function ServiceHistoryPageClient({ initialLogs, initialNextUrl }
 
     const downloadResponse = async (log) => {
         try {
-            const response = await fetchWithAuth.download(
-                `/api/services/generate-pdf/?log_id=${log.id}`,
-                { filename: `${log.service_name}_${log.id}_response.pdf` }
-            );
-            
-            if (!response.success) {
-                console.error('PDF download failed:', response.error);
-                // You could show a toast notification here
-            }
+            // Step 1: Generate the PDF and get the URL
+            const pdfData = await generatePdf(log.id);
+
+            // Step 2: Open the PDF in a new tab
+            window.open(pdfData.pdf_url, '_blank');
+
+            // Step 3: Delete the PDF from the server
+            await deletePdf(pdfData.pdf_filename);
+
         } catch (error) {
-            console.error('Error downloading PDF:', error);
-            // You could show a toast notification here
+            console.error('Error in PDF process:', error);
+            // You could show a toast notification here to inform the user
         }
     };
 
@@ -179,6 +203,13 @@ export default function ServiceHistoryPageClient({ initialLogs, initialNextUrl }
                                                 </div>
                                                 <div className="flex items-center gap-2">
                                                     <button
+                                                        onClick={() => handleViewDetails(log.id)}
+                                                        className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-md transition-colors"
+                                                        title="View Details"
+                                                    >
+                                                        <Eye className="w-4 h-4" />
+                                                    </button>
+                                                    <button
                                                         onClick={() => downloadResponse(log)}
                                                         className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-md transition-colors"
                                                         title="Download Response"
@@ -205,19 +236,18 @@ export default function ServiceHistoryPageClient({ initialLogs, initialNextUrl }
                                         </div>
                                     </div>
 
-                                    {/* API Response Code Block - Always Visible */}
-                                    <div className="mt-3">
-                                        <div className="bg-slate-900 rounded-lg border border-gray-300 overflow-hidden">
-                                            <div className="bg-gray-100 px-3 py-2 border-b border-gray-300 flex items-center justify-between">
-                                                <span className="text-xs font-medium text-gray-600">API Response</span>
-                                            </div>
-                                            <div className="p-3 overflow-auto max-h-64 sm:max-h-80">
-                                                <pre className="text-xs sm:text-sm text-cyan-300 font-mono leading-relaxed whitespace-pre-wrap break-words">
-                                                    {JSON.stringify(log.api_response, null, 2)}
-                                                </pre>
-                                            </div>
+                                    {/* Rendered Log Details */}
+                                    {expandedLogId === log.id && (
+                                        <div className="mt-3">
+                                            {loadingDetails ? (
+                                                <ModalSkeleton />
+                                            ) : renderedLog ? (
+                                                <RenderedLogClient data={renderedLog} />
+                                            ) : (
+                                                <p>Could not load details.</p>
+                                            )}
                                         </div>
-                                    </div>
+                                    )}
                                 </div>
                             );
                         })}

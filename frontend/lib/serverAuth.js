@@ -2,8 +2,8 @@ import { cookies, headers } from 'next/headers';
 
 // Server-side authentication utilities
 export async function getServerAuthState() {
-    const headersList = headers();
-    const cookieStore = cookies();
+    const headersList = await headers();
+    const cookieStore = await cookies();
     
     const isAuthenticated = headersList.get('x-user-authenticated') === 'true';
     const sessionExpired = headersList.get('x-session-expired') === 'true';
@@ -32,12 +32,12 @@ export async function getServerAuthState() {
 }
 
 export async function getServerToken() {
-    const cookieStore = cookies();
+    const cookieStore = await cookies();
     return cookieStore.get('token')?.value || null;
 }
 
 export async function clearSessionExpiredFlag() {
-    const cookieStore = cookies();
+    const cookieStore = await cookies();
     // This will be handled by the client component to clear the flag
     return cookieStore.get('sessionExpired')?.value === 'true';
 }
