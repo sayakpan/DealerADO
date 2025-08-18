@@ -132,7 +132,8 @@ def submit_service_form(request, slug):
             "message": "Wallet not found",
             "service": service.name,
             "log_id": None,
-            "response": {}
+            "response": {},
+            "render": None
         }, status=status.HTTP_403_FORBIDDEN)
 
     if wallet.balance < service.price_per_hit:
@@ -144,7 +145,8 @@ def submit_service_form(request, slug):
             "response": {
                 "balance": float(wallet.balance),
                 "required": float(service.price_per_hit)
-            }
+            },
+            "render": None
         }, status=status.HTTP_402_PAYMENT_REQUIRED)
 
     # Step 2: Validate payload
@@ -156,7 +158,8 @@ def submit_service_form(request, slug):
             "message": "Invalid JSON",
             "service": service.name,
             "log_id": None,
-            "response": {}
+            "response": {},
+            "render": None
         }, status=status.HTTP_400_BAD_REQUEST)
 
     expected_keys = list(service.form_fields.values_list('key', flat=True))
@@ -167,7 +170,8 @@ def submit_service_form(request, slug):
             "message": "Missing required fields.",
             "service": service.name,
             "log_id": None,
-            "response": {"missing": missing_keys}
+            "response": {"missing": missing_keys},
+            "render": None
         }, status=status.HTTP_400_BAD_REQUEST)
         
     sanitized_data = {
@@ -207,17 +211,18 @@ def submit_service_form(request, slug):
             service=service,
             full_url=full_url,
             form_data_sent=sanitized_data,
-            api_response={"error": str(e)},
+            api_response={"error": str(e), "raw_response": response.json()},
             http_status_code=http_status,
             status='failed',
             price_at_time=service.price_per_hit
         )
         return JsonResponse({
             "success": False,
-            "message": "External API call failed.",
+            "message": "API call failed.",
             "service": service.name,
             "log_id": None,
-            "response": {"error": "Failed to connect to service."}
+            "response": {"error": "Failed to connect to service."},
+            "render": None
         }, status=status.HTTP_503_SERVICE_UNAVAILABLE)
         
     try:
@@ -232,7 +237,8 @@ def submit_service_form(request, slug):
             "message": "No deductible codes configured for this service.",
             "service": service.name,
             "log_id": None,
-            "response": {}
+            "response": {},
+            "render": None
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
     should_deduct = response.status_code in deductible_codes
@@ -273,7 +279,8 @@ def submit_service_form(request, slug):
                 "message": "Wallet deduction failed after API call. Please contact support.",
                 "service": service.name,
                 "log_id": usage_log.id,
-                "response": {}
+                "response": {},
+                "render": None
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     
     # Step 7: Return final result
@@ -283,15 +290,19 @@ def submit_service_form(request, slug):
             "message": "External API responded with failure. No wallet deduction made.",
             "service": service.name,
             "log_id": usage_log.id,
-            "response": response_json
+            "response": response_json,
+            "render": None
         }, status=status.HTTP_400_BAD_REQUEST)
+        
+    rendered = render_response_with_schema(service, response_json)
         
     return JsonResponse({
         "success": True,
         "message": "Success",
         "service": service.name,
         "log_id": usage_log.id,
-        "response": response_json
+        "response": response_json,
+        "rendered": rendered
     })
     
 
