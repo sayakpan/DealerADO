@@ -7,6 +7,7 @@ from import_export import resources
 from import_export.admin import ExportMixin
 from import_export.formats.base_formats import CSV, XLSX
 from django.utils.html import format_html
+from django.templatetags.static import static
 
 
 @admin.register(Secrets)
@@ -47,7 +48,7 @@ class ServiceAdmin(admin.ModelAdmin):
 
 @admin.register(ServiceFormField)
 class ServiceFormFieldAdmin(admin.ModelAdmin):
-    list_display = ('id', 'label', 'service', 'key', 'input_type', 'is_required')
+    list_display = ('id', 'label', 'service', 'key', 'input_type')
     search_fields = ('label', 'key', 'service__name')
     list_filter = ('input_type', 'is_required')
     readonly_fields = ('validation_guide_display',)
@@ -91,6 +92,8 @@ class ServiceFormFieldAdmin(admin.ModelAdmin):
                 </ul>
                 <p>You can apply multiple rules at once. Example:</p>
                 <pre>[{"type": "required"}, {"type": "numeric"}, {"type": "hasLength", "value": 10}]</pre>
+                <strong>Option Rules:</strong>
+                <p>Each option in the array must be an object with "value" and "label" keys.</p>
             </div>
         """)
     validation_guide_display.short_description = "Validation Rules Reference"
@@ -168,7 +171,7 @@ class ServiceUsageLogAdmin(ExportMixin, admin.ModelAdmin):
     
 @admin.register(RenderSchema)
 class RenderSchemaAdmin(admin.ModelAdmin):
-    list_display = ("id", "service", "created_at", "updated_at")
+    list_display = ("id", "service", "spec_status", "created_at", "updated_at")
     search_fields = ("service__slug", "service__name")
     readonly_fields = ("created_at", "updated_at", "schema_guide_display")
     actions = ["validate_spec"]
@@ -181,7 +184,20 @@ class RenderSchemaAdmin(admin.ModelAdmin):
             "classes": ("collapse",),
         }),
     )
-
+    
+    def spec_status(self, obj):
+      """
+      Checks if the 'map' field in the spec is empty and returns a tick or cross.
+      Uses Django's standard icons for consistency.
+      """
+      # Check if 'map' field is empty
+      if not obj.spec.get("map") and len(obj.spec.get("sections", [])) == 0:
+          # Red Cross using Django's built-in icon
+          return format_html('<img src="{}" alt="Cross" style="height: 16px; width: 16px;">', static('admin/img/icon-no.svg'))
+      else:
+          # Green Tick using Django's built-in icon
+          return format_html('<img src="{}" alt="Tick" style="height: 16px; width: 16px;">', static('admin/img/icon-yes.svg'))
+    
     def validate_spec(self, request, queryset):
         ok = 0
         for schema in queryset:

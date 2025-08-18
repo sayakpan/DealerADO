@@ -37,6 +37,9 @@ class LoginView(generics.GenericAPIView):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.validated_data
+        if not user.is_active:
+            return Response({"error": "Your account is deactivated. Please contact support."}, status=status.HTTP_400_BAD_REQUEST)
+
         token, _ = Token.objects.get_or_create(user=user)
         return Response({
             'token': token.key,
