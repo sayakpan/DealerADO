@@ -46,7 +46,7 @@ export default function LoginContent() {
                     >
                         <div className="space-y-1">
                             <Label htmlFor="email" className="text-gray-400 text-xs font-normal uppercase tracking-wide">
-                                Email or Phone Number
+                                Email
                             </Label>
                             <Input
                                 id="email"
