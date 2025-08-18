@@ -15,6 +15,47 @@ export async function getServiceBySlug(slug) {
 	return response.data;
 }
 
+export async function generatePdf(logId) {
+	const response = await fetchWithAuth.get(`/api/services/generate-pdf/?log_id=${logId}`);
+	if (response.status === 401) {
+		window.location.href = '/login?status=401';
+		return;
+	}
+	if (!response.success) {
+		throw new Error(response.message || 'Failed to generate PDF');
+	}
+	return response.data;
+}
+
+export async function deletePdf(filename) {
+	const response = await fetchWithAuth.delete('/api/services/delete-pdf/', { filename });
+	if (response.status === 401) {
+		window.location.href = '/login?status=401';
+		return;
+	}
+	if (!response.success) {
+		// Don't throw an error here, as the user has already downloaded the file.
+		// We can just log it.
+		console.error('Failed to delete PDF:', response.message);
+	}
+	return response.data;
+}
+
+export async function getRenderedLog(logId) {
+	const response = await fetchWithAuth.get(`/api/services/render/?log_id=${logId}`);
+
+	if (response.status === 401) {
+		window.location.href = '/login?status=401';
+		return;
+	}
+
+	if (!response.success) {
+		throw new Error(response.message || 'Failed to fetch rendered log');
+	}
+
+	return response.data;
+}
+
 export async function submitServiceData(slug, formData) {
 	const response = await fetchWithAuth.post(`/api/services/service/${slug}/submit/`, formData);
 

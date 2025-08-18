@@ -91,7 +91,7 @@ export default function ForgotPasswordPage() {
                             <div className="space-y-6">
                                 <div className="p-3 border-b border-stone-300">
                                     <label htmlFor="email" className="block text-zinc-500 text-xs font-normal mb-1.5">
-                                        Enter Email or Phone Number
+                                        Enter Email
                                     </label>
                                     <input
                                         id="email"
@@ -101,7 +101,7 @@ export default function ForgotPasswordPage() {
                                         required
                                         className="w-full bg-transparent border-0 outline-0 text-white text-base font-medium"
                                         placeholder="johndoe@gmail.com"
-                                        aria-label="Email or Phone Number"
+                                        aria-label="Email"
                                     />
                                 </div>
                                 <button
