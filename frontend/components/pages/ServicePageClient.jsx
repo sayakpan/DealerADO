@@ -393,26 +393,29 @@ const ServicePageClient = ({ service, slug }) => {
                                 </div>
                             )}
 
-                            {/* Service Result */}
-                            {serviceResult && (
-                                <div className="w-full">
-                                    <div className="flex justify-between items-center my-4">
-                                        <h3 className="text-lg font-semibold">Response</h3>
-                                        <div className="flex gap-2">
-                                            <button
-                                                onClick={handleDownloadPDF}
-                                                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
-                                            >
-                                                Download PDF
-                                            </button>
-                                        </div>
-                                    </div>
-                                    <RenderedLogClient log={serviceResult} />
-                                </div>
-                            )}
                         </div>
                     </div>
                 </div>
+            </div>
+            <div className="max-w-7xl mx-auto px-4 pb-8">
+                {/* Service Result */}
+                {serviceResult && (
+                    <div className="w-full">
+                        <div className="flex justify-between items-center my-4">
+                            <h3 className="text-lg font-semibold">Response</h3>
+                            <div className="flex gap-2">
+                                <button
+                                    onClick={handleDownloadPDF}
+                                    className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+                                >
+                                    Download PDF
+                                </button>
+                            </div>
+                        </div>
+                        <RenderedLogClient log={serviceResult} />
+                    </div>
+                )}
+
             </div>
         </div>
     )
