@@ -202,37 +202,43 @@ export default function ServiceHistoryPageClient({ initialLogs, initialNextUrl }
                                                     </div>
                                                 </div>
                                                 <div className="flex items-center gap-2">
-                                                    <button
-                                                        onClick={() => handleViewDetails(log.id)}
-                                                        className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-md transition-colors"
-                                                        title="View Details"
-                                                    >
-                                                        <Eye className="w-4 h-4" />
-                                                    </button>
-                                                    <button
-                                                        onClick={() => downloadResponse(log)}
-                                                        className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-md transition-colors"
-                                                        title="Download Response"
-                                                    >
-                                                        <Download className="w-4 h-4" />
-                                                    </button>
+                                                    {log.status !== 'failed' && (
+                                                        <>
+                                                            <button
+                                                                onClick={() => handleViewDetails(log.id)}
+                                                                className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-md transition-colors flex items-center gap-1 text-sm"
+                                                                title="View Details"
+                                                            >
+                                                                <Eye className="w-4 h-4" />
+                                                                <span>View</span>
+                                                            </button>
+                                                            <button
+                                                                onClick={() => downloadResponse(log)}
+                                                                className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-md transition-colors flex items-center gap-1 text-sm"
+                                                                title="Download Response"
+                                                            >
+                                                                <Download className="w-4 h-4" />
+                                                                <span>Download</span>
+                                                            </button>
+                                                        </>
+                                                    )}
                                                 </div>
                                             </div>
 
                                             {/* Request Data */}
-                                            {log.form_data_sent && (
-                                                <div className="mb-4">
-                                                    <h4 className="text-sm font-medium text-gray-900 mb-2 flex items-center gap-2">
-                                                        <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
-                                                        Request Data
-                                                    </h4>
-                                                    <div className="bg-gray-50 rounded-md p-3 text-sm text-gray-700">
-                                                        <pre className="whitespace-pre-wrap break-words">
-                                                            {JSON.stringify(log.form_data_sent, null, 2)}
-                                                        </pre>
+                                                {/* {log.form_data_sent && (
+                                                    <div className="mb-4">
+                                                        <h4 className="text-sm font-medium text-gray-900 mb-2 flex items-center gap-2">
+                                                            <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
+                                                            Request Data
+                                                        </h4>
+                                                        <div className="bg-gray-50 rounded-md p-3 text-sm text-gray-700">
+                                                            <pre className="whitespace-pre-wrap break-words">
+                                                                {JSON.stringify(log.form_data_sent, null, 2)}
+                                                            </pre>
+                                                        </div>
                                                     </div>
-                                                </div>
-                                            )}
+                                                )} */}
                                         </div>
                                     </div>
 
@@ -242,7 +248,7 @@ export default function ServiceHistoryPageClient({ initialLogs, initialNextUrl }
                                             {loadingDetails ? (
                                                 <ModalSkeleton />
                                             ) : renderedLog ? (
-                                                <RenderedLogClient data={renderedLog} />
+                                                <RenderedLogClient log={renderedLog} />
                                             ) : (
                                                 <p>Could not load details.</p>
                                             )}

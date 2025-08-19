@@ -289,18 +289,76 @@ const ServicePageClient = ({ service, slug }) => {
                                                 {field.label}
                                             </div>
                                             <div className="text-slate-700 text-2xl font-medium w-full">
-                                                {(field.input_type === 'text' || field.input_type === 'number') && (
-                                                    <input
-                                                        type={field.input_type === 'number' ? 'number' : 'text'}
-                                                        name={field.key}
-                                                        placeholder={field.placeholder}
-                                                        value={formData[field.key] || ''}
-                                                        onChange={(e) => handleInputChange(field.key, e.target.value)}
-                                                        onBlur={() => handleInputBlur(field.key)}
-                                                        className="w-full bg-transparent border-none outline-none text-slate-700 text-2xl font-medium placeholder:text-slate-400 [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [-moz-appearance:textfield]"
-                                                        required={field.is_required}
-                                                    />
-                                                )}
+                                                {(() => {
+                                                    switch (field.input_type) {
+                                                        case 'text':
+                                                        case 'number':
+                                                        case 'date':
+                                                            return (
+                                                                <input
+                                                                    type={field.input_type}
+                                                                    name={field.key}
+                                                                    placeholder={field.placeholder}
+                                                                    value={formData[field.key] || ''}
+                                                                    onChange={(e) => handleInputChange(field.key, e.target.value)}
+                                                                    onBlur={() => handleInputBlur(field.key)}
+                                                                    className="w-full bg-transparent border-none outline-none text-slate-700 text-base font-medium placeholder:text-slate-400 [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [-moz-appearance:textfield]"
+                                                                    required={field.is_required}
+                                                                />
+                                                            );
+                                                        case 'select':
+                                                            return (
+                                                                <select
+                                                                    name={field.key}
+                                                                    value={formData[field.key] || ''}
+                                                                    onChange={(e) => handleInputChange(field.key, e.target.value)}
+                                                                    onBlur={() => handleInputBlur(field.key)}
+                                                                    className="w-full bg-transparent border-none outline-none text-slate-700 text-base font-medium placeholder:text-slate-400"
+                                                                    required={field.is_required}
+                                                                >
+                                                                    <option value="">{field.placeholder}</option>
+                                                                    {field.options.map(option => (
+                                                                        <option key={option.value} value={option.value}>{option.label}</option>
+                                                                    ))}
+                                                                </select>
+                                                            );
+                                                        case 'radio':
+                                                            return (
+                                                                <div className="flex flex-col gap-2">
+                                                                    {field.options.map(option => (
+                                                                        <label key={option.value} className="flex items-center gap-2 text-base font-normal">
+                                                                            <input
+                                                                                type="radio"
+                                                                                name={field.key}
+                                                                                value={option.value}
+                                                                                checked={formData[field.key] === option.value}
+                                                                                onChange={(e) => handleInputChange(field.key, e.target.value)}
+                                                                                onBlur={() => handleInputBlur(field.key)}
+                                                                                required={field.is_required}
+                                                                            />
+                                                                            {option.label}
+                                                                        </label>
+                                                                    ))}
+                                                                </div>
+                                                            );
+                                                        case 'checkbox':
+                                                            return (
+                                                                <label className="flex items-center gap-2 text-base font-normal">
+                                                                    <input
+                                                                        type="checkbox"
+                                                                        name={field.key}
+                                                                        checked={!!formData[field.key]}
+                                                                        onChange={(e) => handleInputChange(field.key, e.target.checked)}
+                                                                        onBlur={() => handleInputBlur(field.key)}
+                                                                        required={field.is_required}
+                                                                    />
+                                                                    {field.label}
+                                                                </label>
+                                                            );
+                                                        default:
+                                                            return null;
+                                                    }
+                                                })()}
                                             </div>
                                             {formErrors[field.key] && (
                                                 <div className="text-[#B52628] text-sm font-normal">
@@ -318,9 +376,9 @@ const ServicePageClient = ({ service, slug }) => {
                                                 group.fields.includes(service.form_fields[index + 1].key)
                                             ) && (
                                                 <div className="w-full inline-flex justify-center items-center gap-3">
-                                                    <div className="flex-1 h-0 outline outline-[0.50px] outline-offset-[-0.25px] outline-gray-200"></div>
+                                                    <div className="flex-1 h-0 outline outline-offset-[-0.25px] outline-gray-200"></div>
                                                     <div className="text-center text-zinc-500 text-base font-semibold">OR</div>
-                                                    <div className="flex-1 h-0 outline outline-[0.50px] outline-offset-[-0.25px] outline-gray-200"></div>
+                                                    <div className="flex-1 h-0 outline outline-offset-[-0.25px] outline-gray-200"></div>
                                                 </div>
                                             )}
                                     </React.Fragment>
