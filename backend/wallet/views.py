@@ -20,6 +20,10 @@ class WalletSummaryView(APIView):
         history_serialized = TransactionLogSerializer(page, many=True).data
 
         return Response({
+            "user": {
+                "id": user.id,
+                "email": user.email,
+            },
             "balance": {
                 "amount": round(wallet.balance, 2),
             },
