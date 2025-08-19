@@ -257,17 +257,13 @@ const ServicePageClient = ({ service, slug }) => {
         if (serviceResult && serviceResult.log_id) {
             try {
 
-                const pdfData = await generatePdf(serviceResult.log_id);
-
-                // Step 2: Open the PDF in a new tab
-                window.open(pdfData.pdf_url, '_blank');
-
-                // Step 3: Delete the PDF from the server
-                await deletePdf(pdfData.pdf_filename);
-
+                const pdfData = await generatePdf(serviceResult.log_id, service.name);
+                if (pdfData?.success) {
+                    toast.success('PDF downloaded successfully!', { title: 'Download Complete' });
+                }
             } catch (error) {
                 console.error('Error downloading PDF:', error);
-                // Handle error appropriately, maybe show a toast notification
+                toast.error('Failed to download PDF', { title: 'Download Failed' });
             }
         }
     };
