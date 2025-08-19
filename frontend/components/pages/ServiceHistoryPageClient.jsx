@@ -8,6 +8,7 @@ import ServiceHeader from '@/components/ui/serviceHeader';
 import { ServiceHistoryCardSkeleton } from '@/components/skeletons/ServiceHistorySkeleton';
 import { ModalSkeleton } from '@/components/skeletons/ModalSkeleton';
 import RenderedLogClient from '../ui/RenderedLogClient';
+import { toast } from '@/plugin/toast';
 
 export default function ServiceHistoryPageClient({ initialLogs, initialNextUrl }) {
     const [logs, setLogs] = useState(initialLogs || []);
@@ -100,17 +101,13 @@ export default function ServiceHistoryPageClient({ initialLogs, initialNextUrl }
     const downloadResponse = async (log) => {
         try {
             // Step 1: Generate the PDF and get the URL
-            const pdfData = await generatePdf(log.id);
-
-            // Step 2: Open the PDF in a new tab
-            window.open(pdfData.pdf_url, '_blank');
-
-            // Step 3: Delete the PDF from the server
-            await deletePdf(pdfData.pdf_filename);
-
+            const pdfData = await generatePdf(log.id, log.service_name);
+            if (pdfData?.success) {
+                toast.success('PDF downloaded successfully!', { title: 'Download Complete' });
+            }
         } catch (error) {
             console.error('Error in PDF process:', error);
-            // You could show a toast notification here to inform the user
+            toast.error('Failed to download PDF', { title: 'Download Failed' });
         }
     };
 

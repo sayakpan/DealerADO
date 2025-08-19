@@ -1,4 +1,5 @@
 import { fetchWithAuth } from "@/utils/api";
+import { formatTimestampWithTime } from "@/utils/converters";
 
 export async function getServiceBySlug(slug) {
 	const response = await fetchWithAuth.get(`/api/services/service/${slug}/`);
@@ -15,8 +16,8 @@ export async function getServiceBySlug(slug) {
 	return response.data;
 }
 
-export async function generatePdf(logId) {
-	const response = await fetchWithAuth.get(`/api/services/generate-pdf/?log_id=${logId}`);
+export async function generatePdf(logID, serviceName) {
+	const response = await fetchWithAuth.download(`/api/services/generate-pdf/?log_id=${logID}`, {filename: `${serviceName} Report - ${logID}.pdf`});
 	if (response.status === 401) {
 		window.location.href = '/login?status=401';
 		return;
@@ -24,7 +25,7 @@ export async function generatePdf(logId) {
 	if (!response.success) {
 		throw new Error(response.message || 'Failed to generate PDF');
 	}
-	return response.data;
+	return response;
 }
 
 export async function deletePdf(filename) {

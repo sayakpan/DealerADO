@@ -257,17 +257,13 @@ const ServicePageClient = ({ service, slug }) => {
         if (serviceResult && serviceResult.log_id) {
             try {
 
-                const pdfData = await generatePdf(serviceResult.log_id);
-
-                // Step 2: Open the PDF in a new tab
-                window.open(pdfData.pdf_url, '_blank');
-
-                // Step 3: Delete the PDF from the server
-                await deletePdf(pdfData.pdf_filename);
-
+                const pdfData = await generatePdf(serviceResult.log_id, service.name);
+                if (pdfData?.success) {
+                    toast.success('PDF downloaded successfully!', { title: 'Download Complete' });
+                }
             } catch (error) {
                 console.error('Error downloading PDF:', error);
-                // Handle error appropriately, maybe show a toast notification
+                toast.error('Failed to download PDF', { title: 'Download Failed' });
             }
         }
     };
@@ -318,9 +314,9 @@ const ServicePageClient = ({ service, slug }) => {
                                                 group.fields.includes(service.form_fields[index + 1].key)
                                             ) && (
                                                 <div className="w-full inline-flex justify-center items-center gap-3">
-                                                    <div className="flex-1 h-0 outline outline-[0.50px] outline-offset-[-0.25px] outline-gray-200"></div>
+                                                    <div className="flex-1 h-0 outline-[0.50px] outline-offset-[-0.25px] outline-gray-200"></div>
                                                     <div className="text-center text-zinc-500 text-base font-semibold">OR</div>
-                                                    <div className="flex-1 h-0 outline outline-[0.50px] outline-offset-[-0.25px] outline-gray-200"></div>
+                                                    <div className="flex-1 h-0 outline-[0.50px] outline-offset-[-0.25px] outline-gray-200"></div>
                                                 </div>
                                             )}
                                     </React.Fragment>
