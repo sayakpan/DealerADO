@@ -41,28 +41,6 @@ export function ServiceHistoryCardSkeleton() {
                     </div>
                 </div>
             </div>
-
-            {/* API Response Code Block */}
-            <div className="mt-3">
-                <div className="bg-slate-900 rounded-lg border border-gray-300 overflow-hidden">
-                    <div className="bg-gray-100 px-3 py-2 border-b border-gray-300">
-                        <Skeleton className="h-4 w-24" />
-                    </div>
-                    <div className="p-3 max-h-64 sm:max-h-80">
-                        <div className="space-y-2">
-                            {Array.from({ length: 8 }).map((_, index) => (
-                                <Skeleton 
-                                    key={index} 
-                                    className={`h-4 bg-gray-600/30 ${
-                                        index % 3 === 0 ? 'w-full' : 
-                                        index % 3 === 1 ? 'w-3/4' : 'w-1/2'
-                                    }`} 
-                                />
-                            ))}
-                        </div>
-                    </div>
-                </div>
-            </div>
         </div>
     );
 }
