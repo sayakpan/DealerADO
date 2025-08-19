@@ -3,8 +3,10 @@
 import React from 'react'
 import Image from 'next/image'
 import ServiceHeader from '@/components/ui/serviceHeader'
+import { ArrowDownLeft, ArrowUpRight } from 'lucide-react'
 
 const WalletPageClient = ({ walletData }) => {
+    console.log(walletData)
     const formatAmount = (amount) => {
         return parseFloat(amount).toFixed(2)
     }
@@ -12,9 +14,9 @@ const WalletPageClient = ({ walletData }) => {
     const formatTransactionType = (type) => {
         switch (type) {
             case 'recharge':
-                return 'Points Added'
+                return 'Credited Points'
             case 'debit':
-                return 'Paid For Order'
+                return 'Debited For Order'
             case 'refund':
                 return 'Refund For Order'
             default:
@@ -32,12 +34,29 @@ const WalletPageClient = ({ walletData }) => {
             hour12: true // for AM/PM format
         });
     };
-    
+
+    const getTransactionIcon = (type) => {
+        return type == 'debit' ? (
+            <ArrowUpRight className="w-4 h-4" />
+        ) : (
+            <ArrowDownLeft className="w-4 h-4" />
+        );
+    };
+
+    const handleAddPoints = () => {
+        const number = '917003142538';
+        const message = `Hello Admin,  
+        
+I would like to recharge my wallet.  
+Email ID: ${walletData?.user?.email}
+Please process my request. Thank you!`;
+        const url = `https://wa.me/${number}?text=${encodeURIComponent(message)}`;
+        window.open(url, '_blank', 'noopener,noreferrer');
+    };
 
     return (
         <div className="min-h-screen bg-gray-50">
             <ServiceHeader title="Wallet" />
-
             {/* Wallet Content */}
             <div className="container mx-auto px-4 py-8 max-w-6xl">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 justify-items-center">
@@ -90,7 +109,7 @@ const WalletPageClient = ({ walletData }) => {
                                 </div>
 
                                 {/* Add Points Button - Responsive */}
-                                <button className="w-full max-w-[90%] h-12 bg-red-700 hover:bg-red-800 rounded-2xl shadow-[0px_4px_16px_0px_rgba(0,0,0,0.20)] flex justify-center items-center transition-colors">
+                                <button onClick={handleAddPoints} className="w-full max-w-[90%] h-12 bg-red-700 hover:bg-red-800 rounded-2xl shadow-[0px_4px_16px_0px_rgba(0,0,0,0.20)] flex justify-center items-center transition-colors">
                                     <span className="text-white text-base font-semibold capitalize">
                                         Add Points
                                     </span>
@@ -101,33 +120,44 @@ const WalletPageClient = ({ walletData }) => {
 
                     {/* Transaction History */}
                     <div className="w-full flex justify-center">
-                        <div className="w-full max-w-[570px] bg-white rounded-2xl p-6 shadow-sm">
-                            <h2 className="text-2xl font-bold text-gray-800 mb-6">History:</h2>
+                        <div className="w-full max-w-[570px] bg-white rounded-2xl p-3 md:p-6 shadow-sm">
+                            <h2 className="text-xl md:text-2xl font-bold text-gray-800 mb-6">Transaction History</h2>
 
                             <div className="space-y-4">
                                 {walletData?.history?.results?.length > 0 ? (
                                     walletData.history.results.map((transaction, index) => (
-                                        <div 
-                                            key={transaction.id} 
-                                            className={`flex justify-between items-center py-3 ${
-                                                index < walletData.history.results.length - 1 ? 'border-b border-gray-100' : ''
-                                            }`}
+                                        <div
+                                            key={transaction.id}
+                                            className={`flex justify-between items-center py-3 ${index < walletData.history.results.length - 1 ? 'border-b border-gray-100' : ''
+                                                }`}
                                         >
-                                            <div>
-                                                <div className="font-semibold text-gray-800">
-                                                    {formatTransactionType(transaction.transaction_type)}
-                                                    {transaction.service_name && transaction.service_name !== 'Manual Admin Adjustment' && ':'}
+                                            <div className='flex gap-2 items-center'>
+                                                <div className={`rounded-full p-2 ${transaction.transaction_type !== 'debit'
+                                                        ? 'bg-green-100 text-green-600'
+                                                        : 'bg-red-100 text-red-600'
+                                                    }`}>
+                                                    {getTransactionIcon(transaction.transaction_type)}
                                                 </div>
-                                                <div className="text-gray-500 text-sm">
-                                                    {transaction.service_name +' '+ formatDateTime(transaction.timestamp)}
+                                                <div>
+                                                    <div className="font-semibold text-gray-800 text-sm md:text-base">
+                                                        {formatTransactionType(transaction.transaction_type)}
+                                                        {transaction.service_name && transaction.service_name !== 'Manual Admin Adjustment' && ':'}
+                                                    </div>
+                                                    <div className="text-gray-500 text-[10px] md:text-[12px]">
+                                                        {transaction.service_name + ' - ' + formatDateTime(transaction.timestamp)}
+                                                    </div>
                                                 </div>
                                             </div>
-                                            <div className={`font-semibold ${
-                                                transaction.transaction_type !== 'debit' 
-                                                    ? 'text-green-600' 
-                                                    : 'text-red-600'
-                                            }`}>
-                                                {transaction.transaction_type !== 'debit' ? '(+)' : '(-)'} {Math.abs(parseFloat(transaction.amount_change)).toFixed(0)}
+                                            <div className={`font-bold text-base md:text-xl flex flex-col items-end ${transaction.transaction_type !== 'debit'
+                                                ? 'text-green-600'
+                                                : 'text-red-600'
+                                                }`}>
+                                                <span>
+                                                    {transaction.transaction_type !== 'debit' ? '+' : '-'} {Math.abs(parseFloat(transaction.amount_change)).toFixed(0)}
+                                                </span>
+                                                <span className='text-gray-600 text-[8px] md:text-[10px] font-normal'>
+                                                    {transaction.transaction_type !== 'debit' ? 'Received' : 'Spent'}
+                                                </span>
                                             </div>
                                         </div>
                                     ))

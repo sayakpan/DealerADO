@@ -12,37 +12,6 @@ from decimal import Decimal
 from django.urls import reverse
 
 
-# @admin.register(Wallet)
-# class WalletAdmin(admin.ModelAdmin):
-#     list_display = ('id', 'wallet_holder_name', 'balance', 'currency', 'is_active', 'updated_at')
-#     readonly_fields = ('user', 'updated_at','currency')
-    
-#     def wallet_holder_name(self, obj):
-#         return f"{obj.user.get_full_name() if obj.user else 'Anonymous'}"
-
-#     def save_model(self, request, obj, form, change):
-#         if change:
-#             old_obj = Wallet.objects.get(pk=obj.pk)
-#             old_balance = old_obj.balance
-#             new_balance = form.cleaned_data['balance']
-
-#             delta = new_balance - old_balance
-
-#             if delta != 0:
-#                 TransactionLog.objects.create(
-#                     wallet=obj,
-#                     transaction_type='recharge' if delta > 0 else 'expired',
-#                     service_name='Manual Admin Adjustment',
-#                     amount_change=delta,
-#                     previous_balance=old_balance,
-#                     new_balance=new_balance,
-#                     performed_by=request.user,
-#                     note='Manual balance update via admin.'
-#                 )
-
-#         super().save_model(request, obj, form, change)
-        
-
 class TransactionLogResource(resources.ModelResource):
     class Meta:
         model = TransactionLog
