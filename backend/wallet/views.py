@@ -22,7 +22,6 @@ class WalletSummaryView(APIView):
         return Response({
             "balance": {
                 "amount": round(wallet.balance, 2),
-                "currency": wallet.currency
             },
             "history": paginator.get_paginated_response(history_serialized).data
         })
