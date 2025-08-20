@@ -23,9 +23,7 @@ class RegisterView(generics.CreateAPIView):
     def create(self, request, *args, **kwargs):
         response = super().create(request, *args, **kwargs)
         user = User.objects.get(email=response.data['email'])
-        token, _ = Token.objects.get_or_create(user=user)
         return Response({
-            "token": token.key,
             "user": UserSerializer(user).data
         })
 
@@ -38,7 +36,7 @@ class LoginView(generics.GenericAPIView):
         serializer.is_valid(raise_exception=True)
         user = serializer.validated_data
         if not user.is_active:
-            return Response({"error": "Your account is not active yet. Please contact support."}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"error": ["Your account is not active yet. Please contact support."]}, status=status.HTTP_400_BAD_REQUEST)
 
         token, _ = Token.objects.get_or_create(user=user)
         return Response({
