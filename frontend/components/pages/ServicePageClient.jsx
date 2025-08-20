@@ -5,6 +5,7 @@ import ServiceHeader from '@/components/ui/serviceHeader'
 import { deletePdf, generatePdf, submitServiceData } from '@/services/services'
 import { validators } from '@/utils/validations'
 import RenderedLogClient from '@/components/ui/RenderedLogClient'
+import { toast } from '@/plugin/toast'
 
 const ServicePageClient = ({ service, slug }) => {
     const [formData, setFormData] = useState({})
@@ -12,7 +13,6 @@ const ServicePageClient = ({ service, slug }) => {
     const [touchedFields, setTouchedFields] = useState({})
     const [submitting, setSubmitting] = useState(false)
     const [serviceResult, setServiceResult] = useState(null)
-    const [submitError, setSubmitError] = useState(null)
     const [submittedData, setSubmittedData] = useState(null)
 
     useEffect(() => {
@@ -229,7 +229,6 @@ const ServicePageClient = ({ service, slug }) => {
         if (validateForm()) {
             try {
                 setSubmitting(true)
-                setSubmitError(null)
                 setServiceResult(null)
                 setSubmittedData(null)
 
@@ -246,7 +245,7 @@ const ServicePageClient = ({ service, slug }) => {
 
             } catch (err) {
                 console.error('Error submitting service data:', err)
-                setSubmitError(err.message || 'An error occurred while fetching details.')
+                toast.error(err.message || 'An error occurred while fetching details.')
             } finally {
                 setSubmitting(false)
             }
@@ -286,7 +285,7 @@ const ServicePageClient = ({ service, slug }) => {
                                     <React.Fragment key={field.key}>
                                         <div className="w-full p-3 border-b border-stone-300 flex flex-col justify-start items-start gap-2.5">
                                             <div className="text-zinc-500 text-sm font-normal">
-                                                {field.label}
+                                                {field.label} {field.is_required && <span className="text-red-500">*</span>}
                                             </div>
                                             <div className="text-slate-700 text-2xl font-medium w-full">
                                                 {(() => {
@@ -391,7 +390,7 @@ const ServicePageClient = ({ service, slug }) => {
                                     }`}>
                                     <button
                                         type="submit"
-                                        className="w-full h-full bg-transparent border-none text-white text-base font-semibold capitalize transition-colors duration-200 disabled:cursor-not-allowed"
+                                        className="w-full h-full cursor-pointer bg-transparent border-none text-white text-base font-semibold capitalize transition-colors duration-200 disabled:cursor-not-allowed"
                                         disabled={submitting}
                                     >
                                         {submitting ? (
@@ -422,32 +421,6 @@ const ServicePageClient = ({ service, slug }) => {
                                         className="opacity-60 text-slate-700 text-sm font-normal leading-tight prose prose-sm max-w-none"
                                         dangerouslySetInnerHTML={{ __html: service.description }}
                                     />
-                                </div>
-                            )}
-
-                            {/* Submitted Data */}
-                            {submittedData && (
-                                <div className="w-full">
-                                    <h3 className="text-base font-semibold text-slate-700 mb-2">Input Parameters</h3>
-                                    <div className="border border-gray-200 rounded-lg p-3 bg-gray-50/50">
-                                        {Object.entries(submittedData).map(([key, value]) => {
-                                            const field = service?.form_fields?.find(f => f.key === key);
-                                            return (
-                                                <div key={key} className="flex justify-between items-center py-1.5 border-b border-gray-200 last:border-b-0 text-sm">
-                                                    <span className="text-gray-600">{field?.label || key}:</span>
-                                                    <span className="text-gray-900 font-medium">{value}</span>
-                                                </div>
-                                            )
-                                        })}
-                                    </div>
-                                </div>
-                            )}
-
-                            {/* Error Message */}
-                            {submitError && (
-                                <div className="w-full text-center py-8 text-red-500">
-                                    <div className="text-lg mb-4">Error</div>
-                                    <p>{submitError}</p>
                                 </div>
                             )}
 
