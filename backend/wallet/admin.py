@@ -37,7 +37,8 @@ class TransactionLogAdmin(ExportMixin, admin.ModelAdmin):
     list_filter = ('transaction_type', ('timestamp', DateTimeRangeFilter))
     search_fields = ('wallet__user__username', 'wallet__user__email', 'service_name', 'note')
     readonly_fields = ('timestamp','wallet', 'transaction_type', 'amount_change', 'previous_balance', 'new_balance', 'related_transaction', 'performed_by')
-    
+    fields = ('id', 'wallet', 'transaction_type', 'service_name', 'amount_change', 'previous_balance', 'new_balance', 'related_transaction', 'performed_by', 'timestamp', 'note')
+
     def has_add_permission(self, request):
         return False  # disallow adding logs manually
 

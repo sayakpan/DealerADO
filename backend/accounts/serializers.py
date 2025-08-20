@@ -50,6 +50,10 @@ class RegisterSerializer(serializers.ModelSerializer):
             first_name=first_name,
             last_name=last_name
         )
+        
+        user.is_active = False
+        user.save()
+        
         Token.objects.get_or_create(user=user)  # Create token
         return user
         
