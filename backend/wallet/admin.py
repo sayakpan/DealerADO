@@ -66,6 +66,7 @@ class WalletTransactionForm(forms.Form):
 class WalletAdmin(admin.ModelAdmin):
     list_display = ('id', 'wallet_holder_name', 'balance', 'is_active', 'updated_at')
     readonly_fields = ('user', 'updated_at')
+    fields = ('user', 'balance', 'is_active', 'updated_at')
 
     def get_urls(self):
         urls = super().get_urls()
