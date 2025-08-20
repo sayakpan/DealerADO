@@ -6,6 +6,8 @@ import { deletePdf, generatePdf, submitServiceData } from '@/services/services'
 import { validators } from '@/utils/validations'
 import RenderedLogClient from '@/components/ui/RenderedLogClient'
 import { toast } from '@/plugin/toast'
+import Popover from '@/components/ui/Popover' // Import Popover component
+import { Info } from 'lucide-react'
 
 const ServicePageClient = ({ service, slug }) => {
     const [formData, setFormData] = useState({})
@@ -281,8 +283,21 @@ const ServicePageClient = ({ service, slug }) => {
                                 {service.form_fields.map((field, index) => (
                                     <React.Fragment key={field.key}>
                                         <div className="w-full p-3 border-b border-stone-300 flex flex-col justify-start items-start gap-2.5">
-                                            <div className="text-zinc-500 text-sm md:text-sm font-normal">
-                                                {field.label} {field.is_required && <span className="text-red-500">*</span>}
+                                        <div className="text-zinc-500 text-sm md:text-sm font-normal flex items-center gap-1">
+                                                {field.label} 
+                                                {field.help_text && (
+                                                    <Popover
+                                                        trigger={<span className="ml-1 mt-1 flex items-center cursor-pointer text-blue-500 text-xs">
+                                                            <Info className="w-3 h-3" />
+                                                        </span>}
+                                                        content={field.help_text}
+                                                        position="top"
+                                                        triggerAction="hover"
+                                                        popoverClasses="max-w-xs text-wrap"
+                                                        contentClass="text-xs text-gray-600"
+                                                    />
+                                                )}
+                                                {field.is_required && <span className="text-red-500">*</span>}
                                             </div>
                                             <div className="text-slate-700 text-base md:text-2xl font-medium w-full">
                                                 {(() => {
