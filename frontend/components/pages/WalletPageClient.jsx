@@ -1,12 +1,65 @@
 "use client"
 
-import React from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import Image from 'next/image'
 import ServiceHeader from '@/components/ui/serviceHeader'
 import { ArrowDownLeft, ArrowUpRight } from 'lucide-react'
+import { fetchWithAuth } from "@/utils/api"
 
-const WalletPageClient = ({ walletData }) => {
-    console.log(walletData)
+const WalletPageClient = ({ walletData: initialWalletData }) => {
+    const [walletData, setWalletData] = useState(initialWalletData)
+    const [loading, setLoading] = useState(false)
+    const observerTarget = useRef(null)
+
+    useEffect(() => {
+        const observer = new IntersectionObserver(
+            (entries) => {
+                if (entries[0].isIntersecting && !loading && walletData?.history?.next) {
+                    loadMoreData()
+                }
+            },
+            { threshold: 0.5 }
+        )
+
+        if (observerTarget.current) {
+            observer.observe(observerTarget.current)
+        }
+
+        return () => {
+            if (observerTarget.current) {
+                observer.unobserve(observerTarget.current)
+            }
+        }
+    }, [loading, walletData?.history?.next])
+
+    const loadMoreData = async () => {
+        try {
+            setLoading(true)
+            if (walletData?.history?.next) {
+                // Extract page number from next URL
+                const url = new URL(walletData.history.next)
+                const page = url.searchParams.get('page')
+                
+                // Use fetchWithAuth with the correct endpoint
+                const response = await fetchWithAuth(`/api/wallet/?page=${page}`)
+                
+                if (response?.data) {
+                    const newData = response.data
+                    setWalletData(prev => ({
+                        ...prev,
+                        history: {
+                            ...newData.history,
+                            results: [...(prev.history?.results || []), ...(newData.history?.results || [])]
+                        }
+                    }))
+                }
+            }
+        } catch (error) {
+            console.error('Error loading more transactions:', error)
+        } finally {
+            setLoading(false)
+        }
+    }
     const formatAmount = (amount) => {
         return parseFloat(amount).toFixed(2)
     }
@@ -164,6 +217,15 @@ Please process my request. Thank you!`;
                                 ) : (
                                     <div className="text-center py-8 text-gray-500">
                                         No transaction history available
+                                    </div>
+                                )}
+                            </div>
+                            <div ref={observerTarget} className="mt-4 text-center">
+                                {loading && (
+                                    <div className="py-4">
+                                        <div className="animate-spin inline-block w-6 h-6 border-[3px] border-current border-t-transparent text-blue-600 rounded-full" role="status" aria-label="loading">
+                                            <span className="sr-only">Loading...</span>
+                                        </div>
                                     </div>
                                 )}
                             </div>

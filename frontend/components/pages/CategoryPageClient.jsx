@@ -43,7 +43,7 @@ export default function CategoryPageClient({ category }) {
                                     key={service.id}
                                     service={service}
                                     onClick={handleServiceClick}
-                                    backgroundImage={service?.image || '/images/categories/default.png'}
+                                    backgroundImage={service?.cover_image_url || '/images/categories/default.png'}
                                 />
                             ))}
                         </div>

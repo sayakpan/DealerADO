@@ -5,6 +5,7 @@ import ServiceHeader from '@/components/ui/serviceHeader'
 import { deletePdf, generatePdf, submitServiceData } from '@/services/services'
 import { validators } from '@/utils/validations'
 import RenderedLogClient from '@/components/ui/RenderedLogClient'
+import { toast } from '@/plugin/toast'
 
 const ServicePageClient = ({ service, slug }) => {
     const [formData, setFormData] = useState({})
@@ -12,8 +13,8 @@ const ServicePageClient = ({ service, slug }) => {
     const [touchedFields, setTouchedFields] = useState({})
     const [submitting, setSubmitting] = useState(false)
     const [serviceResult, setServiceResult] = useState(null)
-    const [submitError, setSubmitError] = useState(null)
     const [submittedData, setSubmittedData] = useState(null)
+    const [downloadingPdf, setDownloadingPdf] = useState(false)
 
     useEffect(() => {
         // Initialize form data with default values from API or empty strings
@@ -229,7 +230,6 @@ const ServicePageClient = ({ service, slug }) => {
         if (validateForm()) {
             try {
                 setSubmitting(true)
-                setSubmitError(null)
                 setServiceResult(null)
                 setSubmittedData(null)
 
@@ -246,7 +246,7 @@ const ServicePageClient = ({ service, slug }) => {
 
             } catch (err) {
                 console.error('Error submitting service data:', err)
-                setSubmitError(err.message || 'An error occurred while fetching details.')
+                toast.error(err.message || 'An error occurred while fetching details.')
             } finally {
                 setSubmitting(false)
             }
@@ -281,10 +281,10 @@ const ServicePageClient = ({ service, slug }) => {
                                 {service.form_fields.map((field, index) => (
                                     <React.Fragment key={field.key}>
                                         <div className="w-full p-3 border-b border-stone-300 flex flex-col justify-start items-start gap-2.5">
-                                            <div className="text-zinc-500 text-sm font-normal">
-                                                {field.label}
+                                            <div className="text-zinc-500 text-sm md:text-sm font-normal">
+                                                {field.label} {field.is_required && <span className="text-red-500">*</span>}
                                             </div>
-                                            <div className="text-slate-700 text-2xl font-medium w-full">
+                                            <div className="text-slate-700 text-base md:text-2xl font-medium w-full">
                                                 {(() => {
                                                     switch (field.input_type) {
                                                         case 'text':
@@ -298,7 +298,7 @@ const ServicePageClient = ({ service, slug }) => {
                                                                     value={formData[field.key] || ''}
                                                                     onChange={(e) => handleInputChange(field.key, e.target.value)}
                                                                     onBlur={() => handleInputBlur(field.key)}
-                                                                    className="w-full bg-transparent border-none outline-none text-slate-700 text-base font-medium placeholder:text-slate-400 [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [-moz-appearance:textfield]"
+                                                                    className="w-full bg-transparent border-none outline-none text-slate-700 text-sm md:text-base font-medium placeholder:text-slate-400 [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [-moz-appearance:textfield]"
                                                                     required={field.is_required}
                                                                 />
                                                             );
@@ -309,7 +309,7 @@ const ServicePageClient = ({ service, slug }) => {
                                                                     value={formData[field.key] || ''}
                                                                     onChange={(e) => handleInputChange(field.key, e.target.value)}
                                                                     onBlur={() => handleInputBlur(field.key)}
-                                                                    className="w-full bg-transparent border-none outline-none text-slate-700 text-base font-medium placeholder:text-slate-400"
+                                                                    className="w-full bg-transparent border-none outline-none text-slate-700 text-sm md:text-base font-medium placeholder:text-slate-400"
                                                                     required={field.is_required}
                                                                 >
                                                                     <option value="">{field.placeholder}</option>
@@ -322,7 +322,7 @@ const ServicePageClient = ({ service, slug }) => {
                                                             return (
                                                                 <div className="flex flex-col gap-2">
                                                                     {field.options.map(option => (
-                                                                        <label key={option.value} className="flex items-center gap-2 text-base font-normal">
+                                                                        <label key={option.value} className="flex items-center gap-2 text-sm md:text-base font-normal">
                                                                             <input
                                                                                 type="radio"
                                                                                 name={field.key}
@@ -339,7 +339,7 @@ const ServicePageClient = ({ service, slug }) => {
                                                             );
                                                         case 'checkbox':
                                                             return (
-                                                                <label className="flex items-center gap-2 text-base font-normal">
+                                                                <label className="flex items-center gap-2 text-sm md:text-base font-normal">
                                                                     <input
                                                                         type="checkbox"
                                                                         name={field.key}
@@ -357,7 +357,7 @@ const ServicePageClient = ({ service, slug }) => {
                                                 })()}
                                             </div>
                                             {formErrors[field.key] && (
-                                                <div className="text-[#B52628] text-sm font-normal">
+                                                <div className="text-[#B52628] text-[10px] md:text-sm font-normal">
                                                     {formErrors[field.key]}
                                                 </div>
                                             )}
@@ -373,7 +373,7 @@ const ServicePageClient = ({ service, slug }) => {
                                             ) && (
                                                 <div className="w-full inline-flex justify-center items-center gap-3">
                                                     <div className="flex-1 h-0 outline outline-offset-[-0.25px] outline-gray-200"></div>
-                                                    <div className="text-center text-zinc-500 text-base font-semibold">OR</div>
+                                                    <div className="text-center text-zinc-500 text-[10px] md:text-base font-semibold">OR</div>
                                                     <div className="flex-1 h-0 outline outline-offset-[-0.25px] outline-gray-200"></div>
                                                 </div>
                                             )}
@@ -387,13 +387,13 @@ const ServicePageClient = ({ service, slug }) => {
                                     }`}>
                                     <button
                                         type="submit"
-                                        className="w-full h-full bg-transparent border-none text-white text-base font-semibold capitalize transition-colors duration-200 disabled:cursor-not-allowed"
+                                        className="w-full h-full cursor-pointer bg-transparent border-none text-white text-sm md:text-base font-semibold capitalize transition-colors duration-200 disabled:cursor-not-allowed"
                                         disabled={submitting}
                                     >
                                         {submitting ? (
                                             <div className="flex items-center justify-center gap-2">
                                                 <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                                                <span>Fetching...</span>
+                                                <span className="text-[10px] md:text-base">Fetching...</span>
                                             </div>
                                         ) : (
                                             'Fetch Details'
@@ -406,44 +406,18 @@ const ServicePageClient = ({ service, slug }) => {
 
                     {/* Service Details */}
                     <div className="w-full max-w-[570px] mx-auto lg:mx-0 flex flex-col gap-6">
-                        <div className="text-slate-700 text-2xl font-bold text-center lg:text-left">
+                        <div className="text-slate-700 text-lg md:text-2xl font-bold text-center lg:text-left">
                             Service Details:
                         </div>
 
                         <div className="px-4 py-3.5 bg-white rounded-xl shadow-[0px_4px_40px_5px_rgba(0,0,0,0.08)] border border-gray-200 flex flex-col justify-start items-start gap-5">
                             {/* Service Description */}
                             {service?.description && (
-                                <div className="w-full pb-4 border-b border-gray-200">
+                                <div className="w-full pb-4">
                                     <div
-                                        className="opacity-60 text-slate-700 text-sm font-normal leading-tight prose prose-sm max-w-none"
+                                        className="opacity-60 text-slate-700 text-[10px] md:text-sm font-normal leading-tight prose prose-sm max-w-none"
                                         dangerouslySetInnerHTML={{ __html: service.description }}
                                     />
-                                </div>
-                            )}
-
-                            {/* Submitted Data */}
-                            {submittedData && (
-                                <div className="w-full">
-                                    <h3 className="text-base font-semibold text-slate-700 mb-2">Input Parameters</h3>
-                                    <div className="border border-gray-200 rounded-lg p-3 bg-gray-50/50">
-                                        {Object.entries(submittedData).map(([key, value]) => {
-                                            const field = service?.form_fields?.find(f => f.key === key);
-                                            return (
-                                                <div key={key} className="flex justify-between items-center py-1.5 border-b border-gray-200 last:border-b-0 text-sm">
-                                                    <span className="text-gray-600">{field?.label || key}:</span>
-                                                    <span className="text-gray-900 font-medium">{value}</span>
-                                                </div>
-                                            )
-                                        })}
-                                    </div>
-                                </div>
-                            )}
-
-                            {/* Error Message */}
-                            {submitError && (
-                                <div className="w-full text-center py-8 text-red-500">
-                                    <div className="text-lg mb-4">Error</div>
-                                    <p>{submitError}</p>
                                 </div>
                             )}
 
@@ -456,13 +430,21 @@ const ServicePageClient = ({ service, slug }) => {
                 {serviceResult && (
                     <div className="w-full">
                         <div className="flex justify-between items-center my-4">
-                            <h3 className="text-lg font-semibold">Response</h3>
+                            <h3 className="text-base md:text-lg font-semibold">Response</h3>
                             <div className="flex gap-2">
                                 <button
                                     onClick={handleDownloadPDF}
-                                    className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+                                    className={`bg-[#B52628] hover:bg-[#9e1f21] cursor-pointer text-white text-[10px] md:text-base px-4 py-2 rounded-lg transition-colors ${downloadingPdf ? 'opacity-70 cursor-not-allowed' : ''}`}
+                                    disabled={downloadingPdf}
                                 >
-                                    Download PDF
+                                    {downloadingPdf ? (
+                                        <div className="flex items-center justify-center gap-2">
+                                            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                                            <span className="text-[10px] md:text-base">Downloading...</span>
+                                        </div>
+                                    ) : (
+                                        'Download PDF'
+                                    )}
                                 </button>
                             </div>
                         </div>
