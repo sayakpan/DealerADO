@@ -6,6 +6,7 @@ import { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import { register } from "@/lib/auth";
 import { validators, validateFields } from "@/utils/validations";
+import { toast } from "@/plugin/toast";
 // import Header from "@/components/core/header";
 // import FooterContent from "@/components/core/Footer";
 
@@ -22,7 +23,7 @@ export default function SignupPage() {
     const validationRules = {
         name: [validators.required],
         email: [validators.required, validators.email],
-        password: [validators.required, validators.minLength(6)],
+        password: [validators.required, validators.minLength(8)],
         confirmPassword: [
             validators.required,
             (value) => value !== password ? "Passwords do not match" : null,
@@ -51,12 +52,15 @@ export default function SignupPage() {
             }
             const response = await register(payload);
             if (response.success) {
-                window.location.href = "/categories";
+                toast.info("Please contact administrator for account activation", { duration: 5000, title: 'Successfully Registered' });
+                setTimeout(() => {
+                    window.location.href = "/login";
+                }, 5000);
             } else {
-                toast.error(response.message || "Login failed");
+                toast.error(response.email[0] || response.error[0] || "Registration failed", { duration: 3000, title: 'Error' });
             }
         } catch (error) {
-            toast.error(error.message || "An error occurred during login");
+            toast.error(error.message || "An error occurred during registration", { duration: 3000, title: 'Error' });
         } finally {
             setIsSubmitting(false);
         }

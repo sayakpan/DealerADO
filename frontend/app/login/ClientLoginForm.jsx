@@ -18,7 +18,7 @@ export default function ClientLoginForm({ sessionExpired }) {
 
     const validationRules = {
         email: [validators.required, validators.email],
-        password: [validators.required, validators.minLength(6)]
+        password: [validators.required, validators.minLength(8)]
     };
 
     // Show session expired message if flagged by server
