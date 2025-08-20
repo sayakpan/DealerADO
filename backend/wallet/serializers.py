@@ -1,7 +1,7 @@
 # wallet/serializers.py
 
 from rest_framework import serializers
-from .models import TransactionLog
+from .models import TransactionLog, Wallet
 
 class TransactionLogSerializer(serializers.ModelSerializer):
     performed_by = serializers.SerializerMethodField()
@@ -15,3 +15,9 @@ class TransactionLogSerializer(serializers.ModelSerializer):
 
     def get_performed_by(self, obj):
         return "admin" if obj.performed_by and obj.performed_by.is_staff else "user"
+    
+    
+class WalletBalanceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Wallet
+        fields = ["balance"]
