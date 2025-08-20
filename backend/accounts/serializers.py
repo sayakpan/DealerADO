@@ -3,6 +3,7 @@ from rest_framework import serializers
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
 from rest_framework.authtoken.models import Token
+from django.contrib.auth.hashers import check_password
 
 
 
@@ -50,6 +51,10 @@ class RegisterSerializer(serializers.ModelSerializer):
             first_name=first_name,
             last_name=last_name
         )
+        
+        user.is_active = False
+        user.save()
+        
         Token.objects.get_or_create(user=user)  # Create token
         return user
         
@@ -62,15 +67,13 @@ class LoginSerializer(serializers.Serializer):
         email = data.get('email')
         password = data.get('password')
 
-        username = User.objects.filter(email=email).values_list('username', flat=True).first()
-
-        if not username:
-            raise serializers.ValidationError({"error": "No user found with this email."})
-
-        user = authenticate(username=username, password=password)
+        user = User.objects.filter(email=email).first()
 
         if not user:
-            raise serializers.ValidationError({"error": "Email or password is incorrect."})
+            raise serializers.ValidationError({"error": ["No user found with this email."]})
+
+        if not check_password(password, user.password):
+            raise serializers.ValidationError({"error": ["Email or password is incorrect."]})
 
         return user
     

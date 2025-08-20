@@ -328,21 +328,13 @@ def generate_pdf_from_log(request):
             ast=rendered,
             user_label=f"{request.user.first_name} {request.user.last_name}"
         )
+
         timestamp = int(time.time())
-        pdf_filename = f"service_reports/{usage_log.service.slug}_{usage_log.user.id}_{timestamp}.pdf"
-        
-        pdf_file = ContentFile(pdf_bytes)
-        default_storage.save(pdf_filename, pdf_file)
-        pdf_url = build_absolute_pdf_url(pdf_filename)
+        filename = f"{usage_log.service.slug}_{usage_log.user.id}_{timestamp}_report.pdf"
 
-        response = HttpResponse(pdf_bytes, content_type='application/pdf')
-        response['Content-Disposition'] = f'inline; filename="{usage_log.service.slug}_{usage_log.user.id}_{timestamp}_report.pdf"'
-
-        return JsonResponse({
-            "message": "PDF generated successfully.",
-            "pdf_url": pdf_url,
-            "pdf_filename": pdf_filename
-        })
+        response = HttpResponse(pdf_bytes, content_type="application/pdf")
+        response["Content-Disposition"] = f'attachment; filename="{filename}"'
+        return response
 
     except Exception as e:
         return JsonResponse({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

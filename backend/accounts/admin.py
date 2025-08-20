@@ -7,4 +7,6 @@ class UserProfileAdmin(admin.ModelAdmin):
     list_display = ('user', 'mobile_number', 'role')
     search_fields = ('user__username', 'user__email', 'mobile_number')
     list_filter = ('role',)
-    autocomplete_fields = ['user'] 
+    # autocomplete_fields = ['user'] 
+    readonly_fields = ('user',)
+    fields = ('user', 'mobile_number', 'role')
