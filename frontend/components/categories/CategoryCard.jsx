@@ -13,7 +13,7 @@ export default function CategoryCard({ category, onClick }) {
             <div className="absolute inset-0 z-0">
                 {/* Background image on top of bg color */}
                 <Image
-                    src="/images/categories/cover-fallback.png" // replace with your actual image path
+                    src={ category.cover_image_url || "/images/categories/cover-fallback.png"} // replace with your actual image path
                     alt="Background pattern"
                     fill
                     className="object-cover opacity-10 pointer-events-none"

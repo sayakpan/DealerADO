@@ -4,12 +4,13 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import SmartLink from "../utils/SmartLink";
-import { ChevronDown, Headset, Home, Info, Menu, X } from "lucide-react";
+import { ChevronDown, Headset, Home, Info, Menu, X, User } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import * as NavigationMenu from "@radix-ui/react-navigation-menu";
 import { Wallet, Settings, LogOut, History } from "lucide-react";
 import { ChevronRight } from "lucide-react";
 import LogoutModal from "@/components/ui/logout-modal";
+import { navigationMenuTriggerStyle } from "@/components/ui/navigation-menu";
 
 export default function ClientNavbarWrapper({ isAuthenticated, user, navLinks }) {
     const pathname = usePathname();
@@ -78,29 +79,45 @@ export default function ClientNavbarWrapper({ isAuthenticated, user, navLinks })
                                         </NavigationMenu.Trigger>
 
                                         <NavigationMenu.Content className="absolute right-0 mt-2 w-56 bg-white border border-gray-200 rounded-md shadow-lg py-2">
-                                            <SmartLink
-                                                href="/wallet"
-                                                className="flex items-center gap-2 px-4 py-2 text-sm text-gray-900 hover:bg-gray-100"
-                                            >
-                                                <Wallet className="w-4 h-4" />
-                                                Wallet
-                                            </SmartLink>
+                                            <NavigationMenu.Link asChild>
+                                                <SmartLink
+                                                    href="/wallet"
+                                                    className="flex items-center gap-2 px-4 py-2 text-sm text-gray-900 hover:bg-gray-100"
+                                                >
+                                                    <Wallet className="w-4 h-4" />
+                                                    Wallet
+                                                </SmartLink>
+                                            </NavigationMenu.Link>
 
-                                            <SmartLink
-                                                href="/service-history"
-                                                className="flex items-center gap-2 px-4 py-2 text-sm text-gray-900 hover:bg-gray-100"
-                                            >
-                                                <History className="w-4 h-4" />
-                                                History
-                                            </SmartLink>
+                                            <NavigationMenu.Link asChild>
+                                                <SmartLink
+                                                    href="/profile"
+                                                    className="flex items-center gap-2 px-4 py-2 text-sm text-gray-900 hover:bg-gray-100"
+                                                >
+                                                    <User className="w-4 h-4" />
+                                                    Profile
+                                                </SmartLink>
+                                            </NavigationMenu.Link>
 
-                                            <SmartLink
-                                                href="/settings"
-                                                className="flex items-center gap-2 px-4 py-2 text-sm text-gray-900 hover:bg-gray-100"
-                                            >
-                                                <Settings className="w-4 h-4" />
-                                                Settings
-                                            </SmartLink>
+                                            <NavigationMenu.Link asChild>
+                                                <SmartLink
+                                                    href="/service-history"
+                                                    className="flex items-center gap-2 px-4 py-2 text-sm text-gray-900 hover:bg-gray-100"
+                                                >
+                                                    <History className="w-4 h-4" />
+                                                    History
+                                                </SmartLink>
+                                            </NavigationMenu.Link>
+
+                                            <NavigationMenu.Link asChild>
+                                                <SmartLink
+                                                    href="/settings"
+                                                    className="flex items-center gap-2 px-4 py-2 text-sm text-gray-900 hover:bg-gray-100"
+                                                >
+                                                    <Settings className="w-4 h-4" />
+                                                    Settings
+                                                </SmartLink>
+                                            </NavigationMenu.Link>
 
                                             <div className="border-t border-gray-100 my-2" />
 
@@ -203,6 +220,7 @@ export default function ClientNavbarWrapper({ isAuthenticated, user, navLinks })
                             ...(isAuthenticated
                                 ? [
                                     { href: "/wallet", label: "Wallet", icon: <Wallet strokeWidth={1.5} className="w-7 h-7 bg-rose-50 p-1.5 rounded-full" /> },
+                                    { href: "/profile", label: "Profile", icon: <User strokeWidth={1.5} className="w-7 h-7 bg-rose-50 p-1.5 rounded-full" /> },
                                     { href: "/service-history", label: "History", icon: <History strokeWidth={1.5} className="w-7 h-7 bg-rose-50 p-1.5 rounded-full" /> },
                                     { href: "/settings", label: "Settings", icon: <Settings strokeWidth={1.5} className="w-7 h-7 bg-rose-50 p-1.5 rounded-full" /> },
                                 ]

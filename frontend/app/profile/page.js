@@ -1,8 +1,8 @@
 "use client"
 
-import React, { useState, useEffect } from 'react'
-import Image from 'next/image'
+import React, { useState } from 'react'
 import ServiceHeader from '@/components/ui/serviceHeader'
+import { User } from 'lucide-react'
 
 const ProfilePage = () => {
     const [profileData, setProfileData] = useState({
@@ -10,7 +10,6 @@ const ProfilePage = () => {
         name: "Phillip Vaccaro",
         mobile: "9876543210",
         email: "carcare@gmail.com",
-        profileImage: "https://placehold.co/180x180"
     })
 
     const handleInputChange = (field, value) => {
@@ -28,16 +27,11 @@ const ProfilePage = () => {
             <div className="container mx-auto px-4 py-8 max-w-6xl">
                 <div className="flex justify-center">
                     <div className="w-full max-w-[1170px] relative">
-                        {/* Profile Image - Positioned to overlap header */}
+                        {/* Profile Icon - Positioned to overlap header */}
                         <div className="flex justify-center mb-8 -mt-20 md:-mt-28 relative z-10">
-                            <Image
-                                // src={profileData.profileImage || '/images/profile/default.png'}
-                                src='/images/homepage/testi-1.png'
-                                alt="Profile"
-                                width={180}
-                                height={180}
-                                className="size-40 md:size-44 rounded-full shadow-[0px_6px_6px_2px_rgba(0,0,0,0.30)] outline-3 outline-white object-cover"
-                            />
+                            <div className="size-40 md:size-44 rounded-full shadow-[0px_6px_6px_2px_rgba(0,0,0,0.30)] outline-3 outline-white bg-gray-200 flex items-center justify-center">
+                                <User className="w-24 h-24 text-gray-600" />
+                            </div>
                         </div>
 
                         {/* Profile Information Form */}
@@ -53,7 +47,8 @@ const ProfilePage = () => {
                                             type="text"
                                             value={profileData.dealershipName}
                                             onChange={(e) => handleInputChange('dealershipName', e.target.value)}
-                                            className="text-slate-700 text-xl font-semibold bg-transparent border-none outline-none focus:ring-0 p-0"
+                                            className="text-slate-700 cursor-not-allowed text-xl font-semibold bg-transparent border-none outline-none focus:ring-0 p-0"
+                                            disabled
                                         />
                                     </div>
                                     <div className="flex-1 p-3 border-b border-stone-300 flex flex-col gap-2.5">
@@ -64,7 +59,8 @@ const ProfilePage = () => {
                                             type="text"
                                             value={profileData.name}
                                             onChange={(e) => handleInputChange('name', e.target.value)}
-                                            className="text-slate-700 text-xl font-semibold bg-transparent border-none outline-none focus:ring-0 p-0"
+                                            className="text-slate-700 text-xl cursor-not-allowed font-semibold bg-transparent border-none outline-none focus:ring-0 p-0"
+                                            disabled
                                         />
                                     </div>
                                 </div>
@@ -84,7 +80,8 @@ const ProfilePage = () => {
                                                 type="tel"
                                                 value={profileData.mobile}
                                                 onChange={(e) => handleInputChange('mobile', e.target.value)}
-                                                className="text-slate-700 text-xl font-semibold bg-transparent border-none outline-none focus:ring-0 p-0 flex-1"
+                                                className="text-slate-700 text-xl font-semibold cursor-not-allowed bg-transparent border-none outline-none focus:ring-0 p-0 flex-1"
+                                                disabled
                                             />
                                         </div>
                                     </div>
@@ -96,7 +93,8 @@ const ProfilePage = () => {
                                             type="email"
                                             value={profileData.email}
                                             onChange={(e) => handleInputChange('email', e.target.value)}
-                                            className="text-slate-700 text-xl font-semibold bg-transparent border-none outline-none focus:ring-0 p-0"
+                                            className="text-slate-700 text-xl font-semibold cursor-not-allowed bg-transparent border-none outline-none focus:ring-0 p-0"
+                                            disabled
                                         />
                                     </div>
                                 </div>
