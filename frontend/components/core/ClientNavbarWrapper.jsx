@@ -1,24 +1,43 @@
 'use client';
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import SmartLink from "../utils/SmartLink";
-import { ChevronDown, Headset, Home, Info, Menu, X, User } from "lucide-react";
+import { ChevronDown, Headset, Home, Info, Menu, X, User, RefreshCcw } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import * as NavigationMenu from "@radix-ui/react-navigation-menu";
 import { Wallet, Settings, LogOut, History } from "lucide-react";
 import { ChevronRight } from "lucide-react";
 import LogoutModal from "@/components/ui/logout-modal";
 import { navigationMenuTriggerStyle } from "@/components/ui/navigation-menu";
+import { getWalletBalance } from "@/services/wallet";
+import WalletLogo from "@/public/images/wallet/logo.png";
 
 export default function ClientNavbarWrapper({ isAuthenticated, user, navLinks }) {
     const pathname = usePathname();
     const [scrolled, setScrolled] = useState(false);
     const [menuOpen, setMenuOpen] = useState(false);
+    const [walletBalance, setWalletBalance] = useState(null);
+    const [loadingBalance, setLoadingBalance] = useState(false);
 
     const fixedNavPathList = ['/login', '/signup', '/forgot-password', '/reset-password', '/contact-us', '/wallet', '/profile', '/service-history', '/about-us', '/privacy-policy', '/terms-and-conditions'];
     const fixedNav = fixedNavPathList.includes(pathname) || pathname.startsWith('/categories/') || pathname.startsWith('/settings') || pathname.startsWith('/services/');
+
+    const fetchWalletBalance = useCallback(async () => {
+        if (isAuthenticated) {
+            setLoadingBalance(true);
+            try {
+                const data = await getWalletBalance();
+                setWalletBalance(data?.balance);
+            } catch (error) {
+                console.error("Failed to fetch wallet balance:", error);
+                setWalletBalance("Error");
+            } finally {
+                setLoadingBalance(false);
+            }
+        }
+    }, [isAuthenticated]);
 
     useEffect(() => {
         const handleScroll = () => {
@@ -27,6 +46,10 @@ export default function ClientNavbarWrapper({ isAuthenticated, user, navLinks })
         window.addEventListener("scroll", handleScroll);
         return () => window.removeEventListener("scroll", handleScroll);
     }, []);
+
+    useEffect(() => {
+        fetchWalletBalance();
+    }, [fetchWalletBalance]);
 
     const baseClasses = fixedNav ? "fixed top-0 z-50 transition-all duration-300 w-full" : "sticky top-0 z-50 transition-all duration-300";
     const loginBgClasses = scrolled ? "bg-black/40 bg-opacity-10 backdrop-blur-md shadow-md" : "bg-transparent";
@@ -79,13 +102,29 @@ export default function ClientNavbarWrapper({ isAuthenticated, user, navLinks })
                                         </NavigationMenu.Trigger>
 
                                         <NavigationMenu.Content className="absolute right-0 mt-2 w-56 bg-white border border-gray-200 rounded-md shadow-lg py-2">
+                                            <div className="flex items-center justify-between px-4 py-2 text-sm text-gray-900">
+                                                <div className="flex items-center gap-2">
+                                                    <Wallet className="w-4 h-4" />
+                                                    <span>Balance:</span>
+                                                </div>
+                                                <div className="flex items-center gap-2">
+                                                    <Image src={WalletLogo} alt="Wallet Logo" width={16} height={16} />
+                                                    <span className="font-semibold">
+                                                        {loadingBalance ? "Loading..." : (walletBalance !== null ? `${walletBalance}` : "N/A")}
+                                                    </span>
+                                                    <button onClick={fetchWalletBalance} disabled={loadingBalance} className="p-1 rounded-full hover:bg-gray-100">
+                                                        <RefreshCcw className={`w-3 h-3 ${loadingBalance ? 'animate-spin' : ''}`} />
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <div className="border-t border-gray-100 my-2" />
                                             <NavigationMenu.Link asChild>
                                                 <SmartLink
                                                     href="/wallet"
                                                     className="flex items-center gap-2 px-4 py-2 text-sm text-gray-900 hover:bg-gray-100"
                                                 >
                                                     <Wallet className="w-4 h-4" />
-                                                    Wallet
+                                                    Go to Wallet
                                                 </SmartLink>
                                             </NavigationMenu.Link>
 
@@ -206,6 +245,21 @@ export default function ClientNavbarWrapper({ isAuthenticated, user, navLinks })
                                         >
                                             My Profile <ChevronRight className="w-3 h-3 ml-1" />
                                         </SmartLink>
+                                    </div>
+                                </div>
+                                <div className="flex items-center justify-between text-sm">
+                                    <div className="flex items-center gap-2">
+                                        <Wallet className="w-4 h-4" />
+                                        <span>Wallet Balance:</span>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <Image src={WalletLogo} alt="Wallet Logo" width={16} height={16} />
+                                        <span className="font-semibold">
+                                            {loadingBalance ? "Loading..." : (walletBalance !== null ? `${walletBalance}` : "N/A")}
+                                        </span>
+                                        <button onClick={fetchWalletBalance} disabled={loadingBalance} className="p-1 rounded-full hover:bg-red-600">
+                                            <RefreshCcw className={`w-3 h-3 ${loadingBalance ? 'animate-spin' : ''}`} />
+                                        </button>
                                     </div>
                                 </div>
                             </div>
