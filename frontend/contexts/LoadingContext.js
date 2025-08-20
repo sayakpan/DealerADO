@@ -19,16 +19,6 @@ export function LoadingProvider({ children }) {
         setIsLoading(false);
     }, [pathname, searchParams]);
 
-    // Additional safety: clear loading after a timeout
-    useEffect(() => {
-        if (isLoading) {
-            const timeout = setTimeout(() => {
-                setIsLoading(false);
-            }, 5000); // Clear loading after 5 seconds max
-
-            return () => clearTimeout(timeout);
-        }
-    }, [isLoading]);
 
     return (
         <LoadingContext.Provider value={{ isLoading, setIsLoading }}>
