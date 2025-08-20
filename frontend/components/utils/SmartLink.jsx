@@ -50,6 +50,16 @@ export default function SmartLink({
             }
         }
 
+        // Prevent navigation if on a categories page and clicking the homepage link (header logo)
+        const isCategoriesPage = pathname.startsWith('/categories');
+        const isHomepageLink = href === '/';
+
+        if (isCategoriesPage && isHomepageLink) {
+            e.preventDefault();
+            if (onClick) onClick(e);
+            return;
+        }
+
         if (
             // Prevent loading behavior for certain conditions
             e.defaultPrevented ||

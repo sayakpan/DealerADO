@@ -2,8 +2,8 @@
 
 const KeyValue = ({ item }) => (
   <div className="flex justify-between items-center py-3 border-b border-gray-200 last:border-b-0">
-    <span className="text-gray-600 text-sm">{item.label}:</span>
-    <span className="text-gray-900 text-sm font-medium">{item.value || "Not Available"}</span>
+    <span className="text-gray-600 text-[10px] md:text-sm">{item.label}:</span>
+    <span className="text-gray-900 text-[10px] md:text-sm font-medium">{item.value || "Not Available"}</span>
   </div>
 )
 
@@ -16,7 +16,7 @@ const Table = ({ item }) => (
           <thead className="bg-gray-50">
             <tr>
               {item.columns.map((col) => (
-                <th key={col.key} className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                <th key={col.key} className="px-4 py-3 text-left text-[10px] md:text-xs font-medium text-gray-500 uppercase">
                   {col.title}
                 </th>
               ))}
@@ -26,7 +26,7 @@ const Table = ({ item }) => (
             {item.rows.map((row, rowIndex) => (
               <tr key={rowIndex}>
                 {item.columns.map((col) => (
-                  <td key={col.key} className="px-4 py-3 text-sm text-gray-900">
+                  <td key={col.key} className="px-4 py-3 text-[10px] md:text-sm text-gray-900">
                     {row[col.key] || <span className="text-gray-400">Not Available</span>}
                   </td>
                 ))}
@@ -37,7 +37,7 @@ const Table = ({ item }) => (
       </div>
     ) : (
       <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 text-center">
-        <p className="text-gray-500 text-sm">{item.empty}</p>
+        <p className="text-gray-500 text-[10px] md:text-sm">{item.empty}</p>
       </div>
     )}
   </div>
@@ -46,9 +46,9 @@ const Table = ({ item }) => (
 const Section = ({ section }) => (
   <div className="mb-6 border border-gray-200 rounded-lg bg-white">
     <div className="bg-gray-50 border-b border-gray-200 px-4 py-3">
-      <h3 className="font-semibold text-gray-900">{section.title}</h3>
+      <h3 className="font-semibold text-gray-900 text-sm md:text-base">{section.title}</h3>
     </div>
-    <div className="p-4">
+    <div className="p-3">
       {section.items.map((item, index) => {
         switch (item.type) {
           case "kv":
@@ -75,17 +75,17 @@ const RenderedLogClient = ({ log }) => {
   const { rendered } = log
 
   return (
-    <div className="bg-gray-50 min-h-screen p-4">
+    <div className="bg-gray-50 min-h-screen">
       <div className="">
         <header className="mb-6 border border-gray-200 rounded-lg bg-white p-6">
           <div className="flex justify-between items-start">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">{rendered.header.left.value}</h1>
-              <p className="text-sm text-gray-500 mt-1">{rendered.header.left.label}</p>
+              <h1 className="text-lg md:text-2xl font-bold text-gray-900">{rendered.header.left.value}</h1>
+              <p className="text-[10px] md:text-sm text-gray-500 mt-1">{rendered.header.left.label}</p>
             </div>
             <div className="text-right">
-              <p className="text-lg font-semibold text-gray-900">{rendered.header.right.value}</p>
-              <p className="text-sm text-gray-500">{rendered.header.right.label}</p>
+              <p className="text-sm md:text-lg font-semibold text-gray-900">{rendered.header.right.value}</p>
+              <p className="text-[10px] md:text-sm text-gray-500">{rendered.header.right.label}</p>
             </div>
           </div>
         </header>
