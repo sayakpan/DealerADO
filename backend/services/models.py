@@ -68,7 +68,7 @@ class HTTPStatusCode(models.Model):
 
 class ServiceCategory(models.Model):
     name = models.CharField(max_length=100, verbose_name="Category Name")
-    slug = models.SlugField(null=True, blank=True, max_length=100, verbose_name="Slug")
+    slug = models.SlugField(null=True, blank=True, max_length=100, verbose_name="Slug", help_text="You don't need to fill this, it will be generated automatically.")
     description = models.TextField(blank=True, verbose_name="Description")
     rank = models.PositiveIntegerField(default=0, verbose_name="Display Order")
     logo = models.ImageField(upload_to="service_categories/logos/", blank=True, null=True, verbose_name="Logo")
@@ -99,7 +99,7 @@ class Service(models.Model):
         verbose_name="Service Category",
     )
     name = models.CharField(max_length=100, verbose_name="Service Name")
-    slug = models.SlugField(null=True, blank=True, max_length=100, verbose_name="Slug")
+    slug = models.SlugField(null=True, blank=True, max_length=100, verbose_name="Slug", help_text="You don't need to fill this, it will be generated automatically.")
     is_active = models.BooleanField(default=True, verbose_name="Is Active")
     api_url = models.URLField(verbose_name="API Endpoint")
     api_method = models.CharField(
