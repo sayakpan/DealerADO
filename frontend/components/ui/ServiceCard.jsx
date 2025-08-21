@@ -44,7 +44,7 @@ export const ServiceCard = ({ service, onClick, backgroundImage, className = "" 
             {/* Content Container */}
             <div className="relative z-30 flex flex-col h-full p-5">
                 {/* Price Section - Top */}
-                <div className="flex items-center gap-[13.33px] mb-3">
+                <div className="flex items-center gap-[10.33px] md:gap-[13.33px] mb-3">
                     {/* Logo Background */}
                     <div
                         className="flex-shrink-0 overflow-hidden"
@@ -63,7 +63,7 @@ export const ServiceCard = ({ service, onClick, backgroundImage, className = "" 
                     </div>
                     {/* Price */}
                     <div
-                        className="text-white font-extrabold text-2xl sm:text-3xl"
+                        className="text-white font-extrabold text-xl sm:text-2xl md:text-3xl"
                         style={{
                             fontFamily: "Plus Jakarta Sans, sans-serif",
                         }}
@@ -96,7 +96,7 @@ export const ServiceCard = ({ service, onClick, backgroundImage, className = "" 
                             {service.short_description}
                         </div>
                     )}
-                    
+
                     {/* Arrow and Line Section */}
                     <div className="flex items-center gap-3 group-hover:translate-x-2 transition-transform duration-300">
                         {/* Horizontal Line */}
