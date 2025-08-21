@@ -54,6 +54,7 @@ class TransactionLog(models.Model):
         related_name='wallet_actions',
         help_text='User who performed this transaction (e.g. admin)'
     )
+    is_reversed = models.BooleanField(default=False,)
 
     def __str__(self):
         return f"{self.wallet.user.first_name}'s Wallet:  ₹{self.amount_change} ({self.transaction_type.title()})"

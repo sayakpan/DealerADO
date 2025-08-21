@@ -117,7 +117,9 @@ class Service(models.Model):
         help_text="Wallet will be deducted only if the response status code is in this list."
     )
     cover_image = models.ImageField(upload_to="services/covers/", blank=True, null=True, verbose_name="Cover Image")
+    short_description = models.CharField(max_length=255, blank=True, verbose_name="Short Description")
     description = CKEditor5Field(blank=True, verbose_name="Description")
+    sample_response = models.JSONField(blank=True, null=True, verbose_name="Sample Response", help_text="Example response from the API")
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -136,6 +138,15 @@ class Service(models.Model):
                 slug_base=self.name
             )
         super().save(*args, **kwargs)
+    
+    def clean(self):
+        super().clean()
+        if self.sample_response:
+            try:
+                # Try dumping & loading back to ensure it's valid JSON
+                json.loads(json.dumps(self.sample_response))
+            except (TypeError, ValueError):
+                raise ValidationError({"sample_response": "Must be valid JSON."})
 
 
 class ServiceFormField(models.Model):
@@ -155,9 +166,9 @@ class ServiceFormField(models.Model):
     key = models.CharField(max_length=100, help_text="Key to be used in API payload", verbose_name="Payload Key")
     input_type = models.CharField(max_length=20, choices=INPUT_TYPES, verbose_name="Input Type")
     is_required = models.BooleanField(default=True, verbose_name="Is Required")
-    help_text = models.TextField(blank=True, verbose_name="Help Text")
+    help_text = models.TextField(blank=True, verbose_name="Help Text, will be shown in 'i' tag next to field.")
     placeholder = models.CharField(max_length=255, blank=True, verbose_name="Placeholder")
-    options = models.JSONField(blank=True, null=True, help_text="Applicable for select, radio, checkbox fields", verbose_name="Options")
+    options = models.JSONField(blank=True, null=True, help_text="Applicable for select, radio, checkbox fields. e.g. [{'value': 'yes', 'label': 'Yes'}, {'value': 'no', 'label': 'No'}]", verbose_name="Options")
     condition_group = models.CharField(max_length=50, blank=True, help_text="Fields in same group share OR condition", verbose_name="Condition Group")
     validation_rules = models.JSONField(
         blank=True,

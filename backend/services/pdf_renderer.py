@@ -1,5 +1,6 @@
 from io import BytesIO
 import os
+import re
 from django.conf import settings
 from reportlab.lib.pagesizes import A4
 from reportlab.pdfgen import canvas
@@ -9,6 +10,8 @@ from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.platypus import Table, TableStyle, Paragraph
 from reportlab.lib.utils import ImageReader
 
+
+URL_REGEX = re.compile(r'^(https?://[^\s]+)$', re.IGNORECASE)
 
 def _fmt_value(v):
     if v is True:
@@ -23,48 +26,170 @@ def _fmt_value(v):
     return str(v)
 
 
-def _draw_wrapped_text(p, x, y, text, width, font_name="Helvetica", font_size=11, leading=14):
-    if text is None:
-        text = "Not Available"
+# def _draw_wrapped_text(p, x, y, text, width, font_name="Helvetica", font_size=11, leading=14):
+#     if text is None:
+#         text = "Not Available"
+#     text = _fmt_value(text)
+#     p.setFont(font_name, font_size)
+#     words = str(text).split()
+#     line = []
+#     space_w = p.stringWidth(" ", font_name, font_size)
+#     cur_w = 0
+#     yy = y
+#     for w in words:
+#         ww = p.stringWidth(w, font_name, font_size)
+#         if cur_w + ww + (space_w if line else 0) > width:
+#             p.drawString(x, yy, " ".join(line))
+#             yy -= leading
+#             line = [w]
+#             cur_w = ww
+#         else:
+#             if line:
+#                 cur_w += space_w + ww
+#                 line.append(w)
+#             else:
+#                 cur_w = ww
+#                 line = [w]
+#     if line:
+#         p.drawString(x, yy, " ".join(line))
+#         yy -= leading
+#     return yy
+
+def _draw_wrapped_text(p, x, y, text, right_margin, font_name="Helvetica", font_size=11, leading=14):
+    """
+    Draws text that wraps automatically based on the available page width.
+
+    1. Calculates available width from starting 'x' to the 'right_margin'.
+    2. Tries to wrap text by breaking at spaces.
+    3. If a single word is too long, it breaks the word at the character
+       that would overflow the available width.
+    
+    Returns the y-coordinate below the drawn text.
+    """
     text = _fmt_value(text)
     p.setFont(font_name, font_size)
-    words = str(text).split()
-    line = []
-    space_w = p.stringWidth(" ", font_name, font_size)
-    cur_w = 0
-    yy = y
-    for w in words:
-        ww = p.stringWidth(w, font_name, font_size)
-        if cur_w + ww + (space_w if line else 0) > width:
-            p.drawString(x, yy, " ".join(line))
+    
+    # 1. Calculate the available width dynamically
+    page_width, _ = p._pagesize
+    available_width = page_width - x - right_margin
+    if available_width <= 0: # Safety check
+        return y
+
+    words = text.split(' ')
+    space_width = p.stringWidth(" ", font_name, font_size)
+    
+    current_line = []
+    current_width = 0
+    yy = y # Use a temporary y for drawing lines
+
+    for word in words:
+        # Handle words that are too long to fit on a single line
+        original_word = word
+        while p.stringWidth(word, font_name, font_size) > available_width:
+            # If there's a line pending, draw it first
+            if current_line:
+                p.drawString(x, yy, " ".join(current_line))
+                yy -= leading
+                current_line = []
+                current_width = 0
+
+            # Find the exact character to break the long word at
+            break_point = 1
+            while p.stringWidth(word[:break_point], font_name, font_size) <= available_width:
+                break_point += 1
+            break_point -= 1 # Step back to the last character that fit
+
+            # Draw the chunk of the word and move to the next line
+            p.drawString(x, yy, word[:break_point])
             yy -= leading
-            line = [w]
-            cur_w = ww
+            
+            # The remainder of the word is the new word to process
+            word = word[break_point:]
+
+        # Normal word placement logic for the (potentially shortened) word
+        word_width = p.stringWidth(word, font_name, font_size)
+        
+        # If the word fits on the current line...
+        if current_line and (current_width + space_width + word_width <= available_width):
+            current_line.append(word)
+            current_width += space_width + word_width
+        # If the word doesn't fit on the current line...
+        elif current_line:
+            p.drawString(x, yy, " ".join(current_line))
+            yy -= leading
+            current_line = [word]
+            current_width = word_width
+        # If it's the first word on a new line...
         else:
-            if line:
-                cur_w += space_w + ww
-                line.append(w)
-            else:
-                cur_w = ww
-                line = [w]
-    if line:
-        p.drawString(x, yy, " ".join(line))
+            current_line = [word]
+            current_width = word_width
+            
+    # Draw any remaining text in the last line
+    if current_line:
+        p.drawString(x, yy, " ".join(current_line))
         yy -= leading
+
     return yy
 
 
+# def _draw_kv(p, x, y, label, value, label_w=3*cm, width=16*cm, font_size=11, leading=14, pad=6):
+#     # Measure the actual label width and ensure value starts after it (plus pad)
+#     p.setFont("Helvetica-Bold", font_size)
+#     label_txt = f"{label}:"
+#     p.drawString(x, y, label_txt)
+
+#     measured = p.stringWidth(label_txt, "Helvetica-Bold", font_size)
+#     value_x = x + max(label_w, measured + pad)
+
+#     p.setFont("Helvetica", font_size)
+#     return _draw_wrapped_text(p, value_x, y, _fmt_value(value), width - (value_x - x), "Helvetica", font_size, leading)
+
 def _draw_kv(p, x, y, label, value, label_w=3*cm, width=16*cm, font_size=11, leading=14, pad=6):
-    # Measure the actual label width and ensure value starts after it (plus pad)
+    # 1. Draw the label
     p.setFont("Helvetica-Bold", font_size)
     label_txt = f"{label}:"
     p.drawString(x, y, label_txt)
 
-    measured = p.stringWidth(label_txt, "Helvetica-Bold", font_size)
-    value_x = x + max(label_w, measured + pad)
+    # 2. Determine the starting point for the value
+    measured_label_width = p.stringWidth(label_txt, "Helvetica-Bold", font_size)
+    value_x = x + max(label_w, measured_label_width + pad)
 
-    p.setFont("Helvetica", font_size)
-    return _draw_wrapped_text(p, value_x, y, _fmt_value(value), width - (value_x - x), "Helvetica", font_size, leading)
+    val_str = _fmt_value(value)
 
+    # 4. If it's a URL → draw as hyperlink
+    if isinstance(val_str, str) and URL_REGEX.match(val_str):
+        display_limit = 30  # characters to show before truncating
+        if len(val_str) > display_limit:
+            display_text = val_str[:display_limit] + "..." + " (Open Link)"
+        else:
+            display_text = val_str + " (Open Link)"
+
+        p.setFont("Helvetica", font_size)
+        p.setFillColor(colors.blue)
+        p.drawString(value_x, y, display_text)
+
+        # underline effect
+        text_width = p.stringWidth(display_text, "Helvetica", font_size)
+        p.line(value_x, y - 1, value_x + text_width, y - 1)
+
+        # clickable region covers entire shortened text
+        p.linkURL(val_str, (value_x, y, value_x + text_width, y + font_size), relative=0)
+
+        p.setFillColor(colors.black)
+        return y - leading
+    else:
+        # fallback to wrapped text
+        p.setFont("Helvetica", font_size)
+        return _draw_wrapped_text(
+            p,
+            value_x,
+            y,
+            val_str,
+            right_margin=2*cm,
+            font_name="Helvetica",
+            font_size=font_size,
+            leading=leading
+        )
 
 # def _draw_table(p, x, y, columns, rows, max_width=18*cm, font_size=10):
 #     styles = getSampleStyleSheet()
@@ -265,14 +390,6 @@ def _draw_logo_top_left(p, x_left, y_top, max_width_cm=3.0, max_height_cm=1.5):
     
     
 def _draw_watermark(p, page_w, page_h):
-#     p.saveState()
-#     p.setFillColorRGB(0.85, 0.85, 0.85)  # light grey
-#     p.setFont("Helvetica-Bold", 50)
-#     p.translate(page_w / 2, page_h / 2)
-#     p.rotate(45)
-#     p.drawCentredString(0, 0, "DealerADO")
-#     p.restoreState()
-    
     logo_path = os.path.join(settings.BASE_DIR, "static", "branding", "logo.png")
     if not os.path.exists(logo_path):
         return
