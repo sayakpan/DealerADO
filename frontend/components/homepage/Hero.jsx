@@ -4,16 +4,20 @@ import { isAuthenticated } from "@/lib/auth"
 import SmartLink from "../utils/SmartLink"
 import ClientOnly from "../utils/ClientOnly"
 
-export default function Hero() {
+export default function Hero({ bannerData }) {
+    const bannerImage = bannerData?.image || "/images/homepage/redcar.png";
+    const bannerTitle = bannerData?.title || "Welcome Garage Companion, Simplify Service Scheduling";
+    const bannerDescription = bannerData?.description || "Experience hassle-free car care with just a few taps.";
+
     return (
         <section className="relative bg-[#151C22] text-white overflow-hidden flex items-center justify-center px-2 md:px-10 lg:px-20">
             {/* Content */}
             <div className="relative z-10 container mx-auto px-4 py-16 md:py-24 lg:py-32 w-2/3 lg:w-1/2 h-full">
                 <div className="max-w-xl">
                     <h1 className="text-xl md:text-3xl lg:text-5xl font-semibold mb-6 leading-tight">
-                        Welcome Garage Companion, Simplify Service Scheduling
+                        {bannerTitle}
                     </h1>
-                    <p className="text-sm lg:text-base mb-8 text-gray-100">Experience hassle-free car care with just a few taps.</p>
+                    <p className="text-sm lg:text-base mb-8 text-gray-100">{bannerDescription}</p>
                     <ClientOnly>
 
                         {isAuthenticated() ? (
@@ -39,8 +43,8 @@ export default function Hero() {
             <div className="relative z-10 container mx-auto px-4 py-24 md:py-32 lg:py-40 w-1/3 lg:w-1/2 h-full">
                 <div className="absolute top-10 md:top-20 -right-16 md:-right-32 w-[200%] md:w-full h-[150px] md:h-[400px] transform rotate-[60deg] md:rotate-[30deg] z-10">
                     <Image
-                        src="/images/homepage/redcar.png"
-                        alt="Red sports car"
+                        src={bannerImage}
+                        alt="Homepage banner"
                         fill
                         className="object-contain object-right"
                         priority

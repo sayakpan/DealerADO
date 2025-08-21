@@ -2,34 +2,34 @@
 
 import Image from "next/image"
 import { useState, useEffect, useCallback } from "react"
-import { getHomepageBanner } from "@/services/categories"
+// import { getHomepageBanner } from "@/services/categories"
 import useEmblaCarousel from "embla-carousel-react"
 
-export default function CategoryHero() {
-    const [carouselData, setCarouselData] = useState([])
+export default function CategoryHero({data = []}) {
+    const [carouselData, setCarouselData] = useState(data?.images || [])
     const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true })
     const [selectedIndex, setSelectedIndex] = useState(0)
 
-    useEffect(() => {
-        async function fetchBannerData() {
-            try {
-                const data = await getHomepageBanner()
-                if (data && data.images) {
-                    setCarouselData(
-                        data.images.map((img) => ({ background_url: img.image }))
-                    )
-                }
-            } catch (error) {
-                console.error("Failed to fetch homepage banner:", error)
-                setCarouselData([
-                    { background_url: "/images/categories/categories-cars.png" },
-                    { background_url: "/images/categories/categories-cars.png" },
-                    { background_url: "/images/categories/categories-cars.png" },
-                ])
-            }
-        }
-        fetchBannerData()
-    }, [])
+    // useEffect(() => {
+    //     async function fetchBannerData() {
+    //         try {
+    //             // const data = await getHomepageBanner()
+    //             if (data && data.images) {
+    //                 setCarouselData(
+    //                     data.images.map((img) => ({ background_url: img.image }))
+    //                 )
+    //             }
+    //         } catch (error) {
+    //             console.error("Failed to fetch homepage banner:", error)
+    //             setCarouselData([
+    //                 { background_url: "/images/categories/categories-cars.png" },
+    //                 { background_url: "/images/categories/categories-cars.png" },
+    //                 { background_url: "/images/categories/categories-cars.png" },
+    //             ])
+    //         }
+    //     }
+    //     fetchBannerData()
+    // }, [])
 
     const onSelect = useCallback(() => {
         if (!emblaApi) return
@@ -69,8 +69,8 @@ export default function CategoryHero() {
                                     {/* Image with natural aspect ratio */}
                                     <div className="relative w-full">
                                         <Image
-                                            src={item.background_url || "/placeholder.svg"}
-                                            alt={`Carousel Image ${index + 1}`}
+                                            src={item.image || "/placeholder.svg"}
+                                            alt={item.name || "Category Image"}
                                             width={1920}
                                             height={1080}
                                             priority
