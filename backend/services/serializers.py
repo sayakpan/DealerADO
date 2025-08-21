@@ -1,4 +1,6 @@
 from rest_framework import serializers
+
+from services.rendering import render_response_with_schema
 from .models import Service, ServiceCategory, ServiceFormField, ServiceUsageLog
 
 class ServiceCategorySerializer(serializers.ModelSerializer):
@@ -36,7 +38,7 @@ class ServiceListItemSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Service
-        fields = ['id', 'name', 'slug', 'price_per_hit', 'cover_image_url']
+        fields = ['id', 'name', 'slug', 'price_per_hit', 'cover_image_url', 'short_description']
 
     def get_cover_image_url(self, obj):
         request = self.context.get('request')
@@ -82,6 +84,7 @@ class ServiceFormFieldSerializer(serializers.ModelSerializer):
 class ServiceDetailSerializer(serializers.ModelSerializer):
     form_fields = ServiceFormFieldSerializer(many=True, read_only=True)
     or_groups = serializers.SerializerMethodField()
+    sample_response = serializers.SerializerMethodField()
 
     class Meta:
         model = Service
@@ -93,6 +96,7 @@ class ServiceDetailSerializer(serializers.ModelSerializer):
             'is_active',
             'form_fields',
             'or_groups',
+            'sample_response',
         ]
     
     def get_form_fields(self, obj):
@@ -114,8 +118,12 @@ class ServiceDetailSerializer(serializers.ModelSerializer):
             }
             for group_fields in groups.values() if len(group_fields) > 1
         ]
-        
-        
+
+    def get_sample_response(self, obj):
+        rendered = render_response_with_schema(obj, obj.sample_response)
+        return rendered
+
+
 class ServiceUsageLogSerializer(serializers.ModelSerializer):
     service_name = serializers.CharField(source='service.name', read_only=True)
     wallet_txn_id = serializers.CharField(source='wallet_transaction.id', read_only=True)
