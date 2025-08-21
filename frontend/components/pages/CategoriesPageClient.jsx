@@ -5,7 +5,7 @@ import CategoryHero from "@/components/categories/CategoryHero"
 import CategoryList from "@/components/categories/CategoryList"
 import { getCategories } from "@/services/categories"
 
-export default function CategoriesPageClient({ initialCategories, initialTotalCount, initialHasMore }) {
+export default function CategoriesPageClient({ initialCategories, initialTotalCount, initialHasMore, carouselData }) {
     const [categories, setCategories] = useState(initialCategories || [])
     const [loadingMore, setLoadingMore] = useState(false)
     const [error, setError] = useState(null)
@@ -51,7 +51,7 @@ export default function CategoriesPageClient({ initialCategories, initialTotalCo
 
     return (
         <div>
-            <CategoryHero />
+            <CategoryHero data={carouselData} />
             <CategoryList 
                 allCategories={categories}
                 totalCount={totalCount}

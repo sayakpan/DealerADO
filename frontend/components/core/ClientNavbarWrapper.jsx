@@ -61,21 +61,40 @@ export default function ClientNavbarWrapper({ isAuthenticated, user, navLinks })
             <div className="max-w-7xl mx-auto px-4 sm:px-4 md:px-10 lg:px-20 xl:px-0">
                 <div className="flex items-center justify-between h-14 md:h-20">
 
-                    {/* Logo */}
-                    <SmartLink href="/" className="flex-shrink-0">
-                        <div className="relative w-28 h-12 sm:w-32 sm:h-14 md:w-36 md:h-16">
-                            <Image
-                                src="/images/core/logo.jpg"
-                                alt="Dealer ADO Logo"
-                                fill
-                                className="rounded-full object-cover hover:opacity-90 transition-opacity"
-                                priority
-                            />
-                        </div>
-                    </SmartLink>
+                    <div className="flex items-center gap-4">
+                        {/* Logo */}
+                        <SmartLink href="/" className="flex-shrink-0">
+                            <div className="relative w-28 h-12 sm:w-32 sm:h-14 md:w-36 md:h-16">
+                                <Image
+                                    src="/images/core/logo.jpg"
+                                    alt="Dealer ADO Logo"
+                                    fill
+                                    className="rounded-full object-cover hover:opacity-90 transition-opacity"
+                                    priority
+                                />
+                            </div>
+                        </SmartLink>
+
+                        
+                    </div>
 
                     {/* Desktop Nav */}
                     <nav className="hidden md:flex gap-6 lg:gap-8 items-center">
+                        {/* Wallet Balance - New Location */}
+                        {isAuthenticated && (
+                            <div className={`hidden md:flex items-center bg-white rounded-full p-3 gap-2 text-sm ${fixedNav ? 'text-gray-800' : 'text-gray-900'}`}>
+                                
+                                <div className="flex items-center gap-2">
+                                    <Image src={WalletLogo} alt="Wallet Logo" width={16} height={16} />
+                                    <span className="font-semibold">
+                                        {loadingBalance ? "Loading..." : (walletBalance !== null ? `${walletBalance}` : "N/A")}
+                                    </span>
+                                    <button onClick={fetchWalletBalance} disabled={loadingBalance} className={`p-1 rounded-full ${fixedNav ? 'hover:bg-gray-100/15' : 'hover:bg-gray-100'}`}>
+                                        <RefreshCcw className={`w-3 h-3 cursor-pointer ${loadingBalance ? 'animate-spin' : ''}`} />
+                                    </button>
+                                </div>
+                            </div>
+                        )}
                         {navLinks.map((item) => (
                             <SmartLink
                                 key={item.href}
@@ -102,22 +121,6 @@ export default function ClientNavbarWrapper({ isAuthenticated, user, navLinks })
                                         </NavigationMenu.Trigger>
 
                                         <NavigationMenu.Content className="absolute right-0 mt-2 w-56 bg-white border border-gray-200 rounded-md shadow-lg py-2">
-                                            <div className="flex items-center justify-between px-4 py-2 text-sm text-gray-900">
-                                                <div className="flex items-center gap-2">
-                                                    <Wallet className="w-4 h-4" />
-                                                    <span>Balance:</span>
-                                                </div>
-                                                <div className="flex items-center gap-2">
-                                                    <Image src={WalletLogo} alt="Wallet Logo" width={16} height={16} />
-                                                    <span className="font-semibold">
-                                                        {loadingBalance ? "Loading..." : (walletBalance !== null ? `${walletBalance}` : "N/A")}
-                                                    </span>
-                                                    <button onClick={fetchWalletBalance} disabled={loadingBalance} className="p-1 rounded-full hover:bg-gray-100">
-                                                        <RefreshCcw className={`w-3 h-3 ${loadingBalance ? 'animate-spin' : ''}`} />
-                                                    </button>
-                                                </div>
-                                            </div>
-                                            <div className="border-t border-gray-100 my-2" />
                                             <NavigationMenu.Link asChild>
                                                 <SmartLink
                                                     href="/wallet"
@@ -247,11 +250,7 @@ export default function ClientNavbarWrapper({ isAuthenticated, user, navLinks })
                                         </SmartLink>
                                     </div>
                                 </div>
-                                <div className="flex items-center justify-between text-sm">
-                                    <div className="flex items-center gap-2">
-                                        <Wallet className="w-4 h-4" />
-                                        <span>Wallet Balance:</span>
-                                    </div>
+                                <div className="flex items-center text-sm bg-white text-gray-800 justify-center p-2 rounded-md">
                                     <div className="flex items-center gap-2">
                                         <Image src={WalletLogo} alt="Wallet Logo" width={16} height={16} />
                                         <span className="font-semibold">
