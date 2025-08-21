@@ -15,6 +15,21 @@ export async function getCategoryBySlug(slug) {
 	return response.data;
 }
 
+export async function getHomepageBanner() {
+	const response = await fetchWithAuth.get(`/api/utility/banner/homepage-banner/`);
+
+	if (response.status === 401) {
+		window.location.href = '/login?status=401';
+		return;
+	}
+
+	if (!response.success) {
+		throw new Error(response.message || 'Failed to fetch homepage banner');
+	}
+
+	return response.data;
+}
+
 export async function getCategories(page = 1, pageSize = 10) {
 	const response = await fetchWithAuth.get(`/api/services/categories/?page=${page}&page_size=${pageSize}`);
 	
