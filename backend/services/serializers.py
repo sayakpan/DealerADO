@@ -120,7 +120,7 @@ class ServiceDetailSerializer(serializers.ModelSerializer):
         ]
 
     def get_sample_response(self, obj):
-        rendered = render_response_with_schema(obj, obj.sample_response)
+        rendered = render_response_with_schema(obj, obj.sample_response) if obj.sample_response else None
         return rendered
 
 
