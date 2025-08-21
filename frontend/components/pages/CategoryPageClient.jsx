@@ -30,7 +30,7 @@ export default function CategoryPageClient({ category }) {
                                 className="w-6 h-6 sm:w-8 sm:h-8 lg:w-10 lg:h-10"
                             />
                             <h1 className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-800">
-                                Dealer Ado Point
+                                DealerADO Point
                             </h1>
                         </div>
                     </div>

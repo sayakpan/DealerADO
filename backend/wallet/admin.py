@@ -1,3 +1,4 @@
+from urllib import request
 from django.contrib import admin
 from .models import Wallet, TransactionLog
 from import_export import resources
@@ -33,11 +34,11 @@ class TransactionLogResource(resources.ModelResource):
 class TransactionLogAdmin(ExportMixin, admin.ModelAdmin):
     resource_class = TransactionLogResource
     formats = [CSV, XLSX]
-    list_display = ('wallet', 'transaction_type', 'amount_change', 'service_name', 'performed_by', 'timestamp')
+    list_display = ('id', 'wallet', 'transaction_type', 'amount_change', 'service_name', 'performed_by', 'timestamp')
     list_filter = ('transaction_type', ('timestamp', DateTimeRangeFilter))
     search_fields = ('wallet__user__username', 'wallet__user__email', 'service_name', 'note')
-    readonly_fields = ('timestamp','wallet', 'transaction_type', 'amount_change', 'previous_balance', 'new_balance', 'related_transaction', 'performed_by')
-    fields = ('id', 'wallet', 'transaction_type', 'service_name', 'amount_change', 'previous_balance', 'new_balance', 'related_transaction', 'performed_by', 'timestamp', 'note')
+    readonly_fields = ('timestamp','wallet', 'transaction_type', 'amount_change', 'previous_balance', 'new_balance', 'related_transaction', 'performed_by', 'is_reversed')
+    fields = ('id', 'wallet', 'transaction_type', 'service_name', 'amount_change', 'previous_balance', 'new_balance', 'related_transaction', 'performed_by', 'timestamp', 'note', 'is_reversed')
 
     def has_add_permission(self, request):
         return False  # disallow adding logs manually
@@ -50,6 +51,62 @@ class TransactionLogAdmin(ExportMixin, admin.ModelAdmin):
             return [f.name for f in self.model._meta.fields if f.name != 'note']
         return super().get_readonly_fields(request, obj)
     
+    def refund_transaction(self, request, queryset):
+        transactions_to_reverse = []
+        wallets_to_update = set()
+        transactions_processed = 0  # Track how many transactions are actually reversed
+
+        for transaction in queryset:
+            if transaction.is_reversed:
+                messages.error(request, f"Transaction {transaction.id} has already been reversed.")
+                continue  # Skip if already reversed
+
+            # Check if the transaction is valid for reversal
+            wallet = transaction.wallet
+            if transaction.transaction_type == 'debit':
+                new_balance = wallet.balance + transaction.amount_change
+            else:
+                new_balance = wallet.balance - transaction.amount_change
+
+            # Create the reversal transaction object
+            new_tx = TransactionLog(
+                wallet=wallet,
+                transaction_type='reversal',
+                service_name=transaction.service_name,
+                amount_change=-transaction.amount_change if transaction.transaction_type == 'recharge' else transaction.amount_change,
+                previous_balance=wallet.balance,
+                new_balance=new_balance,
+                note=f"Reversal of transaction {transaction.id}: {transaction.note}",
+                related_transaction=transaction,  # Link to the original transaction
+                performed_by=request.user
+            )
+
+            # Add to lists for bulk create and update
+            transactions_to_reverse.append(new_tx)
+            wallets_to_update.add(wallet)
+
+            # Mark the original transaction as reversed
+            transaction.is_reversed = True
+            transaction.save()
+
+            transactions_processed += 1  # Increment count of processed transactions
+
+        # Perform bulk creation of reversal transactions
+        if transactions_to_reverse:
+            TransactionLog.objects.bulk_create(transactions_to_reverse)
+
+        # Bulk update wallet balances
+        if wallets_to_update:
+            Wallet.objects.bulk_update(wallets_to_update, ['balance'])
+
+        # Return appropriate message based on transactions processed
+        if transactions_processed > 0:
+            messages.success(request, f"{transactions_processed} reversal transactions processed successfully.")
+        else:
+            messages.info(request, "No transactions were reversed because they were either already reversed or invalid.")
+            
+    refund_transaction.short_description = "Reverse Selected Transactions"
+    actions = [refund_transaction]
     
 class WalletTransactionForm(forms.Form):
     TRANSACTION_TYPE_CHOICES = [
@@ -65,8 +122,8 @@ class WalletTransactionForm(forms.Form):
 @admin.register(Wallet)
 class WalletAdmin(admin.ModelAdmin):
     list_display = ('id', 'wallet_holder_name', 'balance', 'is_active', 'updated_at')
-    readonly_fields = ('user', 'updated_at')
-    fields = ('user', 'balance', 'is_active', 'updated_at')
+    readonly_fields = ('user', 'balance', 'updated_at')
+    fields = ('user', 'balance', 'updated_at')
 
     def get_urls(self):
         urls = super().get_urls()

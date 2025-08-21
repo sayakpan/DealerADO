@@ -19,7 +19,7 @@ export default function SmartLink({
     const searchParams = useSearchParams();
     const { setIsLoading } = useLoading();
 
-    const normalizePath = (path) => path.replace(/\/+$/, '').trim();
+    const normalizePath = (path) => path === '/' ? '/' : path.replace(/\/+$/, '').trim();
 
     const isSameRoute = (targetHref) => {
         const query = searchParams.toString();
@@ -51,7 +51,7 @@ export default function SmartLink({
         }
 
         // Prevent navigation if on a categories page and clicking the homepage link (header logo)
-        const isCategoriesPage = pathname.startsWith('/categories');
+        const isCategoriesPage = pathname === '/categories';
         const isHomepageLink = href === '/';
 
         if (isCategoriesPage && isHomepageLink) {
@@ -94,7 +94,7 @@ export default function SmartLink({
 
         try {
             setIsLoading(true);
-            await router.push(targetHref);
+            router.push(targetHref);
             if (scrollEnabled) window.scrollTo({ top: 0, behavior: 'instant' });
         } catch (error) {
             console.error('Navigation error:', error);

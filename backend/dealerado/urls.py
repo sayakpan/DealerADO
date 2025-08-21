@@ -13,6 +13,7 @@ urlpatterns = [
     path('api/accounts/', include('accounts.urls')),
     path('api/services/', include('services.urls')),
     path('api/wallet/', include('wallet.urls')),
+    path('api/utility/', include('utility.urls')),
     path("ckeditor5/", include('django_ckeditor_5.urls')),
 ]
 

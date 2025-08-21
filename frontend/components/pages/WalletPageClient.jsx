@@ -5,11 +5,20 @@ import Image from 'next/image'
 import ServiceHeader from '@/components/ui/serviceHeader'
 import { ArrowDownLeft, ArrowUpRight } from 'lucide-react'
 import { fetchWithAuth } from "@/utils/api"
+import { Filter } from 'lucide-react'
 
 const WalletPageClient = ({ walletData: initialWalletData }) => {
     const [walletData, setWalletData] = useState(initialWalletData)
     const [loading, setLoading] = useState(false)
     const observerTarget = useRef(null)
+    const [showFilters, setShowFilters] = useState(false)
+    const [filters, setFilters] = useState({
+        transaction_type: '',
+        start_date: '',
+        end_date: '',
+        service_name: '',
+        ordering: '-timestamp'
+    });
 
     useEffect(() => {
         const observer = new IntersectionObserver(
@@ -32,34 +41,62 @@ const WalletPageClient = ({ walletData: initialWalletData }) => {
         }
     }, [loading, walletData?.history?.next])
 
-    const loadMoreData = async () => {
+    const buildQueryParams = (extra = {}) => {
+        const params = new URLSearchParams();
+
+        if (filters.transaction_type) params.append('transaction_type', filters.transaction_type);
+        if (filters.start_date) params.append('start_date', filters.start_date);
+        if (filters.end_date) params.append('end_date', filters.end_date);
+        if (filters.service_name) params.append('service_name', filters.service_name);
+        if (filters.ordering) params.append('ordering', filters.ordering);
+
+        if (extra.page) params.append('page', extra.page);
+
+        return params.toString();
+    };
+
+    useEffect(() => {
+        const handleClickOutside = (e) => {
+            if (showFilters && !e.target.closest(".filter-dropdown")) {
+                setShowFilters(false);
+            }
+        };
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, [showFilters]);
+
+    const loadMoreData = async (reset = false, resetall = false) => {
         try {
-            setLoading(true)
-            if (walletData?.history?.next) {
-                // Extract page number from next URL
-                const url = new URL(walletData.history.next)
-                const page = url.searchParams.get('page')
-                
-                // Use fetchWithAuth with the correct endpoint
-                const response = await fetchWithAuth(`/api/wallet/?page=${page}`)
-                
-                if (response?.data) {
-                    const newData = response.data
-                    setWalletData(prev => ({
-                        ...prev,
-                        history: {
-                            ...newData.history,
-                            results: [...(prev.history?.results || []), ...(newData.history?.results || [])]
-                        }
-                    }))
-                }
+            setLoading(true);
+            console.log(resetall)
+            let page = null;
+            if (!reset && walletData?.history?.next) {
+                const url = new URL(walletData.history.next);
+                page = url.searchParams.get('page');
+            }
+
+            const response = await fetchWithAuth(`/api/wallet/?${resetall ? '' : buildQueryParams({ page })}`);
+
+            if (response?.data) {
+                const newData = response.data;
+                setWalletData(prev => ({
+                    ...newData,
+                    history: {
+                        ...newData.history,
+                        results: reset
+                            ? newData.history.results
+                            : [...(prev.history?.results || []), ...(newData.history?.results || [])]
+                    }
+                }));
             }
         } catch (error) {
-            console.error('Error loading more transactions:', error)
+            console.error('Error loading transactions:', error);
         } finally {
-            setLoading(false)
+            setLoading(false);
+            setShowFilters(false);
         }
-    }
+    };
+
     const formatAmount = (amount) => {
         return parseFloat(amount).toFixed(2)
     }
@@ -70,7 +107,7 @@ const WalletPageClient = ({ walletData: initialWalletData }) => {
                 return 'Credited Points'
             case 'debit':
                 return 'Debited For Order'
-            case 'refund':
+            case 'reversal':
                 return 'Refund For Order'
             default:
                 return type
@@ -171,10 +208,124 @@ Please process my request. Thank you!`;
                         </div>
                     </div>
 
+
                     {/* Transaction History */}
                     <div className="w-full flex justify-center">
                         <div className="w-full max-w-[570px] bg-white rounded-2xl p-3 md:p-6 shadow-sm">
-                            <h2 className="text-xl md:text-2xl font-bold text-gray-800 mb-6">Transaction History</h2>
+                            <div className='flex justify-between items-start mb-2'>
+                                <h2 className="text-xl md:text-2xl font-bold text-gray-800 mb-6">Transaction History</h2>
+                                {/* Filter Button */}
+                                <div className="flex justify-end relative filter-dropdown">
+                                    <button
+                                        onClick={() => setShowFilters(prev => !prev)}
+                                        className="cursor-pointer flex items-center gap-2 px-2.5 py-1.5 bg-white border border-gray-200 hover:bg-gray-50 hover:border-gray-300 rounded-md text-gray-700 text-sm font-medium shadow-sm transition-all duration-200 hover:shadow-md"
+                                    >
+                                        <Filter className="w-4 h-4" />
+                                        Filters
+                                    </button>
+
+                                    {/* Dropdown Panel */}
+                                    {showFilters && (
+                                        <div className="absolute z-30 right-0 top-full mt-2 w-72 md:w-80 bg-white border border-gray-200 rounded-xl shadow-xl p-4 md:p-6 backdrop-blur-sm">
+                                            <div className="space-y-1 md:space-y-3">
+                                                {/* Transaction Type */}
+                                                <div className="space-y-1 md:space-y-2">
+                                                    <label className="text-[10px] md:text-xs font-semibold text-gray-600 uppercase tracking-wide">Transaction Type</label>
+                                                    <select
+                                                        className="w-full bg-white border border-gray-200 rounded-sm px-2 md:px-3 py-1.5 md:py-2.5 text-gray-700 text-xs md:text-sm font-medium focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all duration-200 outline-none"
+                                                        value={filters.transaction_type}
+                                                        onChange={(e) => setFilters(f => ({ ...f, transaction_type: e.target.value }))}
+                                                    >
+                                                        <option value="">All Types</option>
+                                                        <option value="debit">Debit</option>
+                                                        <option value="recharge">Recharge</option>
+                                                        <option value="reversal">Refund</option>
+                                                    </select>
+                                                </div>
+
+                                                {/* Date Range */}
+                                                <div className="space-y-1 md:space-y-2">
+                                                    <label className="text-[10px] md:text-xs font-semibold text-gray-600 uppercase tracking-wide">Date Range</label>
+                                                    <div className="flex gap-2">
+                                                        <input
+                                                            type="date"
+                                                            className="uppercase flex-1 w-[48%] border border-gray-200 rounded-sm px-2 md:px-3 py-1.5 md:py-2.5 text-[10px] md:text-xs text-gray-700 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all duration-200 outline-none"
+                                                            value={filters.start_date}
+                                                            onChange={(e) => setFilters(f => ({ ...f, start_date: e.target.value }))}
+                                                        />
+                                                        <input
+                                                            type="date"
+                                                            className="uppercase flex-1 w-[48%] border border-gray-200 rounded-sm px-2 md:px-3 py-1.5 md:py-2.5 text-[10px] md:text-xs text-gray-700 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all duration-200 outline-none"
+                                                            value={filters.end_date}
+                                                            onChange={(e) => setFilters(f => ({ ...f, end_date: e.target.value }))}
+                                                        />
+                                                    </div>
+                                                </div>
+
+                                                {/* Service Name */}
+                                                <div className="space-y-1 md:space-y-2">
+                                                    <label className="text-[10px] md:text-xs font-semibold text-gray-600 uppercase tracking-wide">Service Name</label>
+                                                    <input
+                                                        type="text"
+                                                        placeholder="Search by service name..."
+                                                        className="w-full border border-gray-200 rounded-sm px-2 md:px-3 py-1.5 md:py-2.5 text-sm text-gray-700 placeholder-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all duration-200 outline-none"
+                                                        value={filters.service_name}
+                                                        onChange={(e) => setFilters(f => ({ ...f, service_name: e.target.value }))}
+                                                    />
+                                                </div>
+
+                                                {/* Ordering */}
+                                                <div className="space-y-1 md:space-y-2">
+                                                    <label className="text-[10px] md:text-xs font-semibold text-gray-600 uppercase tracking-wide">Sort By</label>
+                                                    <select
+                                                        className="w-full border border-gray-200 rounded-sm px-2 md:px-3 py-1.5 md:py-2.5 text-sm text-gray-700 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all duration-200 outline-none"
+                                                        value={filters.ordering}
+                                                        onChange={(e) => setFilters(f => ({ ...f, ordering: e.target.value }))}
+                                                    >
+                                                        <option value="-timestamp">Newest First</option>
+                                                        <option value="timestamp">Oldest First</option>
+                                                        <option value="-amount_change">Amount (High → Low)</option>
+                                                        <option value="amount_change">Amount (Low → High)</option>
+                                                    </select>
+                                                </div>
+
+                                                {/* Apply / Reset */}
+                                                <div className="flex justify-between gap-2 pt-2">
+                                                    <button
+                                                        className="flex-1 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white py-1.5 rounded-md text-xs md:text-sm font-medium shadow-sm hover:shadow-md transition-all duration-200 transform hover:-translate-y-0.5 flex items-center justify-center gap-2"
+                                                        onClick={async () => {
+                                                            loadMoreData(true); // reload with new filters
+                                                        }}
+                                                        disabled={loading}
+                                                    >
+                                                        {loading ? (
+                                                            <div className="animate-spin w-4 h-4 border-[2px] border-white border-t-transparent rounded-full"></div>
+                                                        ) : (
+                                                            "Apply Filters"
+                                                        )}
+                                                    </button>
+                                                    <button
+                                                        className="flex-1 bg-gray-50 hover:bg-gray-100 border border-gray-200 text-gray-700 py-1.5 rounded-md text-xs md:text-sm font-medium transition-all duration-200 hover:shadow-sm"
+                                                        onClick={() => {
+                                                            setFilters({
+                                                                transaction_type: '',
+                                                                start_date: '',
+                                                                end_date: '',
+                                                                service_name: '',
+                                                                ordering: '-timestamp'
+                                                            });
+                                                            setShowFilters(false);
+                                                            loadMoreData(true, true);
+                                                        }}
+                                                    >
+                                                        Reset
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
 
                             <div className="space-y-4">
                                 {walletData?.history?.results?.length > 0 ? (
@@ -186,8 +337,8 @@ Please process my request. Thank you!`;
                                         >
                                             <div className='flex gap-2 items-center'>
                                                 <div className={`rounded-full p-2 ${transaction.transaction_type !== 'debit'
-                                                        ? 'bg-green-100 text-green-600'
-                                                        : 'bg-red-100 text-red-600'
+                                                    ? 'bg-green-100 text-green-600'
+                                                    : 'bg-red-100 text-red-600'
                                                     }`}>
                                                     {getTransactionIcon(transaction.transaction_type)}
                                                 </div>
@@ -201,7 +352,7 @@ Please process my request. Thank you!`;
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div className={`font-bold text-base md:text-xl flex flex-col items-end ${transaction.transaction_type !== 'debit'
+                                            <div className={`w-1/3 font-bold text-base md:text-xl flex flex-col items-end ${transaction.transaction_type !== 'debit'
                                                 ? 'text-green-600'
                                                 : 'text-red-600'
                                                 }`}>
