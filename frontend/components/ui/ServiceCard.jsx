@@ -86,7 +86,17 @@ export const ServiceCard = ({ service, onClick, backgroundImage, className = "" 
                     >
                         {service.name}
                     </div>
-
+                    {service.short_description && (
+                        <div
+                            className="text-white font-normal mb-2 text-[10px] xl:text-xs"
+                            style={{
+                                fontFamily: "Plus Jakarta Sans, sans-serif",
+                            }}
+                        >
+                            {service.short_description}
+                        </div>
+                    )}
+                    
                     {/* Arrow and Line Section */}
                     <div className="flex items-center gap-3 group-hover:translate-x-2 transition-transform duration-300">
                         {/* Horizontal Line */}
