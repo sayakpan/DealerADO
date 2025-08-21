@@ -89,7 +89,7 @@ export default function ClientNavbarWrapper({ isAuthenticated, user, navLinks })
                                     <span className="font-semibold">
                                         {loadingBalance ? "Loading..." : (walletBalance !== null ? `${walletBalance}` : "N/A")}
                                     </span>
-                                    <button onClick={fetchWalletBalance} disabled={loadingBalance} className={`p-1 rounded-full ${fixedNav ? 'hover:bg-gray-700' : 'hover:bg-gray-100'}`}>
+                                    <button onClick={fetchWalletBalance} disabled={loadingBalance} className={`p-1 rounded-full ${fixedNav ? 'hover:bg-gray-100/15' : 'hover:bg-gray-100'}`}>
                                         <RefreshCcw className={`w-3 h-3 cursor-pointer ${loadingBalance ? 'animate-spin' : ''}`} />
                                     </button>
                                 </div>
