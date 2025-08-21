@@ -113,28 +113,65 @@ def apply_format(value, fmt_name: Optional[str], schema_formatters: Dict[str, Di
 
 
 def apply_security_on_ctx(ctx: Dict[str, Any], spec: Dict[str, Any]):
-    sec = spec.get("security") or {}
-    schema_formatters = spec.get("formatters", {})
+    try:
+        sec = spec.get("security") or {}
+        if not isinstance(sec, dict):
+            return  # ignore invalid security config
 
-    # Masking: modify values in normalized context
-    for rule in sec.get("mask", []):
-        path = rule.get("path")
-        fmt_name = rule.get("format")
-        if not path:
-            continue
-        current = deep_get(ctx, path) if "." in path else ctx.get(path)
-        if current is None:
-            continue
-        if fmt_name:
-            fmt_def = schema_formatters.get(fmt_name)
-            if fmt_def:
-                fn = FORMATTERS.get(fmt_def.get("fn"))
-                if fn:
-                    masked = fn(current, fmt_def.get("args", {}))
-                    if "." in path:
-                        deep_set(ctx, path, masked)
-                    else:
-                        ctx[path] = masked
+        schema_formatters = spec.get("formatters", {})
+        if not isinstance(schema_formatters, dict):
+            schema_formatters = {}
+
+        # Masking: modify values in normalized context
+        mask_rules = sec.get("mask", [])
+        if not isinstance(mask_rules, list):
+            mask_rules = []
+
+        for rule in mask_rules:
+            if not isinstance(rule, dict):
+                continue
+            path = rule.get("path")
+            fmt_name = rule.get("format")
+            if not path or not isinstance(path, str):
+                continue
+
+            current = deep_get(ctx, path) if "." in path else ctx.get(path)
+            if current is None:
+                continue
+
+            if fmt_name and isinstance(fmt_name, str):
+                fmt_def = schema_formatters.get(fmt_name)
+                if isinstance(fmt_def, dict):
+                    fn = FORMATTERS.get(fmt_def.get("fn"))
+                    if callable(fn):
+                        try:
+                            masked = fn(current, fmt_def.get("args", {}))
+                        except Exception:
+                            continue  # skip faulty formatter
+                        if "." in path:
+                            deep_set(ctx, path, masked)
+                        else:
+                            ctx[path] = masked
+
+        # Redaction: remove keys entirely from normalized context
+        redact_rules = sec.get("redact", [])
+        if not isinstance(redact_rules, list):
+            redact_rules = []
+
+        for path in redact_rules:
+            if not isinstance(path, str):
+                continue
+            try:
+                if "." in path:
+                    deep_delete(ctx, path)
+                elif path in ctx:
+                    del ctx[path]
+            except Exception:
+                continue  # don't break on faulty path
+
+    except Exception:
+        # Never break the whole pipeline — fail silently
+        return
 
     # Redaction: remove keys entirely from normalized context
     for path in sec.get("redact", []):
