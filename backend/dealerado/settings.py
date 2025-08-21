@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'accounts',
     'wallet',
     'services',
+    'utility',
 ]
 
 MIDDLEWARE = [
