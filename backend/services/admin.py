@@ -9,6 +9,8 @@ from import_export.admin import ExportMixin
 from import_export.formats.base_formats import CSV, XLSX
 from django.utils.html import format_html
 from django.templatetags.static import static
+from django.db import models
+from django_json_widget.widgets import JSONEditorWidget
 
 
 @admin.register(Secrets)
@@ -16,6 +18,11 @@ class SecretsAdmin(admin.ModelAdmin):
     list_display = ('id', 'provider_name', 'auth_type', 'created_at', 'updated_at')
     search_fields = ('provider_name',)
     list_filter = ('auth_type', 'created_at')
+    
+    def formfield_for_dbfield(self, db_field, request, **kwargs): 
+        if isinstance(db_field, models.JSONField):
+            kwargs['widget'] = JSONEditorWidget(attrs={'style': 'height: 200px; width: 100%;'})
+        return super().formfield_for_dbfield(db_field, request, **kwargs)
 
 @admin.register(HTTPStatusCode)
 class HTTPStatusCodeAdmin(admin.ModelAdmin):
@@ -172,6 +179,9 @@ class ServiceUsageLogAdmin(ExportMixin, admin.ModelAdmin):
     
 @admin.register(RenderSchema)
 class RenderSchemaAdmin(admin.ModelAdmin):
+    formfield_overrides = {
+        models.JSONField: {'widget': JSONEditorWidget},
+    }
     list_display = ("id", "service", "spec_status", "created_at", "updated_at")
     search_fields = ("service__slug", "service__name")
     readonly_fields = ("created_at", "updated_at", "schema_guide_display",)
