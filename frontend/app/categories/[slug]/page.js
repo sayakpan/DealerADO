@@ -4,7 +4,7 @@ import ServiceHeader from "@/components/ui/serviceHeader"
 import { redirect } from 'next/navigation';
 
 export default async function CategoryPage({ params }) {
-    const { slug } = params
+    const { slug } = await params
 
     const category = await getServerCategoryBySlug(slug);
 
