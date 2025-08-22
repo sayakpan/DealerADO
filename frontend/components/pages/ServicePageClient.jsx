@@ -248,7 +248,7 @@ const ServicePageClient = ({ service, slug }) => {
 
             } catch (err) {
                 console.error('Error submitting service data:', err)
-                toast.error(err.message || 'An error occurred while fetching details.')
+                toast.error(err?.message || 'An error occurred while fetching details.', { duration: 3000, title: 'Error' })
             } finally {
                 setSubmitting(false)
             }
@@ -258,7 +258,7 @@ const ServicePageClient = ({ service, slug }) => {
     const handleDownloadPDF = async () => {
         if (serviceResult && serviceResult.log_id) {
             try {
-
+                setDownloadingPdf(true);
                 const pdfData = await generatePdf(serviceResult.log_id, service.name);
                 if (pdfData?.success) {
                     toast.success('PDF downloaded successfully!', { title: 'Download Complete' });
@@ -266,6 +266,8 @@ const ServicePageClient = ({ service, slug }) => {
             } catch (error) {
                 console.error('Error downloading PDF:', error);
                 toast.error('Failed to download PDF', { title: 'Download Failed' });
+            } finally {
+                setDownloadingPdf(false);
             }
         }
     };
@@ -278,7 +280,7 @@ const ServicePageClient = ({ service, slug }) => {
                 <div className="flex flex-col lg:flex-row justify-center items-center lg:items-start gap-8">
                     {/* Service Form */}
                     {service?.form_fields && service.form_fields.length > 0 && (
-                        <form onSubmit={handleFormSubmit} className="w-full max-w-[570px] mx-auto lg:mx-0 px-5 py-7 bg-white rounded-[20px] shadow-[0px_4px_40px_5px_rgba(0,0,0,0.08)] flex flex-col justify-start items-start gap-4">
+                        <form onSubmit={handleFormSubmit} className="w-full md:max-w-[80%] lg:max-w-[49%] mx-auto lg:mx-0 px-5 py-7 bg-white rounded-[20px] shadow-[0px_4px_40px_5px_rgba(0,0,0,0.08)] flex flex-col justify-start items-start gap-4">
                             <div className="w-full flex flex-col gap-4">
                                 {service.form_fields.map((field, index) => (
                                     <React.Fragment key={field.key}>
@@ -420,7 +422,7 @@ const ServicePageClient = ({ service, slug }) => {
                     )}
 
                     {/* Service Details */}
-                    <div className="w-full max-w-[570px] mx-auto lg:mx-0 flex flex-col gap-6">
+                    <div className="w-full md:max-w-[80%] lg:max-w-[49%] mx-auto lg:mx-0 flex flex-col gap-6">
                         <div className="text-slate-700 text-lg md:text-2xl font-bold text-center lg:text-left">
                             Service Details:
                         </div>

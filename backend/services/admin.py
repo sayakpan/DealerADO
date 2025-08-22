@@ -1,3 +1,4 @@
+import json
 from django.contrib import admin, messages
 from .models import Secrets, ServiceCategory, Service, ServiceFormField, ServiceUsageLog, HTTPStatusCode, RenderSchema
 from django.utils.safestring import mark_safe
@@ -8,6 +9,8 @@ from import_export.admin import ExportMixin
 from import_export.formats.base_formats import CSV, XLSX
 from django.utils.html import format_html
 from django.templatetags.static import static
+from django.db import models
+from django_json_widget.widgets import JSONEditorWidget
 
 
 @admin.register(Secrets)
@@ -15,6 +18,11 @@ class SecretsAdmin(admin.ModelAdmin):
     list_display = ('id', 'provider_name', 'auth_type', 'created_at', 'updated_at')
     search_fields = ('provider_name',)
     list_filter = ('auth_type', 'created_at')
+    
+    def formfield_for_dbfield(self, db_field, request, **kwargs): 
+        if isinstance(db_field, models.JSONField):
+            kwargs['widget'] = JSONEditorWidget(attrs={'style': 'height: 200px; width: 100%;'})
+        return super().formfield_for_dbfield(db_field, request, **kwargs)
 
 @admin.register(HTTPStatusCode)
 class HTTPStatusCodeAdmin(admin.ModelAdmin):
@@ -171,19 +179,37 @@ class ServiceUsageLogAdmin(ExportMixin, admin.ModelAdmin):
     
 @admin.register(RenderSchema)
 class RenderSchemaAdmin(admin.ModelAdmin):
+    formfield_overrides = {
+        models.JSONField: {'widget': JSONEditorWidget},
+    }
     list_display = ("id", "service", "spec_status", "created_at", "updated_at")
     search_fields = ("service__slug", "service__name")
-    readonly_fields = ("created_at", "updated_at", "schema_guide_display")
+    readonly_fields = ("created_at", "updated_at", "schema_guide_display",)
     actions = ["validate_spec"]
     fieldsets = (
         (None, {
-            "fields": ("service", "spec", "created_at", "updated_at"),
+            "fields": ("service", "spec", "created_at", "updated_at",),
         }),
         ("Schema Authoring Guide", {
             "fields": ("schema_guide_display",),
             "classes": ("collapse",),
         }),
     )
+    
+    def pretty_spec(self, instance):
+        """
+        Takes the JSON from the 'spec' field, formats it, and wraps it
+        in <pre><code> tags for a readable display.
+        """
+        # Convert the Python dictionary to a formatted JSON string
+        formatted_json = json.dumps(instance.spec, indent=4, sort_keys=True)
+
+        # Wrap the formatted JSON in HTML tags for display
+        # format_html is used to prevent Django from auto-escaping the HTML
+        return format_html('<pre><code>{}</code></pre>', formatted_json)
+
+    # Give a user-friendly name to our custom field's column header
+    pretty_spec.short_description = 'Formatted Spec (Read-Only)'
     
     def spec_status(self, obj):
       """
