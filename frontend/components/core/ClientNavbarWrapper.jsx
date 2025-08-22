@@ -196,7 +196,7 @@ export default function ClientNavbarWrapper({ isAuthenticated, user, navLinks })
                         )}
                     </nav>
 
-                    <div className="flex items-center gap-1">
+                    {/* <div className="flex items-center gap-1"> */}
                         {/* {isAuthenticated && (
                             <div className={`flex items-center bg-white border border-gray-100 shadow rounded-full p-1 px-1.5 gap-0.5 text-xs ${fixedNav ? 'text-gray-800' : 'text-gray-900'}`}>
 
@@ -219,7 +219,7 @@ export default function ClientNavbarWrapper({ isAuthenticated, user, navLinks })
                         >
                             {menuOpen ? <X className={`w-6 h-6 ${fixedNav ? 'text-white' : 'text-black'}`} /> : <Menu className={`w-6 h-6 ${fixedNav ? 'text-white' : 'text-black'}`} />}
                         </button>
-                    </div>
+                    {/* </div> */}
                 </div>
             </div>
 
