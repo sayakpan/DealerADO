@@ -1,3 +1,4 @@
+import json
 from django.contrib import admin, messages
 from .models import Secrets, ServiceCategory, Service, ServiceFormField, ServiceUsageLog, HTTPStatusCode, RenderSchema
 from django.utils.safestring import mark_safe
@@ -173,17 +174,32 @@ class ServiceUsageLogAdmin(ExportMixin, admin.ModelAdmin):
 class RenderSchemaAdmin(admin.ModelAdmin):
     list_display = ("id", "service", "spec_status", "created_at", "updated_at")
     search_fields = ("service__slug", "service__name")
-    readonly_fields = ("created_at", "updated_at", "schema_guide_display")
+    readonly_fields = ("created_at", "updated_at", "schema_guide_display",)
     actions = ["validate_spec"]
     fieldsets = (
         (None, {
-            "fields": ("service", "spec", "created_at", "updated_at"),
+            "fields": ("service", "spec", "created_at", "updated_at",),
         }),
         ("Schema Authoring Guide", {
             "fields": ("schema_guide_display",),
             "classes": ("collapse",),
         }),
     )
+    
+    def pretty_spec(self, instance):
+        """
+        Takes the JSON from the 'spec' field, formats it, and wraps it
+        in <pre><code> tags for a readable display.
+        """
+        # Convert the Python dictionary to a formatted JSON string
+        formatted_json = json.dumps(instance.spec, indent=4, sort_keys=True)
+
+        # Wrap the formatted JSON in HTML tags for display
+        # format_html is used to prevent Django from auto-escaping the HTML
+        return format_html('<pre><code>{}</code></pre>', formatted_json)
+
+    # Give a user-friendly name to our custom field's column header
+    pretty_spec.short_description = 'Formatted Spec (Read-Only)'
     
     def spec_status(self, obj):
       """
