@@ -33,6 +33,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'storages',
     'django_ckeditor_5',
+    'django_json_widget',
     'import_export',
     "rangefilter",
     'accounts',
