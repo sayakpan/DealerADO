@@ -16,7 +16,7 @@ class BannerImage(models.Model):
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return f"Image for {self.caption or 'no caption'}"
+        return f"ID {self.id} - {self.caption or 'no caption'}"
     
     class Meta:
         verbose_name = "Banner Image"

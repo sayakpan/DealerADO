@@ -75,22 +75,22 @@ export default function ClientNavbarWrapper({ isAuthenticated, user, navLinks })
                             </div>
                         </SmartLink>
 
-                        
+
                     </div>
 
                     {/* Desktop Nav */}
                     <nav className="hidden md:flex gap-6 lg:gap-8 items-center">
                         {/* Wallet Balance - New Location */}
                         {isAuthenticated && (
-                            <div className={`hidden md:flex items-center bg-white rounded-full p-3 gap-2 text-sm ${fixedNav ? 'text-gray-800' : 'text-gray-900'}`}>
-                                
+                            <div className={`hidden md:flex items-center bg-white border border-gray-100 shadow rounded-full p-2 gap-2 text-sm ${fixedNav ? 'text-gray-800' : 'text-gray-900'}`}>
+
                                 <div className="flex items-center gap-2">
                                     <Image src={WalletLogo} alt="Wallet Logo" width={16} height={16} />
                                     <span className="font-semibold">
-                                        {loadingBalance ? "Loading..." : (walletBalance !== null ? `${walletBalance}` : "N/A")}
+                                        {loadingBalance ? <span className="text-gray-400">---.--</span> : (walletBalance !== null ? `${walletBalance}` : "N/A")}
                                     </span>
                                     <button onClick={fetchWalletBalance} disabled={loadingBalance} className={`p-1 rounded-full ${fixedNav ? 'hover:bg-gray-100/15' : 'hover:bg-gray-100'}`}>
-                                        <RefreshCcw className={`w-3 h-3 cursor-pointer ${loadingBalance ? 'animate-spin' : ''}`} />
+                                        <RefreshCcw className={`w-3 h-3 cursor-pointer ${loadingBalance ? 'animate-spin text-green-600' : ''}`} />
                                     </button>
                                 </div>
                             </div>
@@ -127,7 +127,7 @@ export default function ClientNavbarWrapper({ isAuthenticated, user, navLinks })
                                                     className="flex items-center gap-2 px-4 py-2 text-sm text-gray-900 hover:bg-gray-100"
                                                 >
                                                     <Wallet className="w-4 h-4" />
-                                                    Go to Wallet
+                                                    Wallet
                                                 </SmartLink>
                                             </NavigationMenu.Link>
 
@@ -196,19 +196,36 @@ export default function ClientNavbarWrapper({ isAuthenticated, user, navLinks })
                         )}
                     </nav>
 
-                    {/* Hamburger Icon */}
-                    <button
-                        onClick={() => setMenuOpen(!menuOpen)}
-                        className="md:hidden p-2"
-                    >
-                        {menuOpen ? <X className={`w-6 h-6 ${fixedNav ? 'text-white' : 'text-black'}`} /> : <Menu className={`w-6 h-6 ${fixedNav ? 'text-white' : 'text-black'}`} />}
-                    </button>
+                    <div className="flex items-center gap-1">
+                        {/* {isAuthenticated && (
+                            <div className={`flex items-center bg-white border border-gray-100 shadow rounded-full p-1 px-1.5 gap-0.5 text-xs ${fixedNav ? 'text-gray-800' : 'text-gray-900'}`}>
+
+                                <div className="flex items-center gap-1">
+                                    <Image src={WalletLogo} alt="Wallet Logo" width={12} height={12} />
+                                    <span className="font-semibold">
+                                        {loadingBalance ? <span className="text-gray-400">---.--</span> : (walletBalance !== null ? `${walletBalance}` : "N/A")}
+                                    </span>
+                                    <button onClick={fetchWalletBalance} disabled={loadingBalance} className={`p-1 rounded-full ${fixedNav ? 'hover:bg-gray-100/15' : 'hover:bg-gray-100'}`}>
+                                        <RefreshCcw className={`w-3 h-3 cursor-pointer ${loadingBalance ? 'animate-spin text-green-600' : ''}`} />
+                                    </button>
+                                </div>
+                            </div>
+                        )} */}
+
+                        {/* Hamburger Icon */}
+                        <button
+                            onClick={() => setMenuOpen(!menuOpen)}
+                            className="md:hidden p-2"
+                        >
+                            {menuOpen ? <X className={`w-6 h-6 ${fixedNav ? 'text-white' : 'text-black'}`} /> : <Menu className={`w-6 h-6 ${fixedNav ? 'text-white' : 'text-black'}`} />}
+                        </button>
+                    </div>
                 </div>
             </div>
 
             {/* Mobile Sidebar Menu */}
             <div
-                className={`fixed top-0 md:hidden right-0 h-full w-72 bg-white shadow-lg z-[999] transform transition-transform duration-300 ease-in-out ${menuOpen ? 'translate-x-0' : 'translate-x-full'
+                className={`fixed top-0 md:hidden right-0 h-screen w-72 bg-white shadow-lg z-[999] transform transition-transform duration-300 ease-in-out ${menuOpen ? 'translate-x-0' : 'translate-x-full'
                     }`}
             >
                 <div className="flex justify-end p-4">
@@ -217,7 +234,7 @@ export default function ClientNavbarWrapper({ isAuthenticated, user, navLinks })
                     </button>
                 </div>
 
-                <div className="px-4">
+                <div className="px-4 bg-white h-screen">
                     {isAuthenticated && (
                         <div className="relative overflow-hidden rounded-xl mb-6 bg-red-700 text-white">
                             <div className="absolute inset-0 opacity-20">
@@ -254,7 +271,7 @@ export default function ClientNavbarWrapper({ isAuthenticated, user, navLinks })
                                     <div className="flex items-center gap-2">
                                         <Image src={WalletLogo} alt="Wallet Logo" width={16} height={16} />
                                         <span className="font-semibold">
-                                            {loadingBalance ? "Loading..." : (walletBalance !== null ? `${walletBalance}` : "N/A")}
+                                            {loadingBalance ? <span className="text-gray-400">---.--</span> : (walletBalance !== null ? `${walletBalance}` : "N/A")}
                                         </span>
                                         <button onClick={fetchWalletBalance} disabled={loadingBalance} className="p-1 rounded-full hover:bg-red-600">
                                             <RefreshCcw className={`w-3 h-3 ${loadingBalance ? 'animate-spin' : ''}`} />

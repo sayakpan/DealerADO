@@ -13,5 +13,5 @@ class BannerAdmin(admin.ModelAdmin):
 
 @admin.register(BannerImage)
 class BannerImageAdmin(admin.ModelAdmin):
-    list_display = ('image', 'caption', 'order')
+    list_display = ('id', 'image', 'caption', 'order')
     search_fields = ('caption',)

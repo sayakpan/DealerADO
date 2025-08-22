@@ -3,7 +3,7 @@
 import { useState, useRef, useCallback } from "react"
 import { getUsageLogs, getRenderedLog, generatePdf } from "@/services/services"
 import { formatDate } from "@/utils/dateUtils"
-import { Download, Clock, CheckCircle, XCircle, AlertCircle, Eye } from "lucide-react"
+import { Download, Clock, CheckCircle, XCircle, AlertCircle, Eye, EyeOff } from "lucide-react"
 import ServiceHeader from "@/components/ui/serviceHeader"
 import { ServiceHistoryCardSkeleton } from "@/components/skeletons/ServiceHistorySkeleton"
 import { ModalSkeleton } from "@/components/skeletons/ModalSkeleton"
@@ -20,6 +20,7 @@ export default function ServiceHistoryPageClient({ initialLogs, initialNextUrl }
     const [expandedLogId, setExpandedLogId] = useState(null)
     const [renderedLog, setRenderedLog] = useState(null)
     const [loadingDetails, setLoadingDetails] = useState(false)
+    const [downloading, setDownloading] = useState(null)
 
     const handleViewDetails = async (logId) => {
         if (expandedLogId === logId) {
@@ -104,6 +105,7 @@ export default function ServiceHistoryPageClient({ initialLogs, initialNextUrl }
     const downloadResponse = async (log) => {
         try {
             // Step 1: Generate the PDF and get the URL
+            setDownloading(log.id)
             const pdfData = await generatePdf(log.id, log.service_name)
             if (pdfData?.success) {
                 toast.success("PDF downloaded successfully!", { title: "Download Complete" })
@@ -111,6 +113,8 @@ export default function ServiceHistoryPageClient({ initialLogs, initialNextUrl }
         } catch (error) {
             console.error("Error in PDF process:", error)
             toast.error("Failed to download PDF", { title: "Download Failed" })
+        } finally {
+            setDownloading(null)
         }
     }
 
@@ -175,17 +179,17 @@ export default function ServiceHistoryPageClient({ initialLogs, initialNextUrl }
                                         className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden"
                                     >
                                         <div className="p-3 sm:p-4 lg:p-6">
-                                            <div className="space-y-3 sm:space-y-4">
+                                            <div className="space-y-2 sm:space-y-4">
                                                 {/* Header Section */}
-                                                <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+                                                <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-1 md:gap-3">
                                                     <div className="flex-1 min-w-0">
                                                         <div className="flex items-center gap-2 sm:gap-3 mb-2 flex-wrap">
                                                             {getStatusIcon(log.status)}
-                                                            <h3 className="text-base sm:text-lg font-semibold text-gray-900 truncate">
+                                                            <h3 className="text-sm md:text-base sm:text-lg font-semibold text-gray-900 truncate">
                                                                 {log.service_name}
                                                             </h3>
                                                             <span
-                                                                className={`px-2 py-1 rounded-full text-xs font-medium border ${getStatusColor(log.status)} flex-shrink-0`}
+                                                                className={`capitalize px-1 md:px-2 py-0.5 md:py-1 rounded-full text-[10px] md:text-xs font-medium border ${getStatusColor(log.status)} flex-shrink-0`}
                                                             >
                                                                 {log.status}
                                                             </span>
@@ -201,15 +205,16 @@ export default function ServiceHistoryPageClient({ initialLogs, initialNextUrl }
                                                                 className="flex items-center cursor-pointer gap-1 px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-md transition-colors border border-gray-200"
                                                                 title="View Details"
                                                             >
-                                                                <Eye className="w-3 h-3 sm:w-4 sm:h-4" />
+                                                                {expandedLogId === log.id ? <EyeOff className="w-3 h-3 sm:w-4 sm:h-4" /> : <Eye className="w-3 h-3 sm:w-4 sm:h-4" />}
                                                                 <span className="hidden xs:inline">View</span>
                                                             </button>
                                                             <button
                                                                 onClick={() => downloadResponse(log)}
                                                                 className="flex items-center cursor-pointer gap-1 px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-md transition-colors border border-gray-200"
                                                                 title="Download Response"
+                                                                disabled={downloading === log.id}
                                                             >
-                                                                <Download className="w-3 h-3 sm:w-4 sm:h-4" />
+                                                                {downloading === log.id ? <div className="animate-spin w-3 md:w-4 h-3 md:h-4 border-[2px] border-blue-700 border-t-transparent rounded-full"></div> : <Download className="w-3 h-3 sm:w-4 sm:h-4" />}
                                                                 <span className="hidden xs:inline">Download</span>
                                                             </button>
                                                         </div>
@@ -217,7 +222,15 @@ export default function ServiceHistoryPageClient({ initialLogs, initialNextUrl }
                                                 </div>
 
                                                 {/* Details Section - Responsive Grid */}
-                                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4 text-xs sm:text-sm text-gray-500 bg-gray-50 rounded-md p-2 sm:p-3">
+                                                <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4 text-xs sm:text-sm text-gray-500 bg-gray-50 rounded-md p-2 sm:p-3">
+                                                    {log.wallet_txn_id && (
+                                                        <div className="flex items-center gap-1 col-span-1 sm:col-span-2 lg:col-span-1">
+                                                            <span className="font-medium">Txn ID:</span>
+                                                            <span className="truncate" title={log.wallet_txn_id}>
+                                                                {log.wallet_txn_id}
+                                                            </span>
+                                                        </div>
+                                                    )}
                                                     <div className="flex items-center gap-1">
                                                         <span className="font-medium">Price:</span>
                                                         <span>₹{log.price_at_time}</span>
@@ -232,14 +245,6 @@ export default function ServiceHistoryPageClient({ initialLogs, initialNextUrl }
                                                         <span className="font-medium">Status:</span>
                                                         <span>{log.http_status_code}</span>
                                                     </div>
-                                                    {log.wallet_txn_id && (
-                                                        <div className="flex items-center gap-1 col-span-1 sm:col-span-2 lg:col-span-1">
-                                                            <span className="font-medium">Txn ID:</span>
-                                                            <span className="truncate" title={log.wallet_txn_id}>
-                                                                {log.wallet_txn_id}
-                                                            </span>
-                                                        </div>
-                                                    )}
                                                 </div>
                                             </div>
 
