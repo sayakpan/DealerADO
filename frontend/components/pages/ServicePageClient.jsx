@@ -285,6 +285,7 @@ const ServicePageClient = ({ service, slug }) => {
                                         <div className="w-full p-3 border-b border-stone-300 flex flex-col justify-start items-start gap-2.5">
                                         <div className="text-zinc-500 text-sm md:text-sm font-normal flex items-center gap-1">
                                                 {field.label} 
+                                                {field.is_required && <span className="text-red-500">*</span>}
                                                 {field.help_text && (
                                                     <Popover
                                                         trigger={<span className="ml-1 mt-1 flex items-center cursor-pointer text-blue-500 text-xs">
@@ -297,7 +298,6 @@ const ServicePageClient = ({ service, slug }) => {
                                                         contentClass="text-xs text-gray-600"
                                                     />
                                                 )}
-                                                {field.is_required && <span className="text-red-500">*</span>}
                                             </div>
                                             <div className="text-slate-700 text-base md:text-2xl font-medium w-full">
                                                 {(() => {
