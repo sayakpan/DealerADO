@@ -10,10 +10,10 @@ export const metadata = {
 
 export default async function CategoriesPage() {
     const initialData = await getServerCategories();
-    const carouselData = await getHomepageBanner();
     if (initialData.status === 401) {
         redirect('/login?status=401');
     }
+    const carouselData = await getHomepageBanner();
 
     return (
         <CategoriesPageClient
