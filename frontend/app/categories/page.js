@@ -3,6 +3,11 @@ import CategoriesPageClient from "@/components/pages/CategoriesPageClient"
 import { redirect } from 'next/navigation';
 import { getHomepageBanner } from "@/services/categories";
 
+export const metadata = {
+    title: "Categories | DealerADO",
+    description: "Explore a wide range of car service categories offered by DealerADO. Find the perfect service for your vehicle.",
+};
+
 export default async function CategoriesPage() {
     const initialData = await getServerCategories();
     const carouselData = await getHomepageBanner();
