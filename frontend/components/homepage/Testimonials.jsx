@@ -32,7 +32,7 @@ export default function Testimonials() {
 
                         {/* Content */}
                         <div className="text-center pt-8 md:pt-5">
-                            <h3 className="text-base md:text-xl font-semibold mb-2">Alfonso Carder</h3>
+                            <h3 className="text-base md:text-xl font-semibold mb-2">Rajesh Mehra</h3>
 
                             {/* Stars */}
                             <div className="flex justify-center mb-6">
@@ -45,8 +45,9 @@ export default function Testimonials() {
                             <div className="relative">
                                 <span className="text-6xl text-white/20 absolute -top-4 -left-4">"</span>
                                 <p className="text-[10px] md:text-base leading-relaxed px-8">
-                                    Lorem ipsum dolor sit amet consectetur. Bibendum ultrices pellentesque ornare non est quisque in quis
-                                    velit. Eu nunc vitae amet et faucibus. Purus mauris magna velit elementum suscipit orci.
+                                    DealerADO has made my work so much easier. I can quickly check vehicle details,
+                                    download reports, and confidently share them with my customers. It saves me time
+                                    and builds trust with every deal I close.
                                 </p>
                                 <span className="text-6xl text-white/20 absolute -bottom-8 -right-4">"</span>
                             </div>
