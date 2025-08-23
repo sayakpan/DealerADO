@@ -6,7 +6,7 @@ from services.models import generate_unique_slug
 
 
 class BannerImage(models.Model):
-    image = models.ImageField(upload_to='banners/')
+    image = models.ImageField(upload_to='banners/', help_text="Image size should be 1600x620 pixels. File size should not exceed 1MB.")
     caption = models.CharField(max_length=255, blank=True, null=True)
     order = models.PositiveIntegerField(default=0, help_text="Order of the image in the carousel.")
     

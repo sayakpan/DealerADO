@@ -8,10 +8,7 @@ export default function AboutUs() {
 
                 <div className="max-w-4xl mx-auto text-center">
                     <p className="text-gray-600 text-sm leading-relaxed">
-                        Lorem ipsum dolor sit amet consectetur. Dolor at neque ut mauris amet at. Quisque tincidunt velit fusce
-                        porttitor sed posuere nunc mauris. Vehicula consectetur ut urna ultrices scelerisque ut urna ultrices arcu
-                        elit. Ultrices adipiscing adipiscing lectus elit ultrices tempor. Donec facilisi ut velit mauris ut
-                        adipiscing. Commodo commodo mauris mauris.
+                        DealerADO is a trusted platform designed to help car dealers access accurate vehicle information with ease. By simply entering details, dealers can instantly view results in a clean dashboard and download professional PDF reports to share with customers. Built on the values of innovation, reliability, excellence, and trust, DealerADO makes vehicle verification faster, simpler, and more dependable — empowering dealers to serve their customers with confidence.
                     </p>
                 </div>
             </div>
@@ -19,9 +16,9 @@ export default function AboutUs() {
             {/* Background cars */}
             <div className="relative bottom-0 left-0 right-0 h-[250px] md:h-[350px] lg:h-[450px] xl:h-[500px]">
                 {/* Red diagonal background */}
-                <div className="w-[120%] h-[2%] h-[40px] lg:h-[80px] absolute -left-[3%] sm:-left-[46px] top-[120px] sm:top-[170px] md:top-[240px] lg:top-[260px] origin-top-left rotate-[-10deg] bg-[#B52628]" />
-                <div className="w-[120%] h-[2%] h-[20px] lg:h-[30px] absolute -left-[3%] sm:-left-[46px] top-[170px] sm:top-[220px] md:top-[290px] lg:top-[350px] origin-top-left rotate-[-10deg] bg-[#B52628]" />
-                <div className="w-[120%] h-[2%] h-[20px] lg:h-[30px] absolute -left-[3%] sm:-left-[46px] top-[200px] sm:top-[250px] md:top-[320px] lg:top-[390px] origin-top-left rotate-[-10deg] bg-[#2A394A]" />
+                <div className="w-[120%] h-[2%] md:h-[40px] lg:h-[80px] absolute -left-[3%] sm:-left-[46px] top-[120px] sm:top-[170px] md:top-[240px] lg:top-[260px] origin-top-left rotate-[-10deg] bg-[#B52628]" />
+                <div className="w-[120%] h-[2%] md:h-[20px] lg:h-[30px] absolute -left-[3%] sm:-left-[46px] top-[170px] sm:top-[220px] md:top-[290px] lg:top-[350px] origin-top-left rotate-[-10deg] bg-[#B52628]" />
+                <div className="w-[120%] h-[2%] md:h-[20px] lg:h-[30px] absolute -left-[3%] sm:-left-[46px] top-[200px] sm:top-[250px] md:top-[320px] lg:top-[390px] origin-top-left rotate-[-10deg] bg-[#2A394A]" />
                 {/* Left car */}
                 <div
                     className="absolute bottom-0 left-[-30%] sm:left-[-15%] lg:left-[-12%] w-[400px] h-[240px] md:w-[600px] md:h-[360px] lg:w-[800px] lg:h-[480px] xl:w-[1000px] xl:h-[600px] z-10"
