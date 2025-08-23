@@ -7,6 +7,8 @@ import { changePassword } from '@/services/settings'
 import PasswordChangeSuccessModal from '@/components/ui/password-change-success-modal'
 import InvalidErrorModal from '@/components/ui/invalid-error-modal'
 
+
+
 const ChangePasswordPage = () => {
     const [formData, setFormData] = useState({
         currentPassword: '',
