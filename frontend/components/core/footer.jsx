@@ -60,8 +60,7 @@ export default function FooterContent() {
                                          md:text-xs md:max-w-[400px]
                                          lg:text-xs lg:max-w-[30rem]"
                             >
-                                Lorem ipsum dolor sit amet consectetur. Dolor a neque ut maecenas at. Quisque tincidunt varius fusce
-                                porttitor sed posuere
+                                Simplifying vehicle data access for car dealers. Fast, secure, and pay-as-you-go with wallet credits.
                             </p>
                         </div>
 
