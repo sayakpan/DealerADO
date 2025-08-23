@@ -5,6 +5,8 @@ import ServiceHeader from '@/components/ui/serviceHeader'
 import { User } from 'lucide-react'
 import { getUserDetails } from '@/lib/auth'
 
+
+
 const ProfilePage = () => {
     const { firstName, lastName, mobile, email, role } = getUserDetails()
 

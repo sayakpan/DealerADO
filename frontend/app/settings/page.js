@@ -6,6 +6,8 @@ import SmartLink from '@/components/utils/SmartLink'
 import DeactivateAccountModal from '@/components/ui/deactivate-account-modal'
 import { SettingsSkeleton } from '@/components/skeletons/SettingsSkeleton'
 
+
+
 const SettingsPage = () => {
     const [showDeactivateModal, setShowDeactivateModal] = useState(false)
     return (

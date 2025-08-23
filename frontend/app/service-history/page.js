@@ -5,6 +5,11 @@ import { ServiceHistorySkeleton } from '@/components/skeletons/ServiceHistorySke
 import { XCircle } from 'lucide-react'
 import { redirect } from 'next/navigation';
 
+export const metadata = {
+    title: "Service History | DealerADO",
+    description: "View your complete service history with DealerADO. Track all past car services and their details.",
+};
+
 export default async function ServiceHistoryPage() {
     const logsData = await getServerUsageLogs();
 

@@ -1,4 +1,5 @@
 import { fetchWithAuth } from "@/utils/api";
+import { redirect } from "next/dist/server/api-utils";
 
 export async function getCategoryBySlug(slug) {
 	const response = await fetchWithAuth.get(`/api/services/categories/${slug}/`);
@@ -19,8 +20,13 @@ export async function getHomepageBanner() {
 	const response = await fetchWithAuth.get(`/api/utility/banner/homepage-banner/`);
 
 	if (response.status === 401) {
-		window.location.href = '/login?status=401';
-		return;
+		if(window && window.location && window.location.href){
+			window.location.href = '/login?status=401';
+			return;
+		}else{
+			redirect('/login?status=401');
+			return;
+		}
 	}
 
 	if (!response.success) {
