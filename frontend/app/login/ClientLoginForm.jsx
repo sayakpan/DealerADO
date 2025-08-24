@@ -1,13 +1,13 @@
 'use client';
 
 import Image from "next/image";
-import Link from "next/link";
 import { useState, useEffect } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import { login } from "@/lib/auth";
 import { validateFields, validators } from "@/utils/validations";
 import { toast } from "@/plugin/toast";
 import Cookies from 'universal-cookie';
+import SmartLink from "@/components/utils/SmartLink";
 
 export default function ClientLoginForm({ sessionExpired }) {
     const [email, setEmail] = useState("");
@@ -139,9 +139,9 @@ export default function ClientLoginForm({ sessionExpired }) {
                                 </div>
                                 {errors.password && <p className="text-red-500 text-xs">{errors.password}</p>}
                                 <div className="text-right">
-                                    <Link href="/forgot-password" className="text-white text-sm hover:text-gray-300 transition-colors">
+                                    <SmartLink href="/forgot-password" className="text-white text-sm hover:text-gray-300 transition-colors">
                                         Forgot password?
-                                    </Link>
+                                    </SmartLink>
                                 </div>
                                 <button
                                     type="submit"
@@ -155,9 +155,9 @@ export default function ClientLoginForm({ sessionExpired }) {
                                 </button>
                                 <div className="text-center">
                                     <span className="text-white text-sm">Don't have an account? </span>
-                                    <Link href="/signup" className="text-red-700 text-sm font-semibold underline hover:text-red-600 transition-colors">
+                                    <SmartLink href="/signup" className="text-red-700 text-sm font-semibold underline hover:text-red-600 transition-colors">
                                         Sign Up
-                                    </Link>
+                                    </SmartLink>
                                 </div>
                             </div>
                         </form>
