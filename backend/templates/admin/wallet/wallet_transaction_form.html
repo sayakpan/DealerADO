@@ -1,31 +1,33 @@
-{% extends "admin/base_site.html" %}
-{% load static %}
+{% extends "unfold/layouts/base.html" %}
+{% load i18n unfold %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block extrahead %}
+    {{ block.super }}
+    <script src="{% url 'admin:jsi18n' %}"></script>
+    {{ form.media }}
+{% endblock %}
 
 {% block content %}
-<div style="max-width: 680px; margin: auto; padding: 4px;">
-    <h2 style="margin-bottom: 24px; margin-top: 0px; font-size: 24px; color: #2c3e50;">Wallet Transaction</h2>
-
-    <div
-        style="margin-bottom: 30px; background: #f1f1f1; padding: 16px 20px; border-left: 4px solid #007bff; border-radius: 6px;">
-        <p style="margin: 0;"><strong>Wallet User:</strong> {{ wallet.user.get_full_name }}</p>
-        <p style="margin: 0;"><strong>Current Balance:</strong> ₹{{ wallet.balance }}</p>
-    </div>
-
-    <form method="post" style="background: #fff; padding: 24px 20px; border-radius: 6px; border: 1px solid #ccc;">
-        {% csrf_token %}
-        <table class="admin-form-table" style="width: 100%; border-spacing: 14px;">
-            {{ form.as_table }}
-        </table>
-
+  <form method="post" novalidate>
+    {% csrf_token %}
+    
+    <div class="p-4 bg-white border rounded-md shadow-sm md:p-6">
+      <div class="pb-4 mb-6 border-b flex justify-between">
+        <div>
+            <p class="text-sm font-medium text-gray-500">Wallet User: {{ wallet.user.get_full_name }}</p>
+            <p class="text-sm font-semibold text-gray-800">Current Balance: ₹{{ wallet.balance }}</p>
+        </div>
         <div style="
-    margin-top: 24px;
+    /* margin-top: 24px; */
     display: flex;
     gap: 12px;
     justify-content: flex-end;
     align-items: center;
 ">
 
-            <a href="{{ request.META.HTTP_REFERER }}" class="button" style="
+            <a href="{% url 'admin:wallet_wallet_change' wallet.id %}" class="button" style="
         padding: 8px 20px;
         background-color: #e0e0e0;
         color: #333;
@@ -52,6 +54,12 @@
             </button>
 
         </div>
-    </form>
-</div>
+      </div>
+
+      {% for field in form %}
+        {% include "unfold/helpers/field.html" with field=field %}
+      {% endfor %}
+    </div>
+  </form>
 {% endblock %}
+

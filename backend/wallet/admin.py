@@ -1,16 +1,21 @@
-from urllib import request
 from django.contrib import admin
 from .models import Wallet, TransactionLog
 from import_export import resources
 from import_export.admin import ExportMixin
 from import_export.formats.base_formats import CSV, XLSX
-from rangefilter.filters import DateTimeRangeFilter
-from django.urls import path
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django import forms
-from decimal import Decimal
 from django.urls import reverse
+from unfold.admin import ModelAdmin
+from unfold.decorators import display
+from unfold.decorators import action as unfold_action
+from unfold.widgets import UnfoldAdminTextInputWidget, UnfoldAdminTextareaWidget, UnfoldAdminDecimalFieldWidget
+from unfold.contrib.import_export.forms import ExportForm
+from import_export.admin import ExportMixin
+from unfold.contrib.filters.admin import RangeDateTimeFilter
+from django.utils.translation import gettext_lazy as _
+
 
 
 class TransactionLogResource(resources.ModelResource):
@@ -31,14 +36,20 @@ class TransactionLogResource(resources.ModelResource):
         export_order = fields
         
 @admin.register(TransactionLog)
-class TransactionLogAdmin(ExportMixin, admin.ModelAdmin):
+class TransactionLogAdmin(ExportMixin, ModelAdmin):
     resource_class = TransactionLogResource
+    export_form_class = ExportForm
     formats = [CSV, XLSX]
-    list_display = ('id', 'wallet', 'transaction_type', 'amount_change', 'service_name', 'performed_by', 'timestamp')
-    list_filter = ('transaction_type', ('timestamp', DateTimeRangeFilter))
+    actions = ["export"] 
+    list_filter_submit = True
+    compressed_fields = True
+    
+    list_display = ('id', 'wallet', 'transaction_type_badge', 'amount_change', 'service_name', 'performed_by', 'timestamp')
+    list_filter = ('transaction_type', ('timestamp', RangeDateTimeFilter))
     search_fields = ('wallet__user__username', 'wallet__user__email', 'service_name', 'note')
     readonly_fields = ('timestamp','wallet', 'transaction_type', 'amount_change', 'previous_balance', 'new_balance', 'related_transaction', 'performed_by', 'is_reversed')
-    fields = ('id', 'wallet', 'transaction_type', 'service_name', 'amount_change', 'previous_balance', 'new_balance', 'related_transaction', 'performed_by', 'timestamp', 'note', 'is_reversed')
+    fields = ('id', 'wallet', 'transaction_type', 'service_name', 'amount_change', 'previous_balance', 'new_balance', 'related_transaction', 'performed_by', 'timestamp', 'note',)
+
 
     def has_add_permission(self, request):
         return False  # disallow adding logs manually
@@ -107,56 +118,81 @@ class TransactionLogAdmin(ExportMixin, admin.ModelAdmin):
             
     refund_transaction.short_description = "Reverse Selected Transactions"
     actions = [refund_transaction]
+
+    @display(
+        description="Transaction Type",
+        ordering="transaction_type",
+        label={
+            "recharge": "success",
+            "debit": "danger",
+            "reversal": "info",
+        },
+    )
+    def transaction_type_badge(self, obj):
+        return obj.transaction_type
+    
     
 class WalletTransactionForm(forms.Form):
-    TRANSACTION_TYPE_CHOICES = [
-        ('recharge', 'Recharge'),
-        ('debit', 'Deduct')
-    ]
-    transaction_type = forms.ChoiceField(choices=TRANSACTION_TYPE_CHOICES)
-    amount = forms.DecimalField(decimal_places=2, max_digits=10, min_value=0.01)
-    service_name = forms.CharField(max_length=100)
-    note = forms.CharField(widget=forms.Textarea, required=False)
-    
+    amount = forms.DecimalField(
+        decimal_places=2,
+        max_digits=10,
+        min_value=0.01,
+        widget=UnfoldAdminDecimalFieldWidget
+    )
+    service_name = forms.CharField(
+        label="Service Name / Reason",
+        widget=UnfoldAdminTextInputWidget,
+        help_text="e.g., Recharge"
+    )
+    note = forms.CharField(
+        widget=UnfoldAdminTextareaWidget,
+        required=False
+    )
+
 
 @admin.register(Wallet)
-class WalletAdmin(admin.ModelAdmin):
-    list_display = ('id', 'wallet_holder_name', 'balance', 'is_active', 'updated_at')
+class WalletAdmin(ModelAdmin):
+    compressed_fields = True
+    search_fields = ["user__username", "user__email"]
+    list_display = ('id', 'wallet_holder_name', 'balance', 'updated_at')
     readonly_fields = ('user', 'balance', 'updated_at')
     fields = ('user', 'balance', 'updated_at')
 
-    def get_urls(self):
-        urls = super().get_urls()
-        custom_urls = [
-            path(
-                '<int:wallet_id>/transaction/',
-                self.admin_site.admin_view(self.process_transaction),
-                name='wallet_process_transaction',
-            ),
-        ]
-        return custom_urls + urls
+    actions_detail = ["recharge_wallet", "deduct_from_wallet"]
+    
+    # -- Recharge Action --
+    @unfold_action(
+        description="Recharge", 
+        url_path="recharge",
+        attrs={"class": "btn-success"}
+    )
+    def recharge_wallet(self, request, object_id):
+        return self.handle_transaction(request, object_id, 'recharge')
 
-    def change_view(self, request, object_id, form_url='', extra_context=None):
-        if extra_context is None:
-            extra_context = {}
+    # -- Deduct Action --
+    @unfold_action(
+        description="Deduct",
+        url_path="deduct",
+        attrs={"class": "btn-danger"}
+    )
+    def deduct_from_wallet(self, request, object_id):
+        return self.handle_transaction(request, object_id, 'debit')
 
-        transaction_url = reverse('admin:wallet_process_transaction', args=[object_id])
-        extra_context['custom_transaction_url'] = transaction_url
-
-        return super().change_view(request, object_id, form_url, extra_context=extra_context)
-
-    def process_transaction(self, request, wallet_id):
+    def handle_transaction(self, request, wallet_id, tx_type):
         wallet = get_object_or_404(Wallet, id=wallet_id)
 
         if request.method == 'POST':
             form = WalletTransactionForm(request.POST)
         else:
-            tx_type_initial = request.GET.get('type', 'recharge')
-            form = WalletTransactionForm(initial={'transaction_type': tx_type_initial})
+            tx_type_initial = request.resolver_match.url_name 
+            tx_type = 'recharge' if tx_type_initial == 'wallet_wallet_recharge_wallet' else 'debit'
+            form = WalletTransactionForm(initial={'transaction_type': tx_type})
 
         if request.method == 'POST' and form.is_valid():
+            tx_type_initial = request.resolver_match.url_name
+            tx_type = 'recharge' if tx_type_initial == 'wallet_wallet_recharge_wallet' else 'debit'
+            
             amount = form.cleaned_data['amount']
-            tx_type = form.cleaned_data['transaction_type']
             note = form.cleaned_data['note']
             service_name = form.cleaned_data['service_name']
             old_balance = wallet.balance
@@ -186,10 +222,14 @@ class WalletAdmin(admin.ModelAdmin):
             messages.success(request, f"{tx_type.title()} of ₹{amount} successful.")
             return redirect(reverse('admin:wallet_wallet_change', args=[wallet_id]))
 
-        return render(request, 'admin/wallet/wallet_transaction_form.html', {
+        context = {
             'form': form,
-            'wallet': wallet
-        })
+            'wallet': wallet,
+            'title': f"{tx_type.title()} Wallet",
+            **self.admin_site.each_context(request), # This is crucial
+        }
+        return render(request, 'admin/wallet/wallet_transaction_form.html', context)
+
 
     def wallet_holder_name(self, obj):
         return f"{obj.user.get_full_name() if obj.user else 'Anonymous'}"

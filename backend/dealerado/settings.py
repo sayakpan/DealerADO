@@ -1,6 +1,9 @@
 import os
 from pathlib import Path
 from decouple import config, Csv
+from django.urls import reverse_lazy
+from django.utils.translation import gettext_lazy as _
+from django.templatetags.static import static
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -21,13 +24,29 @@ ENVIRONMENT = config('ENVIRONMENT', default='local')
 
 # Application definition
 
-INSTALLED_APPS = [
+UNFOLD_UI = [
+    "unfold",  # before django.contrib.admin
+    "unfold.contrib.filters",  # optional, if special filters are needed
+    "unfold.contrib.forms",  # optional, if special form elements are needed
+    "unfold.contrib.inlines",  # optional, if special inlines are needed
+    "unfold.contrib.import_export",  # optional, if django-import-export package is used
+    "unfold.contrib.guardian",  # optional, if django-guardian package is used
+    "unfold.contrib.simple_history",  # optional, if django-simple-history package is used
+    "unfold.contrib.location_field",  # optional, if django-location-field package is used
+    "unfold.contrib.constance",  # optional, if django-constance package is used
+]
+
+DEFAULT_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    "django.contrib.humanize",
+]
+
+THIRD_PARTY_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'corsheaders',
@@ -36,11 +55,16 @@ INSTALLED_APPS = [
     'django_json_widget',
     'import_export',
     "rangefilter",
+]
+
+PROJECT_APPS = [
     'accounts',
     'wallet',
     'services',
     'utility',
 ]
+
+INSTALLED_APPS = UNFOLD_UI + DEFAULT_APPS + THIRD_PARTY_APPS + PROJECT_APPS
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -180,6 +204,9 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATICFILES_DIRS = [
+    BASE_DIR / "static",   # <project>/backend/static/
+]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
@@ -250,4 +277,95 @@ CKEDITOR_5_CONFIGS = {
         'language': 'en',
         'upload_url': '/ckeditor5/upload/',
     }
+}
+
+
+UNFOLD = {
+    "SITE_TITLE": "Dealer ADO Admin",
+    "SITE_HEADER": "DealerADO Admin",
+    "SITE_SUBHEADER": "Site Administration",
+    
+    "SITE_SYMBOL": "speed",
+    "SITE_FAVICONS": [
+        {
+            "rel": "icon",
+            "sizes": "32x32",
+            "type": "image/png+xml",
+            "href": lambda request: static("favicon.png"),
+        },
+    ],
+    "SHOW_BACK_BUTTON": True,
+    
+    "STYLES": [
+        lambda request: static("css/styles.css"),
+    ],
+    "SCRIPTS": [
+        lambda request: static("js/scripts.js"),
+    ],
+    
+    "SIDEBAR": {
+        "show_search": False,
+        "command_search": True,
+        "show_all_applications": True,
+        
+        "navigation": [
+            {
+                "items": [
+                    {
+                        "title": _("Dashboard"),
+                        "icon": "dashboard",
+                        "link": reverse_lazy("admin:index"),
+                        "permission": lambda request: request.user.is_active and request.user.is_staff,
+                    },
+                ],
+            },
+            {
+                "title": _("Accounts"),
+                "collapsible": True,
+                "items": [
+                    {"title": _("Users"), "icon": "manage_accounts", "link": reverse_lazy("admin:auth_user_changelist")},
+                    {"title": _("User Profiles"), "icon": "person", "link": reverse_lazy("admin:accounts_userprofile_changelist")},
+                    {"title": _("Auth Tokens"), "icon": "key", "link": reverse_lazy("admin:authtoken_tokenproxy_changelist")},
+                    {"title": _("Groups"), "icon": "group", "link": reverse_lazy("admin:auth_group_changelist")},
+                ],
+            },
+            {
+                "title": _("Services"),
+                "collapsible": False,
+                "items": [
+                    {"title": _("Secrets"), "icon": "lock", "link": reverse_lazy("admin:services_secrets_changelist")},
+                    {"title": _("Service Categories"), "icon": "category", "link": reverse_lazy("admin:services_servicecategory_changelist")},
+                    {"title": _("Services"), "icon": "build", "link": reverse_lazy("admin:services_service_changelist")},
+                    {"title": _("Service Form Fields"), "icon": "description", "link": reverse_lazy("admin:services_serviceformfield_changelist")},
+                    {"title": _("Render Schemas"), "icon": "schema", "link": reverse_lazy("admin:services_renderschema_changelist")},
+                    {"title": _("Service Usage Logs"), "icon": "history", "link": reverse_lazy("admin:services_serviceusagelog_changelist")},
+                    {"title": _("Status Codes"), "icon": "check_circle", "link": reverse_lazy("admin:services_httpstatuscode_changelist")},
+                ],
+            },
+            {
+                "title": _("Utility"),
+                "collapsible": True,
+                "items": [
+                    {"title": _("Banners"), "icon": "collections", "link": reverse_lazy("admin:utility_banner_changelist")},
+                    {"title": _("Banner Images"), "icon": "image", "link": reverse_lazy("admin:utility_bannerimage_changelist")},
+                ],
+            },
+            {
+                "title": _("Wallet & Transactions"),
+                "collapsible": True,
+                "items": [
+                    {"title": _("Wallets"), "icon": "account_balance_wallet", "link": reverse_lazy("admin:wallet_wallet_changelist")},
+                    {"title": _("Transaction Logs"), "icon": "receipt_long", "link": reverse_lazy("admin:wallet_transactionlog_changelist")},
+                ],
+            },
+        ],
+        "DASHBOARD_CALLBACK": "dealerado.admin_dashboard.dashboard_context",
+        "COMMAND": {
+            "search_models": True, 
+            "show_history": True,
+        },
+    },
+    
+    
+    
 }

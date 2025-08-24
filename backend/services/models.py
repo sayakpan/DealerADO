@@ -166,7 +166,7 @@ class ServiceFormField(models.Model):
     key = models.CharField(max_length=100, help_text="Key to be used in API payload", verbose_name="Payload Key")
     input_type = models.CharField(max_length=20, choices=INPUT_TYPES, verbose_name="Input Type")
     is_required = models.BooleanField(default=True, verbose_name="Is Required")
-    help_text = models.TextField(blank=True, verbose_name="Help Text, will be shown in 'i' tag next to field.")
+    help_text = models.TextField(blank=True, verbose_name="Help Text", help_text="Will be shown in 'i' tag next to field.")
     placeholder = models.CharField(max_length=255, blank=True, verbose_name="Placeholder")
     options = models.JSONField(blank=True, null=True, help_text="Applicable for select, radio, checkbox fields. e.g. [{'value': 'yes', 'label': 'Yes'}, {'value': 'no', 'label': 'No'}]", verbose_name="Options")
     condition_group = models.CharField(max_length=50, blank=True, help_text="Fields in same group share OR condition", verbose_name="Condition Group")

@@ -11,10 +11,15 @@ from django.utils.html import format_html
 from django.templatetags.static import static
 from django.db import models
 from django_json_widget.widgets import JSONEditorWidget
+from unfold.admin import ModelAdmin
+from unfold.contrib.filters.admin import AutocompleteSelectFilter, RangeDateTimeFilter
+from unfold.contrib.import_export.forms import ExportForm
+from unfold.decorators import display
 
 
 @admin.register(Secrets)
-class SecretsAdmin(admin.ModelAdmin):
+class SecretsAdmin(ModelAdmin):
+    compressed_fields = True
     list_display = ('id', 'provider_name', 'auth_type', 'created_at', 'updated_at')
     search_fields = ('provider_name',)
     list_filter = ('auth_type', 'created_at')
@@ -24,13 +29,17 @@ class SecretsAdmin(admin.ModelAdmin):
             kwargs['widget'] = JSONEditorWidget(attrs={'style': 'height: 200px; width: 100%;'})
         return super().formfield_for_dbfield(db_field, request, **kwargs)
 
+
 @admin.register(HTTPStatusCode)
-class HTTPStatusCodeAdmin(admin.ModelAdmin):
+class HTTPStatusCodeAdmin(ModelAdmin):
+    compressed_fields = True
     list_display = ('id', 'code', 'description')
     search_fields = ('code', 'description')
 
+
 @admin.register(ServiceCategory)
-class ServiceCategoryAdmin(admin.ModelAdmin):
+class ServiceCategoryAdmin(ModelAdmin):
+    compressed_fields = True
     list_display = ('id', 'name', 'slug', 'rank')
     search_fields = ('name',)
 
@@ -44,18 +53,27 @@ class ServiceAdminForm(forms.ModelForm):
         }
         
 @admin.register(Service)
-class ServiceAdmin(admin.ModelAdmin):
+class ServiceAdmin(ModelAdmin):
     form = ServiceAdminForm
+    compressed_fields = True
+    list_filter_submit = True
+    
     filter_horizontal = ('deductible_codes',)
     list_display = ('id', 'name', 'category', 'api_url','price_per_hit', 'is_active')
     search_fields = ('name', 'api_url')
-    list_filter = ('category', 'is_active', 'api_method')
+    list_filter = ["category", "is_active", "api_method"]
+    list_filter = (
+        "is_active",
+        "api_method",
+        ["category", AutocompleteSelectFilter],
+    )
     ordering = ('-created_at',)
     autocomplete_fields = ['secret', 'category']
 
 
 @admin.register(ServiceFormField)
-class ServiceFormFieldAdmin(admin.ModelAdmin):
+class ServiceFormFieldAdmin(ModelAdmin):
+    compressed_fields = True
     list_display = ('id', 'label', 'service', 'key', 'input_type')
     search_fields = ('label', 'key', 'service__name')
     list_filter = ('input_type', 'is_required')
@@ -87,16 +105,16 @@ class ServiceFormFieldAdmin(admin.ModelAdmin):
             <div style="padding: 1em; background: #f9f9f9; border: 1px solid #ddd;">
                 <strong>Available Validation Rules:</strong>
                 <ul>
-                    <li><code>{"type": "required"}</code> – Field must not be empty</li>
-                    <li><code>{"type": "email"}</code> – Must be a valid email address</li>
-                    <li><code>{"type": "numeric"}</code> – Only digits allowed</li>
-                    <li><code>{"type": "integer"}</code> – Allows negative numbers, no decimals</li>
-                    <li><code>{"type": "decimal"}</code> – Decimal numbers allowed</li>
-                    <li><code>{"type": "alphaNum"}</code> – Only a-z, A-Z, 0-9 allowed</li>
-                    <li><code>{"type": "minLength", "value": 4}</code> – Minimum 4 characters/digits</li>
-                    <li><code>{"type": "maxLength", "value": 10}</code> – Max 10 characters/digits</li>
-                    <li><code>{"type": "hasLength", "value": 6}</code> – Exactly 6 characters/digits</li>
-                    <li><code>{"type": "hasMultipleLengths", "value": [6, 8, 10]}</code> – One of multiple lengths</li>
+                    <li><code>{"type": "required"}</code> - Field must not be empty</li>
+                    <li><code>{"type": "email"}</code> - Must be a valid email address</li>
+                    <li><code>{"type": "numeric"}</code> - Only digits allowed</li>
+                    <li><code>{"type": "integer"}</code> - Allows negative numbers, no decimals</li>
+                    <li><code>{"type": "decimal"}</code> - Decimal numbers allowed</li>
+                    <li><code>{"type": "alphaNum"}</code> - Only a-z, A-Z, 0-9 allowed</li>
+                    <li><code>{"type": "minLength", "value": 4}</code> - Minimum 4 characters/digits</li>
+                    <li><code>{"type": "maxLength", "value": 10}</code> - Max 10 characters/digits</li>
+                    <li><code>{"type": "hasLength", "value": 6}</code> - Exactly 6 characters/digits</li>
+                    <li><code>{"type": "hasMultipleLengths", "value": [6, 8, 10]}</code> - One of multiple lengths</li>
                 </ul>
                 <p>You can apply multiple rules at once. Example:</p>
                 <pre>[{"type": "required"}, {"type": "numeric"}, {"type": "hasLength", "value": 10}]</pre>
@@ -139,14 +157,22 @@ class ServiceUsageLogResource(resources.ModelResource):
         import_id_fields = [] 
 
 @admin.register(ServiceUsageLog)
-class ServiceUsageLogAdmin(ExportMixin, admin.ModelAdmin):
+class ServiceUsageLogAdmin(ExportMixin, ModelAdmin):
     resource_class = ServiceUsageLogResource
     formats = [CSV, XLSX]
+    export_form_class = ExportForm
+    actions = ["export"] 
+    
     list_display = (
         'id', 'user_display', 'service', 'colored_status',
         'http_status_code', 'created_at'
     )
     list_filter = ('service', 'status', 'created_at')
+    list_filter = (
+        ('service', AutocompleteSelectFilter),
+        ('status'),
+        ('created_at', RangeDateTimeFilter),
+    )
     search_fields = ('user__first_name', 'user__last_name', 'user__email')
     readonly_fields = (
         'user', 'service', 'form_data_sent', 'api_response', 'status',
@@ -165,26 +191,27 @@ class ServiceUsageLogAdmin(ExportMixin, admin.ModelAdmin):
         return f"{obj.user.get_full_name() if obj.user else 'Anonymous'}"
     user_display.short_description = 'User'
     
+    @display(
+        description="Status",
+        label={
+            "success": "success",
+            "failed": "danger",
+        },
+    )
     def colored_status(self, obj):
-        status_text = obj.status.capitalize()
-        if obj.status.lower() == "success":
-            return format_html('<span style="color: green;">{}</span>', status_text)
-        elif obj.status.lower() == "failed":
-            return format_html('<span style="color: red;">{}</span>', status_text)
-        return status_text  # fallback for other statuses
-
-    colored_status.short_description = "Status"
-
+        return obj.status
+    
 
     
 @admin.register(RenderSchema)
-class RenderSchemaAdmin(admin.ModelAdmin):
+class RenderSchemaAdmin(ModelAdmin):
+    compressed_fields = True
     formfield_overrides = {
         models.JSONField: {'widget': JSONEditorWidget},
     }
     list_display = ("id", "service", "spec_status", "created_at", "updated_at")
     search_fields = ("service__slug", "service__name")
-    readonly_fields = ("created_at", "updated_at", "schema_guide_display",)
+    readonly_fields = ("service", "created_at", "updated_at", "schema_guide_display",)
     actions = ["validate_spec"]
     fieldsets = (
         (None, {

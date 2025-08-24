@@ -1,0 +1,192 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+{% load humanize %}
+
+{% block extrastyle %}
+    {{ block.super }}
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+{% endblock extrastyle %}
+
+{% block content %}
+
+    <div class="dashboard">
+        <!-- Top Performance Cards -->
+        <div class="performance-cards">
+            <div class="card">
+                <div class="card-header">
+                    <span class="product-name">Services Performance</span>
+                    <span class="time-period">LAST 7 DAYS</span>
+                </div>
+                <div class="amount">₹{{ stats.usage_last_7_days.value|floatformat:2|intcomma }}</div>
+                <div class="progress {% if stats.usage_last_7_days.trend_pct >= 0 %}positive{% else %}negative{% endif %}">
+                    {% if stats.usage_last_7_days.trend_pct >= 0 %}+{% else %}-{% endif %}{{ stats.usage_last_7_days.trend_pct|floatformat:2 }}% from last week
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <span class="product-name">Service Success Rate</span>
+                    <span class="time-period">LAST 7 DAYS</span>
+                </div>
+                <div class="amount">{{ stats.success_rate_last_7_days.value|floatformat:2|intcomma }}%</div>
+                <div class="progress {% if stats.success_rate_last_7_days.trend_pct >= 0 %}positive{% else %}negative{% endif %}">
+                    {% if stats.success_rate_last_7_days.trend_pct >= 0 %}+{% endif %}{{ stats.success_rate_last_7_days.trend_pct|floatformat:2 }}% from last week
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <span class="product-name">Total Recharge Amount</span>
+                    <span class="time-period">OVERALL</span>
+                </div>
+                <div class="amount">₹{{ stats.total_credit.value|floatformat:2|intcomma }}</div>
+                <div class="progress {% if stats.total_credit.trend_pct >= 0 %}positive{% else %}negative{% endif %}">
+                    {% if stats.total_credit.trend_pct >= 0 %}+{% endif %}{{ stats.total_credit.trend_pct|floatformat:2 }}% from last week
+                </div>
+            </div>
+        </div>
+
+        <!-- Groups Table -->
+        <div class="groups-table">
+            <div class="table-header">
+                <div class="date-col"></div>
+                {% for h in service_heatmap.headers %}
+                    <div class="group-col">
+                        Service #{{ h.service_id }}<br>
+                        <span class="total">Total {{ h.total_hits|intcomma }}</span><br>
+                        <span class="total">{{ h.name }}</span>
+                    </div>
+                {% empty %}
+                    <div class="group-col">No services</div>
+                {% endfor %}
+            </div>
+
+            {% for r in service_heatmap.rows %}
+                <div class="table-row">
+                    <div class="date-cell">
+                        <div class="date">{{ r.date|date:"F d, Y" }}</div>
+                        <div class="total-info">Total Hits: {{ r.total|intcomma }}</div>
+                        <div class="total-info">Total Amount: {{ r.revenue|default:0|intcomma|floatformat:2 }}</div>
+                    </div>
+
+                    {% for c in r.cells %}
+                        <div class="data-cell
+                            {% if c.success_rate >= 95 %} level-950
+                            {% elif c.success_rate >= 85 %} level-900
+                            {% elif c.success_rate >= 75 %} level-800
+                            {% elif c.success_rate >= 65 %} level-700
+                            {% elif c.success_rate >= 55 %} level-600
+                            {% elif c.success_rate >= 45 %} level-500
+                            {% elif c.success_rate >= 35 %} level-400
+                            {% elif c.success_rate >= 25 %} level-300
+                            {% elif c.success_rate >= 15 %} level-200
+                            {% elif c.success_rate >= 5 %} level-100
+                            {% else %} level-50{% endif %}">
+                            ₹{{ c.revenue|floatformat:0|intcomma }}
+                            <br><span class="percentage">{{ c.hits|intcomma }} hits · {{ c.success_rate|floatformat:0 }}%</span>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endfor %}
+        </div>
+
+        <!-- Bottom Section -->
+        <div class="bottom-section">
+            <!-- Left Column -->
+            <div class="left-column">
+                <div class="trending-card">
+                    <h2 class="trending-title">
+                        Top services by revenue in last month
+                    </h2>
+
+                    <div class="trending-amount">
+                        ₹{{ trending.total.current|default:0|floatformat:2|intcomma }}
+                    </div>
+
+                    <p class="trending-meta">
+                        Total revenue between
+                        <strong class="emph">{{ trending.period.start|date:"j M" }} - {{ trending.period.end|date:"j M" }}</strong>.
+                        {% with t=trending.total.trend_pct %}
+                            {% if t >= 0 %}
+                                Increase <span class="trend-up">+{{ t|floatformat:2 }}%</span>
+                            {% else %}
+                                Decrease <span class="trend-down">{{ t|floatformat:2 }}%</span>
+                            {% endif %}
+                        {% endwith %}
+                        comparing to previous month
+                        <strong class="emph">{{ trending.period.prev_start|date:"j M" }} - {{ trending.period.prev_end|date:"j M" }}</strong>.
+                    </p>
+
+                    <div class="divider"></div>
+
+                    <div class="trending-list">
+                        {% for it in trending.items %}
+                            <div class="trend-item">
+                                <div class="item-head">
+                                    <h3 class="item-name">{{ it.name }}</h3>
+                                    <strong class="item-badge">₹{{ it.revenue|default:0|floatformat:2|intcomma }}</strong>
+                                </div>
+                                <div class="bar-rail">
+                                    <div class="bar-fill" title="{{ it.bar_pct|floatformat:0 }}%" style="width: {{ it.bar_pct|default:0|floatformat:0 }}%"></div>
+                                </div>
+                            </div>
+                        {% empty %}
+                            <div class="trend-item">
+                                <div class="item-head">
+                                    <h3 class="item-name">No data</h3>
+                                    <strong class="item-badge">₹0.00</strong>
+                                </div>
+                                <div class="bar-rail">
+                                    <div class="bar-fill" style="width: 0%;"></div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>   
+                </div>
+            </div>
+
+            <!-- Right Column -->
+            <div class="right-column">
+                <div class="revenue-section">
+                    <h3>Success/Failed of last 2 week </h3>
+                    <div class="revenue-amount">
+                        ₹{{ revenue_last_14_days.total|default:0|floatformat:2|intcomma }}
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="successFailedChart"></canvas>
+                    </div>
+
+                    {{ success_failed_last_14_days|json_script:"success-failed-data" }}
+                </div>
+
+                <div class="revenue-section">
+                    <h3>Revenue of last 2 week </h3>
+                    <div class="revenue-amount">
+                        ₹{{ revenue_last_14_days.total|default:0|floatformat:2|intcomma }}
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="revenueChart"></canvas>
+                    </div>
+
+                    {{ revenue_last_14_days|json_script:"revenue-data" }}
+                </div>
+
+                <div class="expenses-section">
+                    <h3>Active users last 2 week</h3>
+                    <div class="expenses-amount">{{ active_users_last_14_days.total|default:0|intcomma }}</div>
+                    <div class="chart-container">
+                        <canvas id="activeUsersChart"></canvas>
+                    </div>
+
+                    {{ active_users_last_14_days|json_script:"active-users-data" }}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+{% endblock content %}
+
+{% block extra_js %}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="{% static 'js/scripts.js' %}"></script>
+{% endblock %}
