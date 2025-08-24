@@ -77,14 +77,14 @@ export default function LoginContent() {
                             </a>
                         </div>
 
-                        <Button className="w-full bg-[#c53030] hover:bg-[#b91c1c] text-white py-3 rounded-xl text-sm font-semibold transition-all duration-200 shadow-lg mt-6">
+                        <Button className="w-full cursor-pointer bg-[#c53030] hover:bg-[#b91c1c] text-white py-3 rounded-xl text-sm font-semibold transition-all duration-200 shadow-lg mt-6">
                             Sing In
                         </Button>
 
                         <div className="text-center pt-3">
                             <span className="text-gray-400 text-xs">
                                 Don't have an account?{" "}
-                                <a href="#" className="text-[#c53030] hover:text-[#b91c1c] font-medium transition-colors">
+                                <a href="#" className="text-[#c53030] hover:text-[#b91c1c] font-medium cursor-pointer transition-colors">
                                     Sign Up
                                 </a>
                             </span>

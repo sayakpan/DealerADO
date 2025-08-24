@@ -1,12 +1,12 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
 import { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import { register } from "@/lib/auth";
 import { validators, validateFields } from "@/utils/validations";
 import { toast } from "@/plugin/toast";
+import SmartLink from "@/components/utils/SmartLink";
 
 
 // import Header from "@/components/core/header";
@@ -201,9 +201,9 @@ export default function SignupPage() {
                                 </button>
                                 <div className="text-center">
                                     <span className="text-white text-sm">Already have an account? </span>
-                                    <Link href="/login" className="text-red-700 text-sm font-semibold underline hover:text-red-600 transition-colors">
+                                    <SmartLink href="/login" className="text-red-700 text-sm font-semibold underline hover:text-red-600 transition-colors">
                                         Sign In
-                                    </Link>
+                                    </SmartLink>
                                 </div>
                             </div>
                         </form>
