@@ -4,7 +4,7 @@ import ServiceHeader from "@/components/ui/serviceHeader"
 import { redirect } from 'next/navigation';
 
 export async function generateMetadata({ params }) {
-    const { slug } = params;
+    const { slug } = await params;
     const category = await getServerCategoryBySlug(slug);
 
     if (category.status === 401) {
