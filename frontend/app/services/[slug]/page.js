@@ -5,7 +5,7 @@ import { ServiceFormSkeleton } from '@/components/skeletons/ServiceSkeleton'
 import { redirect } from 'next/navigation';
 
 export async function generateMetadata({ params }) {
-    const { slug } = params;
+    const { slug } = await params;
     const service = await getServerServiceBySlug(slug);
 
     if (service.status === 401) {

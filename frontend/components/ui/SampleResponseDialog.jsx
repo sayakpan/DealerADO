@@ -49,7 +49,7 @@ const SampleResponseDialog = ({
     return (
         <div
             className={`fixed inset-0 z-50 flex items-center justify-center transition-all duration-300 ${
-                isOpen ? 'backdrop-blur-sm' : 'bg-transparent'
+                isOpen ? 'bg-black/50 backdrop-blur-sm' : 'bg-transparent'
             }`}
             onClick={handleBackdropClick}
         >
