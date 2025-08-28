@@ -20,6 +20,7 @@ const ServicePageClient = ({ service, slug }) => {
     const [serviceResult, setServiceResult] = useState(null)
     const [submittedData, setSubmittedData] = useState(null)
     const [downloadingPdf, setDownloadingPdf] = useState(false)
+    const [showError, setShowError] = useState('')
 
     useEffect(() => {
         // Initialize form data with default values from API or empty strings
@@ -245,6 +246,7 @@ const ServicePageClient = ({ service, slug }) => {
                 setSubmitting(true)
                 setServiceResult(null)
                 setSubmittedData(null)
+                setShowError("")
 
                 const submitData = {}
                 Object.keys(formData).forEach((key) => {
@@ -257,6 +259,10 @@ const ServicePageClient = ({ service, slug }) => {
                 const result = await submitServiceData(slug, submitData)
                 setServiceResult(result)
             } catch (err) {
+                if(err?.message === "Details for entered data is not found.") {
+                    setShowError(err?.message)
+                    return;
+                }
                 console.error("Error submitting service data:", err)
                 toast.error(err?.message || "An error occurred while fetching details.", { duration: 3000, title: "Error" })
             } finally {
@@ -476,6 +482,15 @@ const ServicePageClient = ({ service, slug }) => {
             </div>
             <div className="max-w-7xl mx-auto px-4 pb-8">
                 {/* Service Result */}
+                { showError !== "" && (
+                    <div className="w-full text-gray-700">
+                        <div className="px-4 py-3.5 bg-white text-gray-700 rounded-xl shadow-[0px_4px_40px_5px_rgba(0,0,0,0.08)] border border-gray-200 flex flex-col justify-start items-start gap-5">
+                            <div className="w-full text-center">
+                                {showError}
+                            </div>
+                        </div>
+                    </div>
+                )}
                 {serviceResult && (
                     <div className="w-full">
                         <div className="flex justify-between items-center my-4">

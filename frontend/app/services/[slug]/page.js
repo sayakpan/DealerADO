@@ -1,8 +1,6 @@
 import { getServerServiceBySlug } from "@/services/serverServices"
 import ServicePageClient from "@/components/pages/ServicePageClient"
-import ServiceHeader from '@/components/ui/serviceHeader'
-import { ServiceFormSkeleton } from '@/components/skeletons/ServiceSkeleton'
-import { redirect } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 
 export async function generateMetadata({ params }) {
     const { slug } = await params;
@@ -15,9 +13,10 @@ export async function generateMetadata({ params }) {
         };
     }
 
+
     return {
-        title: `${service.name} | DealerADO`,
-        description: service.description || `Details about ${service.name} service offered by DealerADO.`,
+        title: `${service?.name || 'Service'} | DealerADO`,
+        description: service?.description || `Details about ${service?.name || 'Service'} service offered by DealerADO.`,
     };
 }
 
@@ -26,7 +25,9 @@ export default async function ServicePage({ params }) {
     const { slug } = await params
 
     const service = await getServerServiceBySlug(slug);
-
+    if(service.status === 404) {
+        return notFound()
+    }
     if(service.status === 401) {
         redirect('/login?status=401');
     }
