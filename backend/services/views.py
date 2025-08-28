@@ -204,7 +204,7 @@ def submit_service_form(request, slug):
             response = requests.post(full_url, json=sanitized_data, headers=headers, timeout=30)
         response.raise_for_status()
     except requests.RequestException as e:
-        http_status = getattr(e.response, 'status_code', 500) if hasattr(e, 'response') and e.response else 500
+        http_status = response.status_code if response is not None else getattr(e.response, 'status_code', 500) if hasattr(e, 'response') and e.response else 500
         
         ServiceUsageLog.objects.create(
             user=user,
@@ -216,6 +216,17 @@ def submit_service_form(request, slug):
             status='failed',
             price_at_time=service.price_per_hit
         )
+
+        if http_status == 404:
+            return JsonResponse({
+                "success": False,
+                "message": "Details for entered data is not found.",
+                "service": service.name,
+                "log_id": None,
+                "response": {"error": "Details for entered data is not found."},
+                "render": None
+            }, status=status.HTTP_404_NOT_FOUND)
+
         return JsonResponse({
             "success": False,
             "message": "API call failed.",
