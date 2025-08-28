@@ -1,7 +1,7 @@
 import { getServerCategoryBySlug } from "@/services/serverServices"
 import CategoryPageClient from "@/components/pages/CategoryPageClient"
 import ServiceHeader from "@/components/ui/serviceHeader"
-import { redirect } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 
 export async function generateMetadata({ params }) {
     const { slug } = await params;
@@ -25,6 +25,10 @@ export default async function CategoryPage({ params }) {
     const { slug } = await params
 
     const category = await getServerCategoryBySlug(slug);
+
+    if(category.status === 404) {
+        return notFound()
+    }
 
     if(category.status === 401) {
         redirect('/login?status=401');

@@ -5,7 +5,7 @@ import { redirect } from 'next/navigation';
 export async function getServerCategories() {
     // try {
         const response = await serverApi.get(`/api/services/categories/`);
-        if (response.status === 401) {
+        if (response.status === 401 || response.status === 404) {
             // Redirect to logout route - middleware will handle token removal and redirect to login
             return response;
         }
@@ -31,27 +31,27 @@ export async function getServerCategories() {
 
 export async function getServerCategoryBySlug(slug) {
     const response = await serverApi.get(`/api/services/categories/${slug}/`);
-    if (response.status === 401) {
+    if (response.status === 401 || response.status === 404) {
         return response;
     }
     if (!response.success) {
         throw new Error(response.error || 'Failed to fetch category');
     }
 
-    return response.data;
+    return response?.data;
 }
 
 // Services
 export async function getServerServiceBySlug(slug) {
     const response = await serverApi.get(`/api/services/service/${slug}/`);
-    if (response.status === 401) {
+    if (response.status === 401 || response.status === 404) {
         return response;
     }
     if (!response.success) {
         throw new Error(response.error || 'Failed to fetch service');
     }
 
-    return response.data;
+    return response?.data;
 }
 
 export async function getServerUsageLogs(url = null) {
@@ -64,7 +64,7 @@ export async function getServerUsageLogs(url = null) {
     }
 
     const response = await serverApi.get(apiUrl);
-    if (response.status === 401) {
+    if (response.status === 401 || response.status === 404) {
         return response;
     }
     if (!response.success) {
@@ -77,7 +77,7 @@ export async function getServerUsageLogs(url = null) {
 // Wallet
 export async function getServerWalletData() {
     const response = await serverApi.get('/api/wallet/');
-    if (response.status === 401) {
+    if (response.status === 401 || response.status === 404) {
         return response;
     }
     if (!response.success) {
