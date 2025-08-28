@@ -134,7 +134,7 @@ const WalletPageClient = ({ walletData: initialWalletData }) => {
     };
 
     const handleAddPoints = () => {
-        const number = '917003142538';
+        const number = '917903152096';
         const message = `Hello Admin,  
         
 I would like to recharge my wallet.  
