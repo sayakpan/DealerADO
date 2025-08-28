@@ -77,6 +77,7 @@ class ServiceFormFieldSerializer(serializers.ModelSerializer):
             'help_text',
             'placeholder',
             'options',
+            'auto_capitalize',
             'validation_rules',
         ]
 

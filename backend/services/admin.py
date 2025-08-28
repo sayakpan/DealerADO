@@ -71,6 +71,7 @@ class ServiceFormFieldAdmin(admin.ModelAdmin):
                 'is_required',
                 'validation_rules',
                 'placeholder',
+                'auto_capitalize',
                 'help_text',
                 'options',
                 'condition_group',
