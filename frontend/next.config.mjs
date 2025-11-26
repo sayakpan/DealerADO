@@ -4,6 +4,11 @@ const nextConfig = {
         remotePatterns: [
             {
                 protocol: 'https',
+                hostname: 'dealerado-1.s3.amazonaws.com',
+                pathname: '**',
+            },
+            {
+                protocol: 'https',
                 hostname: 'dealerado-s3.s3.amazonaws.com',
                 pathname: '**',
             },

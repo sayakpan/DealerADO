@@ -101,13 +101,16 @@ const WalletPageClient = ({ walletData: initialWalletData }) => {
         return parseFloat(amount).toFixed(2)
     }
 
-    const formatTransactionType = (type) => {
+    const formatTransactionType = (type, originalType) => {
         switch (type) {
             case 'recharge':
                 return 'Credited Points'
             case 'debit':
                 return 'Debited For Order'
             case 'reversal':
+                if (originalType === 'recharge') {
+                    return 'Recharge Reversal'
+                }
                 return 'Refund For Order'
             default:
                 return type
@@ -125,7 +128,11 @@ const WalletPageClient = ({ walletData: initialWalletData }) => {
         });
     };
 
-    const getTransactionIcon = (type) => {
+    const getTransactionIcon = (type, originalType) => {
+        // For reversal of recharge, show debit icon (arrow up)
+        if (type === 'reversal' && originalType === 'recharge') {
+            return <ArrowUpRight className="w-4 h-4" />
+        }
         return type == 'debit' ? (
             <ArrowUpRight className="w-4 h-4" />
         ) : (
@@ -336,15 +343,15 @@ Please process my request. Thank you!`;
                                                 }`}
                                         >
                                             <div className='flex gap-2 items-center'>
-                                                <div className={`rounded-full p-2 ${transaction.transaction_type !== 'debit'
-                                                    ? 'bg-green-100 text-green-600'
-                                                    : 'bg-red-100 text-red-600'
+                                                <div className={`rounded-full p-2 ${transaction.transaction_type === 'debit' || (transaction.transaction_type === 'reversal' && transaction.original_type === 'recharge')
+                                                    ? 'bg-red-100 text-red-600'
+                                                    : 'bg-green-100 text-green-600'
                                                     }`}>
-                                                    {getTransactionIcon(transaction.transaction_type)}
+                                                    {getTransactionIcon(transaction.transaction_type, transaction.original_type)}
                                                 </div>
                                                 <div>
                                                     <div className="font-semibold text-gray-800 text-sm md:text-base">
-                                                        {formatTransactionType(transaction.transaction_type)}
+                                                        {formatTransactionType(transaction.transaction_type, transaction.original_type)}
                                                         {transaction.service_name && transaction.service_name !== 'Manual Admin Adjustment' && ':'}
                                                     </div>
                                                     <div className="text-gray-500 text-[10px] md:text-[12px]">
@@ -352,15 +359,15 @@ Please process my request. Thank you!`;
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div className={`w-1/3 font-bold text-base md:text-xl flex flex-col items-end ${transaction.transaction_type !== 'debit'
-                                                ? 'text-green-600'
-                                                : 'text-red-600'
+                                            <div className={`w-1/3 font-bold text-base md:text-xl flex flex-col items-end ${transaction.transaction_type === 'debit' || (transaction.transaction_type === 'reversal' && transaction.original_type === 'recharge')
+                                                ? 'text-red-600'
+                                                : 'text-green-600'
                                                 }`}>
                                                 <span>
-                                                    {transaction.transaction_type !== 'debit' ? '+' : '-'} {Math.abs(parseFloat(transaction.amount_change)).toFixed(0)}
+                                                    {transaction.transaction_type === 'debit' || (transaction.transaction_type === 'reversal' && transaction.original_type === 'recharge') ? '-' : '+'} {Math.abs(parseFloat(transaction.amount_change)).toFixed(0)}
                                                 </span>
                                                 <span className='text-gray-600 text-[8px] md:text-[10px] font-normal'>
-                                                    {transaction.transaction_type !== 'debit' ? 'Received' : 'Spent'}
+                                                    {transaction.transaction_type === 'debit' || (transaction.transaction_type === 'reversal' && transaction.original_type === 'recharge') ? 'Deducted' : 'Received'}
                                                 </span>
                                             </div>
                                         </div>

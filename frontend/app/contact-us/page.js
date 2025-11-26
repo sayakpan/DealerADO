@@ -8,15 +8,15 @@ import React from 'react'
 
 const ContactUsPage = () => {
     const handleCallUs = () => {
-        window.open('tel:+1234567890', '_self')
+        window.open('tel:+919279394445', '_self')
     }
 
     const handleWhatsApp = () => {
-        window.open('https://wa.me/1234567890', '_blank')
+        window.open('https://wa.me/+919279394445', '_blank')
     }
 
     const handleEmail = () => {
-        window.open('mailto:contact@dealerado.com', '_self')
+        window.open('mailto:admin@dealerado.com', '_self')
     }
 
     const handleDirection = () => {
@@ -82,7 +82,7 @@ const ContactUsPage = () => {
                     </div>
 
                     {/* Our Address section */}
-                    <div className="w-full px-4 py-5 bg-white rounded-[20px] shadow-[0px_4px_40px_5px_rgba(0,0,0,0.08)] flex flex-col gap-5">
+                    {/* <div className="w-full px-4 py-5 bg-white rounded-[20px] shadow-[0px_4px_40px_5px_rgba(0,0,0,0.08)] flex flex-col gap-5">
                         <div className="flex flex-col gap-3">
                             <div className="text-slate-700 text-2xl font-bold">
                                 Our Address
@@ -100,7 +100,7 @@ const ContactUsPage = () => {
                                 Direction
                             </div>
                         </button>
-                    </div>
+                    </div> */}
 
                 </div>
             </div>
